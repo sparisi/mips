@@ -29,7 +29,7 @@ Each MDP requires some mandatory functions:
 - *NAME_simulator*    : defines the reward and transition functions,
 - *NAME_settings*     : defines the learning setup, i.e., the policy and the number of episodes and steps used for evaluation / learning.
 
-Please notice that you have to manually change the number of episodes and steps in *NAME_settings.m* according to your needs.
+Please notice that you have to manually change the number of episodes and steps in *NAME_settings* according to your needs.
 
 Additionally, there are some functions used to better organize the code:
 
