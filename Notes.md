@@ -6,18 +6,18 @@ Also, for Gaussian with full covariance (without Cholesky decomposition) the cov
 
 Anyway, they can manage low stochasticity and if you want your lower-level policy to be stochastic you can of course do it.
 
-
+___
 **Episodic RL and Stabilization**
 
 In episodic policy search (e.g., REPS, PGPE, NES) you can use samples from the last *N_MAX* policies to stabilize the policy update. This stabilization is important to keep the shape of the explorative variance of the policy in high dimensional action spaces. However, it also slows down the convergence speed (the KL divergence will be 0 only if the last *N_MAX* samples are optimal, i.e., if the variance of the final policy is very low).
 
-
+___
 **Normalization in Pareto-ascent Direction**
 
 In PFA and RA, while checking for the minimal-norm Pareto-ascent direction, the gradients are always normalized (i.e., we normalize the gradients even if their norm is less than 1). If the gradients are not normalized, then the minimial-norm Pareto-ascent direction is expected to be mostly influenced by the elements which have smaller norms. Since gradients with small norm are usually associated with objectives that have already achieved a fair degree of convergence, the utility of considering these directions for a well-balanced correction is questionable. 
 This observation points out the necessity of normalizing ALL the gradients when looking for the minimal-norm Pareto-ascent direction (*Desideri, Multiple-gradient descent algorithm for multiobjective optimization, 2012*).
 
-
+___
 **Policy Randomization in PFA**
 
 PFA (usually) needs a randomization of the policy after the optimization of each objective. Such randomization is needed to guarantee enough exploration to optimize the remaining objectives and depends on the policy used. 
@@ -28,7 +28,7 @@ For instance:
 
 Using the entropy as a scaling factor seems the most reasonable choice, but for Gaussians the (differential) entropy can be negative, while for Gibbs policies it could be too small.
 
-
+___
 **MORL Frontiers**
 
 When evaluating a policy with *evaluate_policies*, you can choose to make the policy deterministic or not. In MORL, this affects the resulting Pareto frontier, as any convex combination of the points one the deterministic frontier belongs to the stochastic frontier.
