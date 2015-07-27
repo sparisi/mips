@@ -1,3 +1,9 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Reference: F Sehnke, C Osendorfer, T Rueckstiess, A Graves, J Peters, 
+% Juergen Schmidhuber (2010)
+% Parameter-exploring Policy Gradients
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 function [grad, stepsize] = PGPEbase (pol_high, J, Theta, lrate)
 
 n_episodes = length(J);

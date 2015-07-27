@@ -10,7 +10,7 @@ function out = mcint(f, in, lo, hi, useSimplex)
 %  - useSimplex : if the points were sampled from the simplex
 % 
 % Outputs:
-%  - out      : (vector column) result
+%  - out        : (vector column) result
 
 dim = length(lo);
 N = size(in,1);
