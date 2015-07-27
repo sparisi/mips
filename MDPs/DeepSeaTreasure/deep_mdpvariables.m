@@ -10,7 +10,7 @@ mdp_vars.state_dim = [11 10];
 mdp_vars.max_obj = [1; 1];
 % mdp_vars.max_obj = [124; 20];
 mdp_vars.gamma = 1;
-mdp_vars.is_avg = 0;
+mdp_vars.isAvg = 0;
 mdp_vars.isStochastic = 0;
 
 return

@@ -8,7 +8,7 @@ function [new_results, totrew, totentropy] = execute( ...
   nvar_action = mdp_vars.nvar_action;
   nvar_reward = mdp_vars.nvar_reward;
   gamma = mdp_vars.gamma;
-  is_avg = mdp_vars.is_avg;
+  isAvg = mdp_vars.isAvg;
   
   % Initialize variables
   totrew = zeros(nvar_reward,1);
@@ -64,7 +64,7 @@ function [new_results, totrew, totentropy] = execute( ...
   new_results.terminal = results.terminal(:, 1:steps);
   
   % If we are in the average reward setting, then normalize the return
-  if is_avg && gamma == 1
+  if isAvg && gamma == 1
       totrew = totrew / steps;
   end
   

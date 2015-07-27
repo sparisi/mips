@@ -1,12 +1,11 @@
 function [dataset, J, G, H] = collect_samples_rele( domain, maxepisodes, maxsteps, policy )
-% Collects samples and computes gradients and hessians using ReLe toolbox.
+% Collects samples and computes gradients and hessians using ReLe.
 % More info at https://github.com/AIRLab-POLIMI/ReLe
 % See also README for details.
 
 mdp_var = feval([domain '_mdpvariables']);
 gamma = mdp_var.gamma;
 n_obj = mdp_var.nvar_reward;
-max_obj = mdp_var.max_obj;
 
 mexParams.nbRewards = n_obj;
 
@@ -29,4 +28,4 @@ elseif nargout == 3
 else
     [dataset, J] = collectSamples(domain, maxepisodes, maxsteps, gamma, mexParams);
 end
-J = mean(J,1) .* abs(max_obj)';
+J = mean(J,1);
