@@ -25,11 +25,18 @@ How To Add A New MDP
 
 Each MDP requires some mandatory functions:
 
-- *NAME_mdpvariables* : defines the details of the problem (number of state variables, actions, rewards, discount factor, ...),
 - *NAME_simulator*    : defines the reward and transition functions,
 - *NAME_settings*     : defines the learning setup, i.e., the policy and the number of episodes and steps used for evaluation / learning.
+- *NAME_mdpvariables* : defines the details of the problem, i.e.,
+  - *mdp_vars.nvar_state*   : dimensionality of the state,
+  - *mdp_vars.nvar_action*  : dimensionality of the action,
+  - *mdp_vars.nvar_reward*  : dimensionality of the reward,
+  - *mdp_vars.max_obj*      : reward normalization factor,
+  - *mdp_vars.gamma*        : discount factor,
+  - *mdp_vars.isAvg*        : 1 if we want to consider the average reward, 0 otherwise,
+  - *mdp_vars.isStochastic* : 1 if the environment is stochastic, 0 otherwise.
 
-Please notice that you have to manually change the number of episodes and steps in *NAME_settings* according to your needs.
+Please notice that you have to manually change the number of episodes and steps in *NAME_settings* according to your needs (e.g., according to the algorithm used).
 
 Additionally, there are some functions used to better organize the code:
 
@@ -46,6 +53,8 @@ ReLe Interface
 For collecting samples and computing gradients and hessians, you can also use *ReLe*, a powerful toolbox in C. 
 You can find it here: https://github.com/AIRLab-POLIMI/ReLe
 
-First, you need to mex the files in */ReLe/rele_matlab/src/MEX_functions*.
+First, you need to mex the files in */ReLe/rele_matlab/src/MEX_functions* (you can use the wrapper *MEXMakefile*).
 Then add such folder to the Matlab search path.
 Finally just call *collect_samples_rele* instead of *collect_samples*.
+
+Please notice that, unlike *collect_samples*, *collect_samples_rele* does not return the average entropy over the rollouts.
