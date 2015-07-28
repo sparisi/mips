@@ -12,8 +12,8 @@ J_perturb = zeros(n_samples,1);
 J_theta_ref = J_theta(robj) * ones(n_samples,1);
 
 parfor i = 1 : n_samples
-    theta_perturb = mvnrnd(theta,var);
-    delta_theta(i,:) = theta_perturb - theta';
+    theta_perturb = mvnrnd(theta,var)';
+    delta_theta(i,:) = theta_perturb - theta;
     tmp_pol = policy;
     tmp_pol.theta = theta_perturb;
     
