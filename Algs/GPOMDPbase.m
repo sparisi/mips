@@ -6,6 +6,8 @@ function [dJdtheta, stepsize] = GPOMDPbase(policy, data, gamma, robj, lrate)
 dlp = policy.dlogPidtheta;
 dJdtheta = zeros(dlp,1);
 
+totstep = 0;
+
 % Compute baselines
 num_trials = max(size(data));
 
@@ -29,6 +31,7 @@ for trial = 1 : num_trials
 	end
 end
 b = bnum ./ bden;
+b(isnan(b)) = 0; % When 0 / 0
 
 % Compute gradient
 for trial = 1 : num_trials
@@ -38,10 +41,15 @@ for trial = 1 : num_trials
 			policy.dlogPidtheta(data(trial).s(:,step), data(trial).a(:,step));
         rew = gamma^(step-1) * data(trial).r(robj,step);
 		dJdtheta = dJdtheta + sumdlogPi .* (ones(dlp, 1) * rew - b(:,step));
+        totstep = totstep + 1;
 	end
 end
 
-dJdtheta = dJdtheta / num_trials;
+if gamma == 1
+    dJdtheta = dJdtheta / totstep;
+else
+    dJdtheta = dJdtheta / num_trials;
+end
 
 if nargin >= 5
     T = eye(length(dJdtheta)); % trasformation in Euclidean space

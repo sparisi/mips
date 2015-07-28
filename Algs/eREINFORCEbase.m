@@ -6,6 +6,8 @@ function [dJdtheta, stepsize] = eREINFORCEbase(policy, data, gamma, robj, lrate)
 dlp = policy.dlogPidtheta;
 dJdtheta = zeros(dlp,1);
 
+totstep = 0;
+
 % Compute optimal baseline
 num_trials = max(size(data));
 bnum = zeros(dlp,1);
@@ -25,6 +27,7 @@ parfor trial = 1 : num_trials
     bden = bden + sumdlogPi;
 end
 b = bnum ./ bden;
+b(isnan(b)) = 0; % When 0 / 0
 
 % Compute gradient
 parfor trial = 1 : num_trials
@@ -35,11 +38,16 @@ parfor trial = 1 : num_trials
         sumdlogPi = sumdlogPi + ...
             policy.dlogPidtheta(data(trial).s(:,step), data(trial).a(:,step));
         sumrew = sumrew + gamma^(step-1) * data(trial).r(robj, step);
+        totstep = totstep + 1;
     end
     dJdtheta = dJdtheta + sumdlogPi .* (ones(dlp, 1) * sumrew - b);
 end
 
-dJdtheta = dJdtheta / num_trials;
+if gamma == 1
+    dJdtheta = dJdtheta / totstep;
+else
+    dJdtheta = dJdtheta / num_trials;
+end
 
 if nargin >= 5
     T = eye(length(dJdtheta)); % trasformation in Euclidean space
