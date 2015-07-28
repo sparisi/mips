@@ -4,7 +4,7 @@ mdp_vars = deep_mdpvariables();
 
 numfeatures = 4;
 
-% The polynomial is repeated for each action
+% The basis functions are repeated for each action but the last one
 numbasis = numfeatures * (length(mdp_vars.action_list) - 1);
 
 % If no arguments just return the number of basis functions

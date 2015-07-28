@@ -1,13 +1,13 @@
 clear all
-domain = 'dam';
-robj = 2;
+domain = 'deep';
+robj = 1;
 [n_obj, pol, episodes, steps, gamma] = feval([domain '_settings']);
 iter = 0;
 theta = [];
 
 tolerance = 0.001;
 minS = -20; % with Gaussian policies the (differential) entropy can be negative
-lrate = 4;
+lrate = 0.1;
 
 
 %% Learning
@@ -20,7 +20,6 @@ while true
 %     [grad, stepsize] = GPOMDPbase(pol,ds,gamma,robj,lrate);
 %     [grad, stepsize] = eREINFORCEbase(pol,ds,gamma,robj,lrate);
     [grad, stepsize] = eNACbase(pol,ds,gamma,robj,lrate);
-%     [grad, stepsize] = eNAC(pol,ds,gamma,robj,lrate);
     
     theta = [theta; pol.theta'];
     norm_g = norm(grad);

@@ -15,7 +15,7 @@ policy = gibbs(@puddle_basis_pol, ...
     zeros(puddle_basis_pol,1), ...
     mdp_vars.action_list);
 
-episodes = 2000;
+episodes = 200;
 steps = 50;
 
 end
