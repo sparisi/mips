@@ -26,58 +26,53 @@ classdef gibbs < policy
         function probability = evaluate(obj, state, action)
             assert(size(state,2) == 1);
             assert(size(action,2) == 1);
+            % Assert that the action belongs to the known actions
+            idx = find(obj.action_list == action);
+            assert(length(idx) == 1);
             
-            IT = obj.inverse_temperature;
+            it = obj.inverse_temperature;
             nactions = length(obj.action_list);
-            
-            % Assert that the action is one of the discrete known actions
-            I = find(obj.action_list == action);
-            assert(length(I) == 1);
-            
-            % Compute the sum of all the preferences
-            sumexp = 0;
+            num = zeros(nactions, 1);
+            den = 0;
             for i = 1 : nactions - 1
-                act = obj.action_list(i);
-                local_phi = feval(obj.basis, state, act);
-                sumexp = sumexp + min(exp(IT*obj.theta'*local_phi),1e200);
+                loc_phi = feval(obj.basis, state, obj.action_list(i));
+                loc_Q = obj.theta'*loc_phi;
+                num(i) = exp(it*loc_Q);
+                den = den + num(i);
             end
-            sumexp = sumexp + 1;
+            den = den + 1;
+            num(end) = 1;
             
-            num = 1;
-            if (action < nactions)
-                % Evaluate the bfs of the current state and action
-                phi = feval(obj.basis, state, action);
-                lin_prod = obj.theta'*phi;
-                num = min(exp(IT*lin_prod),1e200);
-            end
+            prob_list = num / den;
+            % A NaN can occur if the exp was Inf
+            prob_list(isnan(prob_list)) = 1;
+            % Ensure that the sum is 1
+            prob_list = prob_list / sum(prob_list);
             
-            % Compute action probability
-            probability = num / sumexp;
+            % Get action probability
+            probability = prob_list(idx);
         end
         
         function action = drawAction(obj, state)
             assert(size(state,2) == 1);
             
-            IT = obj.inverse_temperature;
-            
+            it = obj.inverse_temperature;
             nactions = length(obj.action_list);
-            prob_list = zeros(nactions, 1);
-            
-            % Compute the sum of all the preferences
-            sumexp = 0;
-            
+            num = zeros(nactions, 1);
+            den = 0;
             for i = 1 : nactions - 1
-                act = obj.action_list(i);
-                loc_phi = feval(obj.basis, state, act);
-                exp_term = min(exp(IT*obj.theta'*loc_phi),1e200);
-                prob_list(i) = exp_term;
-                sumexp = sumexp + exp_term;
+                loc_phi = feval(obj.basis, state, obj.action_list(i));
+                loc_Q = obj.theta'*loc_phi;
+                num(i) = exp(it*loc_Q);
+                den = den + num(i);
             end
-            sumexp = sumexp + 1;
-            prob_list(end,1) = 1;
-            prob_list = prob_list / sumexp;
+            den = den + 1;
+            num(end) = 1;
+            
+            prob_list = num / den;
+            % A NaN can occur if the exp was Inf
             prob_list(isnan(prob_list)) = 1;
-            prob_list(isinf(prob_list)) = 1;
+            % Ensure that the sum is 1
             prob_list = prob_list / sum(prob_list);
             [~, action] = find(mnrnd(1, prob_list));
         end
@@ -85,25 +80,28 @@ classdef gibbs < policy
         function S = entropy(obj, state)
             assert(size(state,2) == 1);
             
-            IT = obj.inverse_temperature;
-            
+            it = obj.inverse_temperature;
             nactions = length(obj.action_list);
-            prob_list = zeros(nactions, 1);
-            
-            sumexp = 0;
-            
+            num = zeros(nactions, 1);
+            den = 0;
             for i = 1 : nactions - 1
-                act = obj.action_list(i);
-                loc_phi = feval(obj.basis, state, act);
-                exp_term = min(exp(IT*obj.theta'*loc_phi),1e200);
-                prob_list(i) = exp_term;
-                sumexp = sumexp + exp_term;
+                loc_phi = feval(obj.basis, state, obj.action_list(i));
+                loc_Q = obj.theta'*loc_phi;
+                num(i) = exp(it*loc_Q);
+                den = den + num(i);
             end
-            sumexp = sumexp + 1;
-            prob_list(end,1) = 1;
-            prob_list = prob_list / sumexp;
+            den = den + 1;
+            num(end) = 1;
+            
+            prob_list = num / den;
+            % A NaN can occur if the exp was Inf
+            prob_list(isnan(prob_list)) = 1;
+            % Ensure that the sum is 1
+            prob_list = prob_list / sum(prob_list);
+
             S = 0;
             for i = 1 : nactions
+                % Usual checks for the entropy
                 if ~(isinf(prob_list(i)) || isnan(prob_list(i)) || prob_list(i) == 0)
                     S = S + (-prob_list(i)*log2(prob_list(i)));
                 end
@@ -119,34 +117,36 @@ classdef gibbs < policy
             end
             assert(size(state,2) == 1);
             assert(size(action,2) == 1);
+            % Assert that the action belongs to the known actions
+            idx = find(obj.action_list == action);
+            assert(length(idx) == 1);
             
-            IT = obj.inverse_temperature;
-            
-            % Assert that the action is one of the discrete known actions
-            I = find(obj.action_list == action);
-            assert(length(I) == 1);
-            
-            % Compute the sum of all the preferences
-            sumexp = 0;
-            sumpref = 0;
-            nactions = length(obj.action_list);
-            prob_list = zeros(nactions, 1);
-            for i = 1 : nactions - 1
-                act = obj.action_list(i);
-                loc_phi = feval(obj.basis, state, act);
-                exp_term = min(exp(IT*obj.theta'*loc_phi),1e200);
-                prob_list(i) = exp_term;
-                sumexp = sumexp + exp_term;
-                sumpref = sumpref + IT*loc_phi*prob_list(i);
+            it = obj.inverse_temperature;
+            nactions = length(obj.action_list) - 1;
+            exp_term = zeros(nactions,1);
+            phi_term = zeros(feval(obj.basis),nactions);
+            for i = 1 : nactions
+                loc_phi = feval(obj.basis, state, obj.action_list(i));
+                loc_Q = obj.theta'*loc_phi;
+                exp_term(i) = exp(it*loc_Q);
+                phi_term(:,i) = it*loc_phi;
             end
-            sumexp = sumexp + 1;
-            sumpref = sumpref / sumexp;
+            
+            idx = isinf(exp_term);
+            if max(idx)
+                exp_term(idx) = 1;
+                exp_term(~idx) = 0;
+            end
+            
+            num = phi_term * exp_term;
+            den = sum(exp_term);
+
+            phi = feval(obj.basis, state, action);
             
             if action == obj.action_list(end)
-                dlpdt = - sumpref;
+                dlpdt = - num ./ (1 + den);
             else
-                loc_phi = feval(obj.basis, state, action);
-                dlpdt = IT*loc_phi - sumpref;
+                dlpdt = it*phi - num ./ (1 + den);
             end
         end
         
@@ -178,7 +178,7 @@ classdef gibbs < policy
                 if size(areEq,1) ~= size(areEqTemp,1)
                     areEqTemp = areEqTemp';
                 end
-                areEq = bitand( areEq, areEqTemp);
+                areEq = bitand(areEq, areEqTemp);
             else
                 return;
             end
