@@ -22,7 +22,7 @@ tmp(5) = (state(2) > 0.95);
 tmp(6) = (state(2) >= 0.75 && state(1) < 0.45);
 tmp(7) = (state(1) >= 0.45);
 
-% Features depending only from the state
+% Features depending only on the state
 if nargin == 1
     phi = tmp;
     return

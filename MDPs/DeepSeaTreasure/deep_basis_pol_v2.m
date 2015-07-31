@@ -20,7 +20,7 @@ tmp(3) = (state(1) == 1 && ~(state(1) == 1 && state(2) == 1) ...
         && ~(state(1) == 1 && state(2) == 10));
 tmp(4) = (state(2) == 10);
 
-% Features depending only from the state
+% Features depending only on the state
 if nargin == 1
     phi = tmp;
     return

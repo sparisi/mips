@@ -18,7 +18,7 @@ tmp(1) = 1;
 tmp(2) = state(1);
 tmp(3) = state(2);
 
-% Features depending only from the state
+% Features depending only on the state
 if nargin == 1
     phi = tmp;
     return

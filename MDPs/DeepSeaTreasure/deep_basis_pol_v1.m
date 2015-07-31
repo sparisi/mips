@@ -21,7 +21,7 @@ tmp(4) = state(1) * state(2);
 tmp(5) = (state(1) == 1 && state(2) == 1);
 tmp(6) = (state(1) == 1);
 
-% Features depending only from the state
+% Features depending only on the state
 if nargin == 1
     phi = tmp;
     return
