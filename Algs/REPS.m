@@ -26,7 +26,7 @@ while true
     
     [J_iter, Theta_iter] = collect_episodes(domain, N, solver.policy);
 
-    % At first run, fill the pool to maintain the samples distribution
+    % First, fill the pool to maintain the samples distribution
     if iter == 1
         J = repmat(min(J_iter),N_MAX,1);
         for k = 1 : N_MAX
