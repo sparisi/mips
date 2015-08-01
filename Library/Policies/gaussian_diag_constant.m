@@ -10,7 +10,7 @@ classdef gaussian_diag_constant < policy
             assert(size(init_mean,2) == 1)
             assert(size(init_sigma,1) == dim)
             assert(size(init_sigma,2) == 1)
-
+            
             obj.theta = [init_mean; init_sigma];
             obj.dim = dim;
             obj.dim_explore = length(init_sigma);
@@ -49,6 +49,52 @@ classdef gaussian_diag_constant < policy
             dlogpdt = [dlogpdt_mu; dlogpdt_sigma];
         end
         
+        %%% Fisher information matrix
+        function F = fisher(obj)
+            sigma = obj.theta(obj.dim+1:end);
+            invsigma = diag(sigma.^-2);
+            
+            F_blocks = cell(obj.dim,1);
+            for k = 1 : obj.dim
+                tmp = invsigma(k:end, k:end);
+                tmp(1,1) = tmp(1,1) + 1 / sigma(k)^2;
+                F_blocks{k} = tmp;
+            end
+            F = blkdiag(invsigma, F_blocks{:});
+            
+            pointSize = obj.dim;
+            indices = zeros(pointSize*2,1);
+            indices(1:pointSize) = 1:pointSize;
+            indices(pointSize+1) = pointSize+1;
+            for i = 2:pointSize
+                indices(pointSize+i) = indices(pointSize+i-1) + pointSize -i + 2;
+            end
+            F = F(indices,indices);
+        end
+        
+        %%% Inverse Fisher information matrix
+        function invF = inverseFisher(obj)
+            sigma = obj.theta(obj.dim+1:end);
+            invsigma = diag(sigma.^-2);
+            
+            invF_blocks = cell(obj.dim,1);
+            for k = 1 : obj.dim
+                tmp = invsigma(k:end, k:end);
+                tmp(1,1) = tmp(1,1) + 1 / sigma(k)^2;
+                invF_blocks{k} = eye(size(tmp)) / tmp;
+            end
+            invF = blkdiag(diag(sigma.^2), invF_blocks{:});
+            
+            pointSize = obj.dim;
+            indices = zeros(pointSize*2,1);
+            indices(1:pointSize) = 1:pointSize;
+            indices(pointSize+1) = pointSize+1;
+            for i = 2:pointSize
+                indices(pointSize+i) = indices(pointSize+i-1) + pointSize -i + 2;
+            end
+            invF = invF(indices,indices);
+        end
+        
         function obj = update(obj, direction)
             obj.theta = obj.theta + direction;
         end
@@ -76,7 +122,7 @@ classdef gaussian_diag_constant < policy
             sigma = sqrt(sigma);
             obj.theta = [mu; sigma(:)];
         end
-                
+        
         function obj = randomize(obj, factor)
             obj.theta(obj.dim+1:end) = obj.theta(obj.dim+1:end) .* factor;
         end
@@ -93,7 +139,7 @@ classdef gaussian_diag_constant < policy
             for i = 1 : length(mu)
                 norm = normpdf(range, mu(i), Sigma(i,i));
                 plot(range, norm)
-            end            
+            end
         end
         
     end
