@@ -58,10 +58,11 @@ classdef gaussian_chol_constant < policy
             cholA = indices;
             cholA(indices == 1) = obj.theta(obj.dim+1:end);
             cholA = cholA';
-            invsigma = cholA \ eye(size(cholA)) / cholA';
+            invA = inv(cholA);
+            invsigma = invA * invA';
             dlogpdt_k = invsigma * (action - mu);
             
-            R = cholA' \ (action - mu) * (action - mu)' * invsigma;
+            R = invA' * (action - mu) * (action - mu)' * invsigma;
             dlogpdt_sigma = zeros(obj.dim);
             for i = 1 : obj.dim
                 for j = i : obj.dim
@@ -84,7 +85,8 @@ classdef gaussian_chol_constant < policy
             cholA = indices;
             cholA(indices == 1) = obj.theta(obj.dim+1:end);
             cholA = cholA';
-            invsigma = cholA \ eye(size(cholA)) / cholA';
+            invA = inv(cholA);
+            invsigma = invA * invA';
             F_blocks = cell(obj.dim,1);
             for k = 1 : obj.dim
                 tmp = invsigma(k:end, k:end);
@@ -101,7 +103,8 @@ classdef gaussian_chol_constant < policy
             cholA(indices == 1) = obj.theta(obj.dim+1:end);
             cholA = cholA';
             sigma = cholA' * cholA;
-            invsigma = cholA \ eye(size(cholA)) / cholA';
+            invA = inv(cholA);
+            invsigma = invA * invA';
             invF_blocks = cell(obj.dim,1);
             for k = 1 : obj.dim
                 tmp = invsigma(k:end, k:end);

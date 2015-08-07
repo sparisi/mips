@@ -10,7 +10,7 @@ classdef gaussian_constant < policy
             assert(size(init_mean,2) == 1)
             assert(size(init_sigma,1) == dim)
             assert(size(init_sigma,2) == dim)
-
+            
             obj.theta = [init_mean; init_sigma(:)];
             obj.dim = dim;
             obj.dim_explore = length(init_sigma(:));
@@ -44,8 +44,9 @@ classdef gaussian_constant < policy
             sigma = vec2mat(obj.theta(obj.dim+1:end),obj.dim);
             
             dlogpdt_mu = sigma \ (action - mu);
-            A = -0.5 * eye(obj.dim) / sigma;
-            B = 0.5 * sigma \ (action - mu) * (action - mu)' / sigma;
+            invsigma = inv(sigma);
+            A = -0.5 * invsigma;
+            B =  0.5 * invsigma * (action - mu) * (action - mu)' * invsigma;
             dlogpdt_sigma = A + B;
             
             dlogpdt = [dlogpdt_mu; dlogpdt_sigma(:)];
@@ -56,7 +57,7 @@ classdef gaussian_constant < policy
             sigma = vec2mat(obj.theta(obj.dim+1:end),obj.dim);
             obj.theta(obj.dim+1:end) = nearestSPD(sigma);
         end
-
+        
         function obj = makeDeterministic(obj)
             obj.theta(obj.dim+1:end) = 1e-8;
         end
@@ -68,7 +69,7 @@ classdef gaussian_constant < policy
             params.mu = mu;
             params.Sigma = sigma;
         end
-       
+        
         function obj = weightedMLUpdate(obj, weights, Action)
             mu = Action * weights / sum(weights);
             sigma = zeros(size(obj.dim));
@@ -84,7 +85,7 @@ classdef gaussian_constant < policy
         function obj = randomize(obj, factor)
             obj.theta(obj.dim+1:end) = obj.theta(obj.dim+1:end) .* factor;
         end
-       
+        
     end
     
 end

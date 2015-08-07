@@ -72,11 +72,12 @@ classdef gaussian_chol_linear < policy
             cholA = indices;
             cholA(indices == 1) = obj.theta(n_k+1:end);
             cholA = cholA';
-            invsigma = cholA \ eye(size(cholA)) / cholA';
+            invA = inv(cholA);
+            invsigma = invA * invA';
             
             dlogpdt_k = invsigma * (action - k * phi) * phi';
             
-            R = cholA' \ (action - mu) * (action - mu)' * invsigma;
+            R = invA' * (action - mu) * (action - mu)' * invsigma;
             dlogpdt_sigma = zeros(obj.dim);
             for j = 1 : obj.dim
                 for i = 1 : j
