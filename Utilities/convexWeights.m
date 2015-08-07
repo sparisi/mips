@@ -2,12 +2,12 @@ function W = convexWeights ( N, density )
 % Generates a matrix W of D weights such that the sum of every row is 1.
 %
 % Inputs:
-% - N       : number of weights.
-% - density : number of points in the interval [0,1].
+% - N       : number of weights
+% - density : number of points in the interval [0,1]
 %
 % Outputs: 
 % - W       : a M-by-N matrix which rows are the weights for convex 
-%             combinations between N elements. M depends on density and N.
+%             combinations between N elements. M depends on density and N
 %
 % Example:
 % convexWeights(2,10)
