@@ -26,9 +26,8 @@ How To Add A New MDP
 Each MDP requires some mandatory functions:
 
 - *NAME_simulator*    : defines the reward and transition functions,
-- *NAME_settings*     : defines the learning setup, i.e., the policy and the number of episodes and steps used for evaluation / learning.
+- *NAME_settings*     : defines the learning setup, i.e., the policy and the number of episodes and steps used for evaluation / learning,
 - *NAME_mdpvariables* : defines the details of the problem, i.e.,
-
   - *mdp_vars.nvar_state*   : dimensionality of the state,
   - *mdp_vars.nvar_action*  : dimensionality of the action,
   - *mdp_vars.nvar_reward*  : dimensionality of the reward,
