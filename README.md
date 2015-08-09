@@ -28,10 +28,11 @@ Each MDP requires some mandatory functions:
 - *NAME_simulator*    : defines the reward and transition functions,
 - *NAME_settings*     : defines the learning setup, i.e., the policy and the number of episodes and steps used for evaluation / learning.
 - *NAME_mdpvariables* : defines the details of the problem, i.e.,
+
   - *mdp_vars.nvar_state*   : dimensionality of the state,
   - *mdp_vars.nvar_action*  : dimensionality of the action,
   - *mdp_vars.nvar_reward*  : dimensionality of the reward,
-  - *mdp_vars.max_obj*      : reward normalization factor,
+  - *mdp_vars.maxr*         : maximum magnitude of the reward (used as normalization factor),
   - *mdp_vars.gamma*        : discount factor,
   - *mdp_vars.isAvg*        : 1 if we want to consider the average reward, 0 otherwise,
   - *mdp_vars.isStochastic* : 1 if the environment is stochastic, 0 otherwise.
