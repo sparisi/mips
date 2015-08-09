@@ -58,6 +58,6 @@ if reward1 == 0
 else
     absorb = 1;
 end
-reward = [reward1; reward2] ./ mdp_vars.max_obj;
+reward = [reward1; reward2];
 
 return

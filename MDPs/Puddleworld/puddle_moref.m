@@ -4,7 +4,7 @@ function [front, weights, utopia, antiutopia] = puddle_moref( outPlot )
 
 front = dlmread('puddle_ref.dat');
 weights = [];
-warning('No weights are available for the Puddleworld domain.')
+% warning('No weights are available for the Puddleworld domain.')
 utopia = [];
 antiutopia = [];
 

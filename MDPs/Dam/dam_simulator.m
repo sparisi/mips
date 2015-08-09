@@ -69,6 +69,4 @@ if mdp_vars.nvar_reward == 4
 end
 absorb = 0;
 
-reward = reward ./ mdp_vars.max_obj;
-
 return

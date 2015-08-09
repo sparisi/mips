@@ -18,8 +18,8 @@ parfor k = 1 : maxepisodes
     pol_tmp.theta(1:dim_theta) = theta;
     Theta(:,k) = theta;
 
-%     [~, J_ep] = collect_samples(domain, 1, steps, pol_tmp);
-    [~, J_ep] = collect_samples_rele(domain, 1, steps, pol_tmp);
+    [~, J_ep] = collect_samples(domain, 1, steps, pol_tmp);
+%     [~, J_ep] = collect_samples_rele(domain, 1, steps, pol_tmp);
 
     J(k,:) = J_ep;
     

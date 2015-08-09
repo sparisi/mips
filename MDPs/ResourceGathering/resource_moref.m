@@ -4,7 +4,7 @@ function [front, weights, utopia, antiutopia] = resource_moref( outPlot )
 
 front = dlmread('resource_ref.dat');
 weights = [];
-warning('No weights are available for the Resource Gathering domain.')
+% warning('No weights are available for the Resource Gathering domain.')
 utopia = [];
 antiutopia = [];
 

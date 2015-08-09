@@ -3,9 +3,9 @@ function [dataset, J, S] = collect_samples( ...
 % Collects full episodes, i.e., it returns a dataset containing information
 % also about the single steps for each episode.
 
-% Initialize some variables
 simulator = [domain '_simulator'];
-mdpconfig = [domain '_mdpvariables'];
+mdpvars = feval([domain '_mdpvariables']);
+maxr = mdpvars.maxr;
 
 empty_sample.s = [];
 empty_sample.a = [];
@@ -31,6 +31,9 @@ parfor episodes = 1 : maxepisodes
     J = J + totrew;
     S = S + totentropy;
     
+    % Normalize rewards
+    sample.r = bsxfun(@times,sample.r,1./maxr);
+    
     % Store the new sample
     if ~isempty(sample.a)
         dataset(episodes).s = sample.s;
@@ -42,8 +45,7 @@ parfor episodes = 1 : maxepisodes
     
 end
 
-mdp_vars = feval(mdpconfig);
-J = ((J / maxepisodes) .* abs(mdp_vars.max_obj))';
+J = J / maxepisodes;
 S = S / maxepisodes;
 
 return

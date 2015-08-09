@@ -77,6 +77,6 @@ if(nextstate(1) == 5 && nextstate(2) == 3)
     nextstate(4) = 0;
 end
 
-reward = [reward1; reward2; reward3] ./ mdp_vars.max_obj;
+reward = [reward1; reward2; reward3];
 
 return

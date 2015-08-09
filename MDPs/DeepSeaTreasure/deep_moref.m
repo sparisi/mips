@@ -4,9 +4,9 @@ function [front, weights, utopia, antiutopia] = deep_moref( outPlot )
 
 front = dlmread('deep_ref.dat');
 weights = [];
-warning('No weights are available for the Deep Sea Treasure domain.')
+% warning('No weights are available for the Deep Sea Treasure domain.')
 utopia = [124, -1];
-antiutopia = [-1, -20];
+antiutopia = [0, -20];
 
 if outPlot
     hold on

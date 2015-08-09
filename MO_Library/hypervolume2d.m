@@ -1,37 +1,32 @@
 function hv = hypervolume2d(f, antiutopia, utopia)
 % Computes the hypervolume of a 2-dimensional frontier for a maximization
-% problem. The frontier is always normalized in order to have the
-% objectives in the range [-1, 0] or [0, 1]. The normalization is performed
-% using the utopia and antiutopia points. If only the antiutopia point is
-% provided, the frontier is not normalized and the antiutopia is chosen as
-% reference point.
+% problem. If the user provides both the utopia and antiutopia, the 
+% frontier is normalized in order to have the objectives in the range 
+% [0, 1]. If only the antiutopia point is provided, the frontier is not 
+% normalized and the antiutopia is chosen as reference point.
+% Please note that points at the same level or below the antiutopia are not
+% considered, so choose the antiutopia carefully. For example, if the 
+% antiutopia is [0,-19], the point [124, -19] is ignored, so it would be
+% better to choose [124, -20] as antiutopia.
 %
 % Inputs:
-% - f          : N-by-D matrix representing a D-dimensional Pareto front of N
-%                points
+% - f          : N-by-D matrix representing a D-dimensional Pareto front of
+%                N points
 % - antiutopia : antiutopia point (1-by-D vector)
 % - utopia     : utopia point (1-by-D vector)
 %
 % Outputs:
 % - hv         : hypervolume
-%
-% Example: if the reference point is [-10, 10] then the frontier is
-% normalized by r and the new reference point is [-1, 0].
 
-% Find the correct factor to normalize the frontier in the interval [-1,0] (or [0, 1])
 if nargin == 3
-    m = [utopia; antiutopia];
-    [~, idx] = max(abs(m));
-    r = m([idx == 1; idx == 2])'; % Reference point
-
-    f = f * diag( 1 ./ abs(r) ); % Normalize the objectives
-    r = (antiutopia >= 0) - 1; % Change the reference point
+    f = normalize_points(f,antiutopia,utopia);
+    r = zeros(1, size(f,2));
 else
     r = antiutopia;
 end
 
 % If a solution lays below the reference point, ignore it
-isBelow = sum( bsxfun(@ge, r, f), 2) >= 1;
+isBelow = sum( bsxfun(@gt, r, f), 2) >= 1;
 f(isBelow, :) = [];
 
 if isempty(f)
