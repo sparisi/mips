@@ -18,6 +18,7 @@ if strcmp('dam',domain)
     end
 elseif strcmp('lqr',domain)
     mexParams.dim = mdp_var.dim;
+    mexParams.stddev = 1;
 end
 
 mexParams.policyParameters = policy.theta;

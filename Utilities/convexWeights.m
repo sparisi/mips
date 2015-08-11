@@ -1,13 +1,13 @@
-function W = convexWeights ( N, density )
-% Generates a matrix W of D weights such that the sum of every row is 1.
+function w = convexWeights ( dim, n )
+% Generates a matrix of convex combinations.
 %
 % Inputs:
-% - N       : number of weights
-% - density : number of points in the interval [0,1]
+% - dim : number of weights
+% - n   : number of unique points in the interval [0,1] for each weight
 %
 % Outputs: 
-% - W       : a M-by-N matrix which rows are the weights for convex 
-%             combinations between N elements. M depends on density and N
+% - w   : a M-by-N matrix which rows are the weights for convex 
+%         combinations between N elements. M depends on density and N
 %
 % Example:
 % convexWeights(2,10)
@@ -23,39 +23,13 @@ function W = convexWeights ( N, density )
 %  0.9 0.1
 %  1.0 0.0]
 
-W = recursiveLoops([], zeros(1,N), 1, N, density);
-
-end
-
-function W = recursiveLoops ( W, w, n, N, density )
-% Uses recursion to generate N-1 nested loops.
-%
-% Inputs:
-% - W       : current matrix
-% - w       : current weights
-% - n       : current level of recursion
-% - N       : max level of recursion
-% - density : points in the interval [0,1]
-
-if n == N
-    v = 0;
-    for i = 1 : n - 1
-        v = v + w(i);
-    end
-    w(n) = 1 - v;
-    W = [W; w];
-    return
-end
-
-v = 0;
-for i = 1 : n - 1
-    v = v + w(i);
-end
-v = 1 - v;
-
-for i = 0 : 1 / density : v
-    w(n) = i;
-    W = recursiveLoops(W,w,n+1,N,density);
-end
+c = nchoosek(1 : n+dim-1, dim-1);
+m = size(c,1);
+t = ones(m, n+dim-1);
+t( repmat((1:m).', 1, dim-1)+(c-1)*m ) = 0;
+u = [zeros(1,m); t.'; zeros(1,m)];
+v = cumsum(u,1);
+w = diff( reshape(v(u==0), dim+1, m), 1 ).';
+w = w ./ n;
 
 end
