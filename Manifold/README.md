@@ -31,4 +31,4 @@ The implemented indicators are:
  - *pareto* (L_P)     : Pareto-ascent norm (not implemented for the sampled version)
  - *mix1* (L_M1)      : L_A * (1 - w * L_P) (not implemented for the sampled version)
  - *mix2* (L_M2)      : beta1 * L_A / L_U - beta2
- - *mix3* (L_M2)      : L_A * (1 - w * L_U)
+ - *mix3* (L_M3)      : L_A * (1 - w * L_U)
