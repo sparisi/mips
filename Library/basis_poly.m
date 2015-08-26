@@ -1,6 +1,4 @@
 function Phi = basis_poly(degree, dim, offset, state)
-% Phi = basis_poly(degree, dim, offset, state)
-%
 % It computes full polynomial features, i.e. phi(s) = s^0 + s^1 + s^2 + ...
 % Since s is a vector, s^i denotes all the possible products of degree i
 % between all elements of s.
