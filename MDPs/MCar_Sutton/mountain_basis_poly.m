@@ -1,8 +1,8 @@
-function phi = puddle_basis_pol(state, action)
+function phi = mountain_basis_poly(state, action)
 
-mdp_vars = puddle_mdpvariables();
+mdp_vars = mountain_mdpvariables();
 
-numfeatures = 7;
+numfeatures = 3;
 
 % The basis functions are repeated for each action but the last one
 numbasis = numfeatures * (length(mdp_vars.action_list) - 1);
@@ -15,12 +15,8 @@ end
 
 tmp = zeros(numfeatures,1);
 tmp(1) = 1;
-tmp(2) = (state(1)+0.1);
-tmp(3) = (state(2)+0.1);
-tmp(4) = (state(1) > 0.95);
-tmp(5) = (state(2) > 0.95);
-tmp(6) = (state(2) >= 0.75 && state(1) < 0.45);
-tmp(7) = (state(1) >= 0.45);
+tmp(2) = state(1);
+tmp(3) = state(2);
 
 % Features depending only on the state
 if nargin == 1

@@ -1,4 +1,4 @@
-function phi = resource_basis_pol(state, action)
+function phi = resource_basis_poly(state, action)
 
 mdp_vars = resource_mdpvariables();
 n_actions = length(mdp_vars.action_list);

@@ -1,4 +1,4 @@
-function phi = lqr_basis_pol(state)
+function phi = lqr_basis_poly(state)
 
 var = lqr_mdpvariables;
 

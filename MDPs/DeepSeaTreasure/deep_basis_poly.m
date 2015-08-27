@@ -1,8 +1,8 @@
-function phi = deep_basis_pol_v3(state, action)
+function phi = deep_basis_poly(state, action)
 
 mdp_vars = deep_mdpvariables();
 
-numfeatures = 3;
+numfeatures = 4;
 
 % The basis functions are repeated for each action but the last one
 numbasis = numfeatures * (length(mdp_vars.action_list) - 1);
@@ -17,6 +17,7 @@ tmp = zeros(numfeatures,1);
 tmp(1) = 1;
 tmp(2) = state(1);
 tmp(3) = state(2);
+tmp(4) = state(1)*state(2);
 
 % Features depending only on the state
 if nargin == 1

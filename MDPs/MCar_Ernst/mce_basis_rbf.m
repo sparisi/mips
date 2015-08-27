@@ -1,4 +1,4 @@
-function phi = mce_basis_rbf_v1(state,action)
+function phi = mce_basis_rbf(state,action)
 
 n_centers = 4;
 if nargin == 0
