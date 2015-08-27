@@ -16,7 +16,7 @@ end
 tmp = zeros(numfeatures,1);
 tmp(1) = 1;
 tmp(2) = (state(1) == 1 && state(2) == 1);
-tmp(3) = (state(1) == 1 && ~state(2) == 1 && ~state(2) == 10);
+tmp(3) = (state(1) == 1 && state(2) ~= 1 && state(2) ~= 10);
 tmp(4) = (state(2) == 10);
 
 % Features depending only on the state
