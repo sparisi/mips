@@ -3,7 +3,6 @@ function [nextstate, reward, absorb] = dam_simulator(state, action)
 mdp_vars = dam_mdpvariables();
 
 env = dam_environment();
-reward = zeros(mdp_vars.nvar_reward,1);
 
 % Initial states
 s_init = [9.6855361e+01, 5.8046026e+01, ...
@@ -59,14 +58,13 @@ end
 p_hyd = env.ETA * env.G * env.GAMMA_H2O * nextstate/env.S * q / (3.6e6);
 
 % Deficit in the hydroelectric supply w.r.t the hydroelectric demand
-if mdp_vars.nvar_reward == 3
-    reward(3) = -max(env.W_HYD - p_hyd, 0) + penalty;
-end
+reward(3) = -max(env.W_HYD - p_hyd, 0) + penalty;
 
 % Cost due to the excess level w.r.t. a flooding threshold (downstream)
-if mdp_vars.nvar_reward == 4
-    reward(4) = -max(action - env.Q_FLO_D, 0) + penalty;
-end
+reward(4) = -max(action - env.Q_FLO_D, 0) + penalty;
+
 absorb = 0;
+
+reward = reward(1:mdp_vars.nvar_reward)';
 
 return
