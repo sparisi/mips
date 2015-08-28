@@ -58,6 +58,9 @@ else
     for i = 1 : n_pol
         plot3(z(:,i),x(:,i),y2(:,i),'-b');
         plot3(z(:,i),x(:,i),y(:,i),'-.r','LineWidth',2);
+        ylabel state
+        zlabel action
+        set(gca,'XTick',[]);
     end
     view(-53,32)
 end
