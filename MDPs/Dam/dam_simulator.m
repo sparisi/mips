@@ -51,10 +51,7 @@ reward(1) = -max(nextstate/env.S - env.H_FLO_U, 0) + penalty;
 % Deficit in the water supply w.r.t. the water demand
 reward(2) = -max(env.W_IRR - action, 0) + penalty;
 
-q = 0;
-if action > env.Q_MEF
-    q = action - env.Q_MEF;
-end
+q = max(action - env.Q_MEF, 0);
 p_hyd = env.ETA * env.G * env.GAMMA_H2O * nextstate/env.S * q / (3.6e6);
 
 % Deficit in the hydroelectric supply w.r.t the hydroelectric demand
