@@ -1,6 +1,6 @@
 function pn = normalize_points(p,minp,maxp)
 % Normalizes points in order to have them in [0,1].
-% pn = (p - maxp) / (minp - maxp)
+% pn = (p - minp) / (maxp - minp)
 %
 % Inputs:
 % - p    : N-by-D matrix, where N is the number of points and D is the
