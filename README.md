@@ -28,11 +28,11 @@ Each MDP requires some mandatory functions:
 - *NAME_simulator*    : defines the reward and transition functions,
 
 - *NAME_settings*     : defines the learning setup and returns
-  - *n_obj*    : number of objective of the problem,
+  - *n_obj*    : number of objectives of the problem,
   - *policy*   : policy used to solve the problem,
   - *episodes* : number of episodes used for evaluation / learning,
   - *steps*    : max number of steps of each episode,
-  - *gamma*    : discount factor.
+  - *gamma*    : discount factor,
 
 - *NAME_mdpvariables* : defines the details of the problem, i.e.,
   - *mdp_vars.nvar_state*   : dimensionality of the state,
