@@ -1,4 +1,6 @@
 function minNorm = symParetoNorm(D_theta_J)
+% SYMPARETONORM Computes the symbolic minimum-norm Pareto-ascent direction
+% given the symbolic Jacobian D_theta_J.
 
 dim_J = size(D_theta_J,1);
 

@@ -1,15 +1,16 @@
 function [L, D_J_L] = getIndicator(domain, ind_type, J, beta)
-% Computes the quality of a solution according to a specific metric.
+% GETINDICATOR Computes the quality of a solution according to a specific 
+% metric.
 %
-% Inputs:
-% - domain   : the name of the MDP
-% - ind_type : the type of indicator
-% - J        : the solution to evaluate
-% - beta     : parameters of the indicator function
+%    INPUT
+%     - domain   : the name of the MDP
+%     - ind_type : the type of indicator
+%     - J        : the solution to evaluate
+%     - beta     : parameters of the indicator function
 %
-% Outputs:
-% - L        : the indicator
-% - D_J_L    : the derivative of the indicator wrt J
+%    OUTPUT
+%     - L        : the indicator
+%     - D_J_L    : the derivative of the indicator wrt J
 
 [~, ~, utopia, antiutopia] = feval([domain '_moref'],0);
 dim_J = length(J);
