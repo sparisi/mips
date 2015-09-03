@@ -1,6 +1,6 @@
-%%% Gaussian Mixture Model with constant mean and covariance.
-%%% Params: mean and covariance.
 classdef gmm_constant
+% GMM_CONSTANT Gaussian Mixture Model with constant means and covariances.
+% Parameters: means and covariances.
     
     properties(GetAccess = 'public', SetAccess = 'private')
         mu;    % means

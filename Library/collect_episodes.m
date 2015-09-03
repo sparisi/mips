@@ -1,7 +1,7 @@
 function [J, Theta] = collect_episodes(domain, maxepisodes, pol_high)
-% Collects episodes for the specified domain. The low-level policy is
-% deterministic and its parameters are drawn from a high-level
-% distribution (pol_high).
+% COLLECT_EPISODES Collects episodes for the specified domain. The 
+% low-level policy is deterministic and its parameters are drawn from a 
+% high-level distribution (POL_HIGH).
 
 [n_obj, pol_low, ~, steps] = feval([domain '_settings']);
 pol_low = pol_low.makeDeterministic;

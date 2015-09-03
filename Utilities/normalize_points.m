@@ -1,12 +1,17 @@
 function pn = normalize_points(p,minp,maxp)
-% Normalizes points in order to have them in [0,1].
+% NORMALIZE_POINTS Normalizes points in order to have them in [0,1].
 % pn = (p - minp) / (maxp - minp)
 %
-% Inputs:
-% - p    : N-by-D matrix, where N is the number of points and D is the
-%          dimensionality of a point
-% - minp : 1-by-D vector of the minimum feasible value the points can have
-% - maxp : 1-by-D vector of the maximum feasible value the points can have
+%    INPUT
+%     - p    : N-by-D matrix, where N is the number of points and D is the
+%              dimensionality of a point
+%     - minp : 1-by-D vector of the minimum feasible value the points can
+%              assume
+%     - maxp : 1-by-D vector of the maximum feasible value the points can
+%              assume
+%
+%    OUTPUT
+%     - pn   : N-by-D matrix of normalized points
 
 % checkmin = bsxfun(@ge,p,minp);
 % checkmin = min(checkmin(:));

@@ -1,16 +1,16 @@
 function out = trapz2d(f, x_min, x_max, y_min, y_max, n_points)
-% Double trapezoidal integral over a uniformly spaced interval.
+% TRAPZ2D Double trapezoidal integral over a uniformly spaced interval.
 %
-% Inputs:
-%  - f        : handle to the (vectorial) function to integrate
-%  - x_min    : lower bound of the first variable
-%  - x_max    : upper bound of the first variable
-%  - y_min    : lower bound of the second variable
-%  - y_max    : upper bound of the second variable
-%  - n_points : number of points to sample per dimension
+%    INPUT
+%     - f        : handle to the (vectorial) function to integrate
+%     - x_min    : lower bound of the first variable
+%     - x_max    : upper bound of the first variable
+%     - y_min    : lower bound of the second variable
+%     - y_max    : upper bound of the second variable
+%     - n_points : number of points to sample per dimension
 % 
-% Outputs:
-%  - out      : (vector column) result
+%    OUTPUT
+%     - out      : (vector column) result
 
 n = ceil(sqrt(n_points));
 x = linspace(x_min, x_max, n);

@@ -1,4 +1,5 @@
 classdef policy
+% POLICY Generic class for policies.
     
     properties(GetAccess = 'public', SetAccess = 'protected')
         dim_explore; % Size of the explorative parameters (e.g., variance)

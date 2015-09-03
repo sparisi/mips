@@ -1,6 +1,7 @@
-%%% Gaussian with constant mean and covariance: N(K,S).
-%%% Params: mean and covariance.
 classdef gaussian_constant < policy
+% GAUSSIAN_CONSTANT Gaussian distribution with constant mean and
+% covariance.
+% Parameters: mean K and covariance S.
     
     methods
         

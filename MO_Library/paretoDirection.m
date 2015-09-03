@@ -1,8 +1,11 @@
 function [dir, lambda] = paretoDirection(N_obj, jacobian)
-% Computes the minimum-norm Pareto-ascent direction.
+% PARETODIRECTION Computes the minimum-norm Pareto-ascent direction.
 %
-% Reference: S Parisi, M Pirotta, N Smacchia, L Bascetta, M Restelli (2014)
+% =========================================================================
+% REFERENCE
+% S Parisi, M Pirotta, N Smacchia, L Bascetta, M Restelli
 % Policy gradient approaches for multi-objective sequential decision making
+% (2014)
 
 options = optimset('Display', 'off',...
                    'Algorithm', 'interior-point-convex');

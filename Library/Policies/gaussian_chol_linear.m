@@ -1,6 +1,7 @@
-%%% Gaussian with linear mean and constant covariance: N(K*phi,S).
-%%% Params: mean and Cholesky decomposition (S = A'A).
 classdef gaussian_chol_linear < policy
+% GAUSSIAN_CHOL_LINEAR Gaussian distribution with linear mean and constant 
+% covariance: N(K*phi,S).
+% Parameters: mean K and Cholesky decomposition A, with S = A'A.
     
     properties(GetAccess = 'public', SetAccess = 'private')
         basis;

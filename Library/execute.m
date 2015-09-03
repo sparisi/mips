@@ -1,5 +1,5 @@
-function [new_results, totrew, totentropy] = execute( ...
-    domain, initial_state, simulator, policy, maxsteps )
+function [new_results, totrew, totentropy] = execute(domain, ...
+    initial_state, simulator, policy, maxsteps)
 
 % Get MDP characteristics
 mdpconfig = [domain '_mdpvariables'];

@@ -1,6 +1,7 @@
-%%% Gaussian with linear mean (with offset) and constant covariance: N(k+K*phi,S).
-%%% Params: mean and covariance.
 classdef gaussian_linear_full < policy
+% GAUSSIAN_LINEAR_FULL Gaussian distribution with linear mean (with offset) 
+% and constant covariance: N(k+K*phi,S).
+% Parameters: offset k, mean K and covariance S.
     
     properties(GetAccess = 'public', SetAccess = 'private')
         basis;

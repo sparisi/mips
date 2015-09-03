@@ -1,14 +1,12 @@
 function fprintfmat(A, every_x_row, every_x_column, precision, specifier)
-% Prints a matrix separating rows with '-' and columns with '|'.
+% FPRINTFMAT Prints a matrix separating rows with '-' and columns with '|'.
 %
-% Inputs:
-% - A                    : the matrix to be printed
-% - every_x_row          : number of rows separated by '-'
-% - every_x_column       : number of columns separated by '|'
-% - precision (optional) : number of digits after a period (integer)
-% - specifier (optional) : notation of the output (single character)
-%
-% Example: fprintf(A,1,2,3,'f')
+%    INPUT
+%     - A                    : the matrix to be printed
+%     - every_x_row          : number of rows separated by '-'
+%     - every_x_column       : number of columns separated by '|'
+%     - precision (optional) : number of digits after a period (integer)
+%     - specifier (optional) : notation of the output (single character)
 
 if rem(size(A,2), every_x_column) ~= 0
     error('Incompatible number of columns.')

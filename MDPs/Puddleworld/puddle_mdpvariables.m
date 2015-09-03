@@ -1,6 +1,6 @@
 function mdp_vars = puddle_mdpvariables()
 % Reference: Vamplew et al, Empirical evaluation methods for multiobjective 
-% reinforcement learning algorithms 
+% reinforcement learning algorithms (2011)
 
 mdp_vars.nvar_state = 2;
 mdp_vars.nvar_action = 1;

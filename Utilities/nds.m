@@ -1,30 +1,32 @@
 function R = nds(P)
-% Non-domination sorting. Duplicate solutions (same rows in P) are ignored
-% for the dominance count and are assigned all the same rank.
+% NDS Non-domination sorting. Duplicate solutions (same rows in P) are 
+% ignored for the dominance count and are assigned all the same rank.
 %
-% Inputs:
-% - P : N-by-D matrix, where N is the number of points and D is the
-%       number of elements (objectives) of each point.
+%    INPUT
+%     - P : N-by-D matrix, where N is the number of points and D is the
+%           number of elements (objectives) of each point.
 %
-% Outputs:
-% - R : N-by-3 matrix. First column has the number of solutions by which
-%       each solution is weakly dominated. Second column has the sub-front
-%       where each solution belongs. Third column has a crowding
-%       distance.
+%    INPUT
+%     - R : N-by-3 matrix. First column has the number of solutions by 
+%           which each solution is weakly dominated. Second column has the 
+%           sub-front where each solution belongs. Third column has a 
+%           crowding distance.
 %
-% NB: The crowding distance used in this code is not exactly the one
-% described in NSGA-II. In this implementation, it is the average Euclidean 
-% distance between each solution and the solutions belonging to the same 
-% sub-front.
+% =========================================================================
+% WARNING
+% The crowding distance used in this code is not exactly the one described
+% in NSGA-II. In this implementation, it is the average Euclidean distance 
+% between each solution and the solutions belonging to the same sub-front.
 % Also notice that the distance is negated to sort the solution correctly 
 % (as we prefer sparse solution, the higher the distance the better).
 %
-% Reference: K Deb, A Pratap, S Agarwal, T Meyarivan,
-% "A fast and elitist multiobjective genetic algorithm: NSGA-II",
-% IEEE Transactions on Evolutionary Computation, 2002.
+% =========================================================================
+% REFERENCE
+% K Deb, A Pratap, S Agarwal, T Meyarivan
+% A fast and elitist multiobjective genetic algorithm: NSGA-II (2002)
 %
-% Example:
-%
+% =========================================================================
+% EXAMPLE
 % P = [0.6850   0.2048
 %     0.2649    0.2967
 %     0.3348    0.6344

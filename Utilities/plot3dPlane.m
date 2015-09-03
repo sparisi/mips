@@ -1,4 +1,6 @@
 function fig = plot3dPlane(pointA, pointB, pointC, opacity)
+% PLOT3DPLANE Plots a 3d plane passing through three points. Use optional 
+% input argument OPACITY to regulate the opacity of the plane.
 
 normal = cross(pointA-pointB, pointA-pointC); % calculate plane normal
 

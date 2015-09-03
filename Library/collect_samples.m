@@ -1,7 +1,7 @@
-function [dataset, J, S] = collect_samples( ...
-    domain, maxepisodes, maxsteps, policy )
-% Collects full episodes, i.e., it returns a dataset containing information
-% also about the single steps for each episode.
+function [dataset, J, S] = collect_samples(domain, ...
+    maxepisodes, maxsteps, policy)
+% COLLECT_SAMPLES Collects full episodes, i.e., it returns a DATASET 
+% containing information also about the single steps for each episode.
 
 simulator = [domain '_simulator'];
 mdpvars = feval([domain '_mdpvariables']);

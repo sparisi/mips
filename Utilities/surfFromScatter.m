@@ -1,4 +1,5 @@
 function surfFromScatter(x, y, z)
+% SURFFROMSCATTER Plots a surface from scattered data (X,Y,Z).
 
 figure
 grid on

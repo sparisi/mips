@@ -1,6 +1,6 @@
-function phi = mountain_basis_poly(state, action)
+function phi = mcs_basis_poly(state, action)
 
-mdp_vars = mountain_mdpvariables();
+mdp_vars = mcs_mdpvariables();
 
 numfeatures = 3;
 

@@ -1,11 +1,10 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Reference: D Wierstra, T Schaul, T Glasmachers, Y Sun, J Peters
-% J Schmidhuber (2014)
-% Natural Evolution Strategy
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 classdef NES_Solver < handle
-    
-    % Natural Evolution Strategies
+% NES_SOLVER Natural Evolution Strategy.
+%
+% =========================================================================
+% REFERENCE
+% D Wierstra, T Schaul, T Glasmachers, Y Sun, J Peters, J Schmidhuber
+% Natural Evolution Strategy (2014)
     
     properties(GetAccess = 'public', SetAccess = 'private')
         lrate;

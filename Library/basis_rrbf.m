@@ -1,21 +1,21 @@
 function Phi = basis_rrbf(n_centers, widths, range, state)
-% Uniformly distributed Roooted Gaussian Radial Basis Functions.
-%
+% BASIS_RRBF Uniformly distributed Roooted Gaussian Radial Basis Functions.
 % Phi(i) = exp(-||state - centers(i)|| / widths(i))
 %
-% Inputs:
-%  - n_centers        : number of centers (the same for all dimensions)
-%  - widths           : array of widths for each dimension
-%  - range            : N-by-2 matrix with min and max values for the
-%                       N-dimensional input state
-%  - state (optional) : the state to evaluate
+%    INPUT
+%     - n_centers : number of centers (the same for all dimensions)
+%     - widths    : array of widths for each dimension
+%     - range     : N-by-2 matrix with min and max values for the
+%                   N-dimensional input state
+%     - state     : (optional) the state to evaluate
 %
-% Outputs:
-%  - Phi              : if a state is provided as input, the function 
-%                       returns the feature vector representing it; 
-%                       otherwise it returns the number of features
+%    OUTPUT
+%     - Phi       : if a state is provided as input, the function 
+%                   returns the feature vector representing it; 
+%                   otherwise it returns the number of features
 %
-% Example:
+% =========================================================================
+% EXAMPLE
 % basis_rrbf(2, [30, 20], [0,1; 0,1], [0.2, 0.1]')
 %     0.2983
 %     0.0499

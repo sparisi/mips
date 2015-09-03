@@ -1,8 +1,8 @@
 function div = getKL(pWeighting, qWeighting)
-% Approximates the Kullback-Leibler KL(q||p) divergence beetween two
-% distributions q (the old one) and p (the new one) using the weights for
+% GETKL Approximates the Kullback-Leibler KL(Q||P) divergence beetween two
+% distributions Q (the old one) and P (the new one) using the weights for
 % a Maximum-Likelihood update.
-% If no weights for q are provided, they are assumed to be 1.
+% If no weights for Q are provided, they are assumed to be 1.
 
 if(nargin == 1)
     qWeighting = ones(length(pWeighting));

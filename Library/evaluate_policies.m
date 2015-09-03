@@ -1,6 +1,6 @@
-function J = evaluate_policies ( policies, domain, makeDet )
-% Given a set of low-level POLICIES, it returns the corresponding return J
-% in the objectives space.
+function J = evaluate_policies (policies, domain, makeDet)
+% EVALUATE_POLICIES Given a set of low-level POLICIES, it returns the 
+% corresponding return J in the objectives space.
 % Set MAKEDET to 1 if you want to make the policies deterministic.
 
 [n_obj, ~, episodes, steps] = feval([domain '_settings']);

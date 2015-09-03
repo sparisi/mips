@@ -1,10 +1,10 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Reference: K Deb, A Pratap, S Agarwal, T Meyarivan (2002)
-% A fast and elitist multiobjective genetic algorithm: NSGA-II
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 classdef NSGA2_Solver < Genetic_Solver
-    
-    % Non-dominated Sorting Genetic Algorithm II
+% NSGA2_SOLVER Non-dominated Sorting Genetic Algorithm II.
+%
+% =========================================================================
+% REFERENCE
+% K Deb, A Pratap, S Agarwal, T Meyarivan
+% A fast and elitist multiobjective genetic algorithm: NSGA-II (2002)
     
     methods
         

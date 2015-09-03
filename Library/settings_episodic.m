@@ -1,15 +1,15 @@
 function [n_obj, policy] = settings_episodic(domain, isDet)
-% Function used to retrieve the settings for episodic algorithms.
+% SETTING_EPISODIC Wrapper to retrieve the settings for episodic algorithms.
 %
-% Inputs: 
-% - domain : name of the MDP
-% - isDet  : 1 if you want the low-level policy to be deterministic, 
-%            0 otherwise
+%    INPUT
+%     - domain : name of the MDP
+%     - isDet  : 1 if you want the low-level policy to be deterministic, 
+%                0 otherwise
 %
-% Outputs:
-% - n_obj  : number of parameters of the low-level policy to be learnt
-% - policy : high-level policy, i.e., distribution used to draw low-level 
-%            policy parameters
+%    OUTPUT
+%     - n_obj  : number of parameters of the low-level policy to be learnt
+%     - policy : high-level policy, i.e., distribution used to draw 
+%                low-level policy parameters
 
 [n_obj, pol_low] = feval([domain '_settings']);
 n_params = length(pol_low.theta) - pol_low.dim_explore * isDet;

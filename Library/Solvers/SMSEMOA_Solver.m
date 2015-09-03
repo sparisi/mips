@@ -1,10 +1,10 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Reference: N Beume, B Naujoks, M Emmerich (2007)
-% SMS-EMOA: Multiobjective selection based on dominated hypervolume
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 classdef SMSEMOA_Solver < Genetic_Solver
-    
-    % S-Metric Selection Evolutionary Multi-Objective Algorithm
+% SMSEMOA_SOLVER S-Metric Selection Evolutionary Multi-Objective Algorithm.
+%
+% =========================================================================
+% REFERENCE
+% N Beume, B Naujoks, M Emmerich
+% SMS-EMOA: Multiobjective selection based on dominated hypervolume (2007)
     
     properties(GetAccess = 'public', SetAccess = 'private')
         fitness;   % fitness function

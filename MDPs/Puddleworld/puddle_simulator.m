@@ -1,7 +1,6 @@
 function [nextstate, reward, absorb] = puddle_simulator(state, action)
 
 env = puddle_environment();
-mdp_vars = puddle_mdpvariables();
 
 if nargin == 0
 

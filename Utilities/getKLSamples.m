@@ -1,7 +1,9 @@
 function div = getKLSamples(p, q, states, actions)
-% Approximates the Kullback-Leibler KL(q||p) divergence beetween two
-% distributions q (the old one) and p (the new one) using samples.
-% Reference: http://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence
+% GETKLSAMPLES Approximates the Kullback-Leibler KL(Q||P) divergence 
+% beetween two distributions Q (the old one) and P (the new one) using 
+% samples.
+%
+% http://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence
 
 n = size(actions,1);
 pWeighting = zeros(n,1);

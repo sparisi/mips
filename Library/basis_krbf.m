@@ -1,23 +1,23 @@
 function Phi = basis_krbf(n_centers, range, state)
-% Uniformly distributed Kernel Radial Basis Functions. Centers and 
-% bandwidths are automatically computed to guarantee 25% of overlapping and 
-% confidence between 95-99%.
-%
+% BASIS_KRBF Uniformly distributed Kernel Radial Basis Functions. Centers  
+% and bandwidths are automatically computed to guarantee 25% of overlapping  
+% and peaks between 0.95-0.99.
 % Phi = exp( -0.5 * (state - centers)' * B^-1 * (state - centers) ), 
 % where B is a diagonal matrix denoting the bandwiths of the kernels.
 %
-% Inputs:
-%  - n_centers        : number of centers (the same for all dimensions)
-%  - range            : N-by-2 matrix with min and max values for the
-%                       N-dimensional input state
-%  - state (optional) : the state to evaluate
+%    INPUT
+%     - n_centers : number of centers (the same for all dimensions)
+%     - range     : N-by-2 matrix with min and max values for the
+%                   N-dimensional input state
+%     - state     : (optional) the state to evaluate
 %
-% Outputs:
-%  - Phi              : if a state is provided as input, the function 
-%                       returns the feature vector representing it; 
-%                       otherwise it returns the number of features
+%    OUTPUT
+%     - Phi       : if a state is provided as input, the function returns
+%                   the feature vector representing it; otherwise it 
+%                   returns the number of features
 %
-% Example:
+% =========================================================================
+% EXAMPLE
 % basis_krbf(2, [0,1; 0,1], [0.2, 0.1]')
 %     0.7118
 %     0.0508

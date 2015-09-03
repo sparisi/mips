@@ -1,6 +1,7 @@
-%%% Gaussian with linear mean and constant diagonal covariance: N(K*phi,S).
-%%% Params: mean and diagonal std (S = diag(s)^2).
 classdef gaussian_diag_linear < policy
+% GAUSSIAN_DIAG_LINEAR Gaussian distribution with linear mean and constant 
+% diagonal covariance: N(K*phi,S).
+% Parameters: mean K and diagonal std s, where S = diag(s)^2.
     
     properties(GetAccess = 'public', SetAccess = 'private')
         basis;

@@ -1,15 +1,15 @@
 function rw = scalarizeReward(r,w,metric,u)
-% Scalarizes rewards according to a function.
-% 
-% Inputs:
-% - r      : N-by-D matrix, where N is the number of reward samples and D 
-%            is the dimension of the reward vector
-% - w      : D-by-1 vector with the weights for the scalarization
-% - metric : string defining the scalarization function
-% - u      : utopia point (needed by only some metrics)
+% SCALARIZEREWARD Scalarizes rewards according to a function.
 %
-% Outputs:
-% - rw     : normalized reward matrix
+%    INPUT
+%     - r      : N-by-D matrix, where N is the number of reward samples and D
+%                is the dimension of the reward vector
+%     - w      : D-by-1 vector with the weights for the scalarization
+%     - metric : string defining the scalarization function
+%     - u      : utopia point (needed by only some metrics)
+%
+%    OUTPUT
+%     - rw     : normalized reward matrix
 
 if strcmp('ws',metric)
     rw = sum(bsxfun(@times, w/sum(w), r), 2);

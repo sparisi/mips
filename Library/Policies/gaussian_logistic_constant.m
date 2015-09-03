@@ -1,6 +1,7 @@
-%%% Gaussian with constant mean and logistic covariance: N(K,S).
-%%% Params: mean and logistic weights (S = tau/(1+exp(-w)).
 classdef gaussian_logistic_constant < policy
+% GAUSSIAN_LOGISTIC_CONSTANT Gaussian distribution with constant mean and 
+% logistic covariance: N(K,S).
+% Parameters: mean K and logistic weights w, with S = tau/(1+exp(-w)).
     
     properties(GetAccess = 'public', SetAccess = 'public')
         tau;

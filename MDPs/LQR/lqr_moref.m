@@ -1,4 +1,6 @@
 function [front, weights, utopia, antiutopia] = lqr_moref( outPlot )
+% Returns reference frontiers, weights, utopia and antiutopia points for
+% the problem. If OUTPLOT = 1, then it also plots the reference frontier.
 
 n_obj = lqr_settings;
 

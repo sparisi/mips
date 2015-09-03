@@ -1,6 +1,7 @@
-%%% Gaussian with linear mean and logistic covariance: N(K*phi,S).
-%%% Params: mean and logistic weights (S = tau/(1+exp(-w)).
 classdef gaussian_logistic_linear < policy
+% GAUSSIAN_LOGISTIC_LINEAR Gaussian distribution with linear mean and 
+% logistic covariance: N(K,S).
+% Parameters: mean K and logistic weights w, with S = tau/(1+exp(-w)).
     
     properties(GetAccess = 'public', SetAccess = 'private')
         basis;

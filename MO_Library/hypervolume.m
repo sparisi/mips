@@ -1,9 +1,9 @@
 function hv = hypervolume(F, AU, U, N)
-% Approximates the hypervolume of a Pareto frontier. First, it generates 
-% random samples in the hypercuboid defined by the utopia and antiutopia 
-% points. Second, it counts the number of samples dominated by the front. 
-% The hypervolume is approximated as the ratio 'dominated points / total
-% points'.
+% HYPERVOLUME Approximates the hypervolume of a Pareto frontier. First, it  
+% generates random samples in the hypercuboid defined by the utopia and  
+% antiutopia points. Second, it counts the number of samples dominated by 
+% the front.  The hypervolume is approximated as the ratio 
+% 'dominated points / total points'.
 % Please notice that the choice of the utopia and antiutopia point is
 % crucial: using points very far from the frontier will result in similar
 % hypervolume even for very different frontiers (if the utopia is too far 
@@ -13,14 +13,14 @@ function hv = hypervolume(F, AU, U, N)
 % for the approximation (e.g., if the antiutopia is above the frontier or 
 % the utopia is below, the hypervolume will be 0).
 %
-% Inputs:
-% - F  : the Pareto front to evaluate
-% - AU : antiutopia point
-% - U  : utopia point
-% - N  : number of sample for the approximation
+%    INPUT
+%     - F  : the Pareto front to evaluate
+%     - AU : antiutopia point
+%     - U  : utopia point
+%     - N  : number of sample for the approximation
 %
-% Outputs:
-% - hv : hypervolume
+%    OUTPUT
+%    - hv : hypervolume
 
 [n_sol, dim] = size(F);
 

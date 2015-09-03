@@ -1,6 +1,6 @@
-%%% Gibbs (soft-max) policy with preferences on all action.
-%%% The temperature is fixed.
 classdef gibbs_allpref < policy
+% GIBBS_ALLPREF Gibbs (soft-max) distribution with preferences on all 
+% actions. The temperature is fixed.
     
     properties(GetAccess = 'public', SetAccess = 'private')
         basis;

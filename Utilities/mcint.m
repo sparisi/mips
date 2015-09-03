@@ -1,16 +1,16 @@
 function out = mcint(f, in, lo, hi, useSimplex)
-% Monte Carlo numerical integration for integrals of any size.
+% MCINT Monte Carlo numerical integration for integrals of any size.
 %
-% Inputs:
-%  - f          : handle to the (vectorial column) function to integrate
-%  - in         : N-by-dim matrix containing the sample points (N is the 
-%                 number of samples, dim is the number of variables)
-%  - lo         : lower bounds of integration
-%  - hi         : upper bounds of integration
-%  - useSimplex : if the points were sampled from the simplex
+%    INPUT
+%     - f          : handle to the (vectorial column) function to integrate
+%     - in         : N-by-dim matrix containing the sample points (N is the 
+%                    number of samples, dim is the number of variables)
+%     - lo         : lower bounds of integration
+%     - hi         : upper bounds of integration
+%     - useSimplex : if the points were sampled from the simplex
 % 
-% Outputs:
-%  - out        : (vector column) result
+%    OUTPUT
+%     - out        : (vector column) result
 
 dim = length(lo);
 N = size(in,1);

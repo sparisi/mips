@@ -1,4 +1,4 @@
-function [nextstate, reward, absorb] = mountain_simulator(state, action)
+function [nextstate, reward, absorb] = mcs_simulator(state, action)
 
 if nargin == 0
     

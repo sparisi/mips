@@ -1,15 +1,16 @@
-function w = convexWeights ( dim, n )
-% Generates a matrix of convex combinations.
+function w = convexWeights(dim, n)
+% CONVEXWEIGHTS Generates a matrix W of convex points in [0,1].
 %
-% Inputs:
-% - dim : number of weights
-% - n   : number of unique points in the interval [0,1] for each weight
+%    INPUT
+%     - dim : number of weights
+%     - n   : number of unique points in the interval [0,1] for each weight
 %
-% Outputs: 
-% - w   : a M-by-N matrix which rows are the weights for convex 
-%         combinations between N elements. M depends on density and N
+%    OUTPUT
+%     - w   : M-by-N matrix which rows are the weights for convex 
+%             combinations between N elements. M depends on density and N
 %
-% Example:
+% =========================================================================
+% EXAMPLE
 % convexWeights(2,10)
 % [0.0 1.0
 %  0.1 0.9

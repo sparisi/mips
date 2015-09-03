@@ -1,7 +1,12 @@
-%%% Gaussian with constant mean and covariance: N(K,S).
-%%% Params: mean and Cholesky decomposition (S = A'A).
-%%% Reference: Y Sun, Efficient Natural Evolution Strategies, 2009
 classdef gaussian_chol_constant < policy
+% GAUSSIAN_CHOL_CONSTANT Gaussian distribution with constant mean and 
+% covariance: N(K,S).
+% Parameters: mean K and Cholesky decomposition A, with S = A'A.
+%
+% =========================================================================
+% REFERENCE
+% Y Sun, D Wierstra, T Schaul, J Schmidhuber
+% Efficient Natural Evolution Strategies (2009)
     
     methods
         

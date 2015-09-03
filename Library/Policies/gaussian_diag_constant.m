@@ -1,6 +1,7 @@
-%%% Gaussian with constant mean and diagonal covariance: N(K,S).
-%%% Params: mean and diagonal std (S = diag(s)^2).
 classdef gaussian_diag_constant < policy
+% GAUSSIAN_DIAG_CONSTANT Gaussian distribution with constant mean and 
+% diagonal covariance: N(K,S).
+% Parameters: mean K and diagonal std s, where S = diag(s)^2.
     
     methods
         

@@ -1,5 +1,8 @@
 function combs = nmultichoosek(values, k)
-% Like nchoosek, but with repetitions.
+% NMULTICHOOSEK Like nchoosek, but with repetitions.
+%
+% http://stackoverflow.com/questions/28284671/generating-all-combinations-with-repetition-using-matlab
+
 if numel(values) == 1 
     n = values;
     combs = nchoosek(n+k-1, k);

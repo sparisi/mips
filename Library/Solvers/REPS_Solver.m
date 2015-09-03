@@ -1,11 +1,11 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Reference: M P Deisenroth, G Neumann, J Peters (2013)
-% A Survey on Policy Search for Robotics, Foundations and Trends
-% in Robotics.
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 classdef REPS_Solver < handle
-
-    % Relative Entropy Policy Search
+% REPS_Solver Relative Entropy Policy Search.
+%
+% =========================================================================
+% REFERENCE
+% M P Deisenroth, G Neumann, J Peters
+% A Survey on Policy Search for Robotics, Foundations and Trends in 
+% Robotics (2013).
 
     properties(GetAccess = 'public', SetAccess = 'private')
         epsilon; % KL divergence bound

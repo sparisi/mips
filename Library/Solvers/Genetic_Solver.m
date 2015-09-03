@@ -1,4 +1,5 @@
 classdef Genetic_Solver < handle
+% GENETIC_SOLVER Generic implementation of a genetic algorithm.
     
     properties(GetAccess = 'public', SetAccess = 'protected')
         elitism;   % elitism percentage

@@ -1,20 +1,21 @@
 function points = samplePoints(lo, hi, N, useSimplex, linearly)
-% Samples continuous points in an interval. It allows for both linear and
-% uniform random sampling. It is also possible to draw points only in the 
-% simplex of the interval.
+% SAMPLEPOINTS Samples continuous points in an interval. It allows for both 
+% linear and uniform random sampling. It is also possible to draw points 
+% only in the simplex of the interval.
 %
-% Inputs:
-% - lo         : lower bound (column of length D)
-% - hi         : upper bound (column of length D)
-% - N          : number of points to sample
-% - useSimplex : put 1 if you want to sample from the simplex of the bound,
-%                0 otherwise
-% - linearly   : put 1 if you want the points to be linearly spaced, 0
-%                otherwise
+%    INPUT
+%     - lo         : lower bound (column of length D)
+%     - hi         : upper bound (column of length D)
+%     - N          : number of points to sample
+%     - useSimplex : 1 to sample from the simplex of the bound,
+%                    0 otherwise
+%     - linearly   : 1 if to have linearly spaced points,
+%                    0 otherwise
 %
-% Outputs:
-% - points     : D-by-NN matrix with random points, where NN >= N
+%    OUTPUT
+%     - points     : D-by-NN matrix with random points, where NN >= N
 %
+% =========================================================================
 % More information about sampling from the simplex:
 % http://math.stackexchange.com/questions/502583/uniform-sampling-of-points-on-a-simplex
 %

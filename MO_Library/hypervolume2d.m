@@ -1,7 +1,7 @@
 function hv = hypervolume2d(f, antiutopia, utopia)
-% Computes the hypervolume of a 2-dimensional frontier for a maximization
-% problem. If the user provides both the utopia and antiutopia, the 
-% frontier is normalized in order to have the objectives in the range 
+% HYPERVOLUME2D Computes the hypervolume of a 2-dimensional frontier for a 
+% maximization problem. If the user provides both the utopia and antiutopia,  
+% the frontier is normalized in order to have the objectives in the range 
 % [0, 1]. If only the antiutopia point is provided, the frontier is not 
 % normalized and the antiutopia is chosen as reference point.
 % Please note that points at the same level or below the antiutopia are not
@@ -9,14 +9,14 @@ function hv = hypervolume2d(f, antiutopia, utopia)
 % antiutopia is [0,-19], the point [124, -19] is ignored, so it would be
 % better to choose [124, -20] as antiutopia.
 %
-% Inputs:
-% - f          : N-by-D matrix representing a D-dimensional Pareto front of
-%                N points
-% - antiutopia : antiutopia point (1-by-D vector)
-% - utopia     : utopia point (1-by-D vector)
+%    INPUT
+%     - f          : N-by-D matrix representing a D-dimensional Pareto 
+%                    front of N points
+%     - antiutopia : antiutopia point (1-by-D vector)
+%     - utopia     : utopia point (1-by-D vector)
 %
-% Outputs:
-% - hv         : hypervolume
+%    OUTPUT
+%     - hv         : hypervolume
 
 if nargin == 3
     f = normalize_points(f,antiutopia,utopia);

@@ -1,16 +1,15 @@
-function saveDataset( filename, data, type, reward_idx, continuous )
-% Writes a dataset on a file.
+function saveDataset(filename, data, type, reward_idx, continuous)
+% SAVEDATASET Writes a dataset on a file.
 %
-% Inputs:
-%
-%  - filename   : name of the output file
-%  - data       : dataset to be saved
-%  - type       : 1 <state, action, reward, endep> (DEFAULT)
-%                 2 <state, action, nextstate, reward>
-%  - reward_idx : indices of the rewards to be saved (DEFAULT all)
-%  - continuous : 0 episodic (DEFAULT). Next state of the last transition 
-%                   is replaced by 123.456
-%                 1 non episodic (continuous)
+%    INPUT
+%     - filename   : name of the output file
+%     - data       : dataset to be saved
+%     - type       : 1 <state, action, reward, endep> (default)
+%                    2 <state, action, nextstate, reward>
+%     - reward_idx : indices of the rewards to be saved (default all)
+%     - continuous : 0 episodic (default). Next state of the last  
+%                    transition is replaced by 123.456
+%                    1 non episodic (continuous)
 
 if nargin < 3
     type = 1;

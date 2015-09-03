@@ -1,6 +1,7 @@
-%%% Gaussian with linear mean and constant covariance: N(K*phi,S).
-%%% Params: mean and covariance.
 classdef gaussian_linear < policy
+% GAUSSIAN_LINEAR Gaussian distribution with linear mean and constant 
+% covariance: N(K*phi,S).
+% Parameters: mean K and covariance S.
     
     properties(GetAccess = 'public', SetAccess = 'private')
         basis;

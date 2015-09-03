@@ -1,6 +1,7 @@
-%%% Gaussian with linear mean and fixed covariance: N(K*phi,S).
-%%% Params: mean.
 classdef gaussian_fixedvar < policy
+% GAUSSIAN_FIXEDVAR Gaussian distribution with linear mean and fixed 
+% covariance: N(K*phi,S).
+% Parameters: mean K.
     
     properties(GetAccess = 'public', SetAccess = 'private')
         basis;
