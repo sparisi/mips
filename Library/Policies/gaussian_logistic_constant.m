@@ -90,6 +90,7 @@ classdef gaussian_logistic_constant < policy
         end
         
         function obj = weightedMLUpdate(obj, weights, Action)
+            assert(min(weights)>=0) % weights cannot be negative
             weights = weights / sum(weights);
             mu = Action * weights;
             logv = zeros(obj.dim,1);
@@ -99,7 +100,6 @@ classdef gaussian_logistic_constant < policy
                 for k = 1 : size(Action,2)
                     tmp = tmp + (weights(k) * (Action(j,k) - mu(j)).^2);
                 end
-                
                 logv(j) = -log( obj.tau(j) / tmp - 1 );
             end
                 

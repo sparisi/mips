@@ -113,6 +113,7 @@ classdef gaussian_diag_constant < policy
         end
         
         function obj = weightedMLUpdate(obj, weights, Action)
+            assert(min(weights)>=0) % weights cannot be negative
             mu = Action * weights / sum(weights);
             sigma = zeros(obj.dim,1);
             for k = 1 : size(Action,2)

@@ -113,6 +113,7 @@ classdef gaussian_diag_linear < policy
         end
         
         function obj = weightedMLUpdate(obj, weights, Action, Phi)
+            assert(min(weights)>=0) % weights cannot be negative
             Sigma = zeros(obj.dim);
             D = diag(weights);
             N = size(Action,1);

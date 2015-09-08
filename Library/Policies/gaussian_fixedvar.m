@@ -93,6 +93,14 @@ classdef gaussian_fixedvar < policy
             params.Sigma = obj.sigma;
         end
         
+        function obj = weightedMLUpdate(obj, weights, Action, Phi)
+            assert(min(weights)>=0) % weights cannot be negative
+            D = diag(weights);
+            W = (Phi' * D * Phi + 1e-8 * eye(size(Phi,2))) \ Phi' * D * Action;
+            W = W';
+            obj.theta = W(:);
+        end
+        
     end
     
 end

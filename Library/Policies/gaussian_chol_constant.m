@@ -138,8 +138,39 @@ classdef gaussian_chol_constant < policy
             params.Sigma = sigma;
         end
         
+        function obj = weightedMLUpdate(obj, weights, Action)
+            assert(min(weights)>=0) % weights cannot be negative
+            mu = Action * weights / sum(weights);
+            sigma = zeros(size(obj.dim));
+            for k = 1 : size(Action,2)
+                sigma = sigma + (weights(k) * (Action(:,k) - mu) * (Action(:,k) - mu)');
+            end
+            Z = (sum(weights)^2 - sum(weights.^2)) / sum(weights);
+            sigma = sigma / Z;
+            sigma = nearestSPD(sigma);
+            cholA = chol(sigma);
+            tri = cholA';
+            tri = tri(tril(true(obj.dim), 0)).';
+            obj.theta = [mu; tri'];
+        end
+        
         function obj = randomize(obj, factor)
             obj.theta(obj.dim+1:end) = obj.theta(obj.dim+1:end) .* factor;
+        end
+        
+        function plot(obj)
+            params = obj.getParams;
+            mu = params.mu;
+            Sigma = params.Sigma;
+            figure; hold all
+            xlabel 'x_i'
+            ylabel 'Policy density'
+            x = max(abs(mu)) + 2*max(abs(Sigma(:)));
+            range = -x: 0.1 : x;
+            for i = 1 : length(mu)
+                norm = normpdf(range, mu(i), Sigma(i,i));
+                plot(range, norm)
+            end            
         end
         
     end

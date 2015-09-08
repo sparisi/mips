@@ -45,7 +45,7 @@ classdef gaussian_constant < policy
             sigma = vec2mat(obj.theta(obj.dim+1:end),obj.dim);
             
             dlogpdt_mu = sigma \ (action - mu);
-            invsigma = inv(sigma);
+            invsigma = inv(sigma)';
             A = -0.5 * invsigma;
             B =  0.5 * invsigma * (action - mu) * (action - mu)' * invsigma;
             dlogpdt_sigma = A + B;
@@ -72,6 +72,7 @@ classdef gaussian_constant < policy
         end
         
         function obj = weightedMLUpdate(obj, weights, Action)
+            assert(min(weights)>=0) % weights cannot be negative
             mu = Action * weights / sum(weights);
             sigma = zeros(size(obj.dim));
             for k = 1 : size(Action,2)
@@ -85,6 +86,21 @@ classdef gaussian_constant < policy
         
         function obj = randomize(obj, factor)
             obj.theta(obj.dim+1:end) = obj.theta(obj.dim+1:end) .* factor;
+        end
+        
+        function plot(obj)
+            params = obj.getParams;
+            mu = params.mu;
+            Sigma = params.Sigma;
+            figure; hold all
+            xlabel 'x_i'
+            ylabel 'Policy density'
+            x = max(abs(mu)) + 2*max(abs(Sigma(:)));
+            range = -x: 0.1 : x;
+            for i = 1 : length(mu)
+                norm = normpdf(range, mu(i), Sigma(i,i));
+                plot(range, norm)
+            end
         end
         
     end

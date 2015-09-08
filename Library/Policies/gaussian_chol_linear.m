@@ -105,6 +105,25 @@ classdef gaussian_chol_linear < policy
             obj.theta(n_k+1:end) = 1e-8;
         end
         
+        function obj = weightedMLUpdate(obj, weights, Action, Phi)
+            assert(min(weights)>=0) % weights cannot be negative
+            Sigma = zeros(obj.dim);
+            D = diag(weights);
+            N = size(Action,1);
+            W = (Phi' * D * Phi + 1e-8 * eye(size(Phi,2))) \ Phi' * D * Action;
+            W = W';
+            for k = 1 : N
+                Sigma = Sigma + (weights(k) * (Action(k,:)' - W*Phi(k,:)') * (Action(k,:)' - W*Phi(k,:)')');
+            end
+            Z = (sum(weights)^2 - sum(weights.^2)) / sum(weights);
+            Sigma = Sigma / Z;
+            Sigma = nearestSPD(Sigma);
+            cholA = chol(Sigma);
+            tri = cholA';
+            tri = tri(tril(true(obj.dim), 0)).';
+            obj.theta = [W(:); tri'];
+        end
+        
         function obj = randomize(obj, factor)
             n_k = obj.dim*feval(obj.basis);
             obj.theta(n_k+1:end) = obj.theta(n_k+1:end) .* factor;

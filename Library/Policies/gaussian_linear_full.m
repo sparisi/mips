@@ -95,6 +95,7 @@ classdef gaussian_linear_full < policy
         end
         
         function obj = weightedMLUpdate(obj, weights, Action, Phi)
+            assert(min(weights)>=0) % weights cannot be negative
             N = size(Action,1);
             D = diag(weights);
             S = [ones(N,1), Phi];
