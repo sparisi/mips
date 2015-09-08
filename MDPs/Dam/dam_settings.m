@@ -5,12 +5,13 @@ n_obj = mdp_vars.nvar_reward;
 gamma = mdp_vars.gamma;
 dim = mdp_vars.nvar_action;
 
+bfs = @dam_basis_rbf;
 k0 = [50, -50, 0, 0, 50];
-% k0 = zeros(1,dam_basis_rbf());
-% policy = gaussian_fixedvar(@dam_basis_rbf, dim, k0, 0.1);
-% policy = gaussian_linear(@dam_basis_rbf, dim, k0, 20);
-policy = gaussian_diag_linear(@dam_basis_rbf, dim, k0, 20);
-% policy = gaussian_logistic_linear(@dam_basis_rbf, dim, k0, 1, 50);
+% k0 = zeros(1,bfs());
+% policy = gaussian_fixedvar(bfs, dim, k0, 0.1);
+% policy = gaussian_linear(bfs, dim, k0, 20);
+policy = gaussian_diag_linear(bfs, dim, k0, 20);
+% policy = gaussian_logistic_linear(bfs, dim, k0, 1, 50);
 
 %%% Evaluation
 episodes = 1000;

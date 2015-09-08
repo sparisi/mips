@@ -4,9 +4,8 @@ mdp_vars = resource_mdpvariables();
 n_obj = mdp_vars.nvar_reward;
 gamma = mdp_vars.gamma;
 
-policy = gibbs(@resource_basis_poly, ...
-    zeros(resource_basis_poly,1), ...
-    mdp_vars.action_list);
+bfs = @resource_basis_poly;
+policy = gibbs(bfs, zeros(bfs(),1), mdp_vars.action_list);
 
 episodes = 150;
 steps = 40;
