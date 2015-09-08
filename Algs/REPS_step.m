@@ -2,25 +2,27 @@ clear all
 domain = 'dam';
 robj = 1;
 [~, policy, episodes, steps, gamma] = feval([domain '_settings']);
+mdp_vars = feval([domain '_mdpvariables']);
 iter = 0;
 
 epsilon = 0.9;
-phiV = @(varargin)basis_poly(4,2,1,varargin{:});
+% phiV = @(varargin)basis_poly(1,mdp_vars.nvar_state,1,varargin{:});
 % phiV = @(varargin)basis_krbf(5,[-30,0; -30,0],varargin{:});
+phiV = policy.basis;
 solver = CREPS_Solver(epsilon,policy,phiV);
 
 %% Learning
 while true
     
     iter = iter + 1;
-    [data, J, S] = collect_samples(domain, episodes, steps, policy);
+    [data, J, S] = collect_samples_rele(domain, episodes, steps, policy);
 
     count = 1;
     for trial = 1 : max(size(data));
         for step = 1 : size(data(trial).a,2)
             Action(count,:) = data(trial).a(:,step);
-            PhiPolicy(count,:) = policy.phi(data(trial).s(:,step));
-            PhiVFun(count,:) = policy.phi(data(trial).s(:,step));
+            PhiP(count,:) = policy.phi(data(trial).s(:,step));
+            PhiVFun(count,:) = phiV(data(trial).s(:,step));
             R(count) = gamma^(step - 1) * (data(trial).r(robj,step));
             count = count + 1;
         end
@@ -41,6 +43,6 @@ while true
         break
     end
     
-    policy = policy.weightedMLUpdate(weights, Action, PhiPolicy);
+    policy = policy.weightedMLUpdate(weights, Action, PhiP);
     
 end
