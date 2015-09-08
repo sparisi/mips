@@ -9,16 +9,14 @@ classdef REPS_Solver < handle
 
     properties(GetAccess = 'public', SetAccess = 'private')
         epsilon; % KL divergence bound
-        N;       % number of samples
         policy;  % distribution for sampling the episodes
     end
     
     methods
         
         %% CLASS CONSTRUCTOR
-        function obj = REPS_Solver(epsilon, N, policy)
+        function obj = REPS_Solver(epsilon, policy)
             obj.epsilon = epsilon;
-            obj.N = N;
             obj.policy = policy;
         end
         
@@ -52,7 +50,7 @@ classdef REPS_Solver < handle
             d = exp( (J - max(J)) / eta );
 
             % Compute KL divergence
-            qWeighting = ones(obj.N,1);
+            qWeighting = ones(length(J),1);
             pWeighting = d;
             divKL = getKL(pWeighting, qWeighting);
         end
@@ -67,8 +65,9 @@ classdef REPS_Solver < handle
             maxJ = max(J);
             J = J - maxJ;
             
-            A = sum(exp(J / eta)) / obj.N;
-            B = sum(exp(J / eta) .* J) / obj.N;
+            N = length(J);
+            A = sum(exp(J / eta)) / N;
+            B = sum(exp(J / eta) .* J) / N;
             
             g = eta * obj.epsilon + eta * log(A) + maxJ; % dual function
             gd = obj.epsilon + log(A) - B / (eta * A);   % gradient
