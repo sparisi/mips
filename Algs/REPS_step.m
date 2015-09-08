@@ -1,5 +1,5 @@
 clear all
-domain = 'dam';
+domain = 'deep';
 robj = 1;
 [~, policy, episodes, steps, gamma] = feval([domain '_settings']);
 mdp_vars = feval([domain '_mdpvariables']);
@@ -15,13 +15,13 @@ solver = CREPS_Solver(epsilon,policy,phiV);
 while true
     
     iter = iter + 1;
-    [data, J, S] = collect_samples_rele(domain, episodes, steps, policy);
+    [data, J, S] = collect_samples(domain, episodes, steps, policy);
 
     count = 1;
     for trial = 1 : max(size(data));
         for step = 1 : size(data(trial).a,2)
             Action(count,:) = data(trial).a(:,step);
-            PhiP(count,:) = policy.phi(data(trial).s(:,step));
+            PhiP(count,:) = policy.basis(data(trial).s(:,step));
             PhiVFun(count,:) = phiV(data(trial).s(:,step));
             R(count) = gamma^(step - 1) * (data(trial).r(robj,step));
             count = count + 1;
@@ -37,7 +37,7 @@ while true
 
     str_obj = strtrim(sprintf('%.4f, ', J));
     str_obj(end) = [];
-    fprintf('%d ) Entropy = %.2f, Div KL = %.3f, J = [ %s ]\n', iter, S, divKL, str_obj)
+    fprintf('%d ) Entropy: %.2f, Div KL: %.3f, J: [ %s ]\n', iter, S, divKL, str_obj)
     
     if divKL < 0.001
         break

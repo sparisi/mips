@@ -78,14 +78,6 @@ classdef gaussian_fixedvar < policy
             obj.sigma = 1e-8 * ones(size(obj.sigma));
         end
         
-        function phi = phi(obj, state)
-            if (nargin == 1)
-                phi = feval(obj.basis);
-                return
-            end
-            phi = feval(obj.basis, state);
-        end
-        
         function params = getParams(obj)
             k = vec2mat(obj.theta,obj.dim);
 

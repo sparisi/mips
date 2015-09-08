@@ -158,15 +158,6 @@ classdef gibbs < policy
             obj.inverse_temperature = 1e8;
         end
         
-        function phi = phi(obj, state)
-            if (nargin == 1)
-                % Return the dimension of the vector of basis functions
-                phi = feval(obj.basis) / (length(obj.action_list) - 1);
-                return
-            end
-            phi = feval(obj.basis, state);
-        end
-        
         function obj = randomize(obj, factor)
             obj.theta = obj.theta ./ factor;
         end

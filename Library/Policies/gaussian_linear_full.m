@@ -86,14 +86,6 @@ classdef gaussian_linear_full < policy
             obj.theta(n_k+1:end) = 1e-8;
         end
         
-        function phi = phi(obj, state)
-            if (nargin == 1)
-                phi = feval(obj.basis);
-                return
-            end
-            phi = feval(obj.basis, state);
-        end
-        
         function obj = weightedMLUpdate(obj, weights, Action, Phi)
             assert(min(weights)>=0) % weights cannot be negative
             N = size(Action,1);

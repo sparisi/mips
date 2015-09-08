@@ -5,9 +5,9 @@ robj = 1;
 iter = 0;
 theta = [];
 
-tolerance = 0.001;
+tolerance = 0.01;
 minS = -20; % with Gaussian policies the (differential) entropy can be negative
-lrate = 0.1;
+lrate = 1;
 
 
 %% Learning
@@ -26,7 +26,7 @@ while true
     
     str_obj = strtrim(sprintf('%.4f, ', J));
     str_obj(end) = [];
-    fprintf('%d ) Entropy = %.2f, Norm = %.4f, J = [ %s ]\n', iter, S, norm_g, str_obj)
+    fprintf('%d ) Entropy: %.2f, Norm: %.4f, J: [ %s ]\n', iter, S, norm_g, str_obj)
     
     if norm_g < tolerance || S < minS
         break

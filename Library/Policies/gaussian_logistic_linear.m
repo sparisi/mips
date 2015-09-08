@@ -97,14 +97,7 @@ classdef gaussian_logistic_linear < policy
         function obj = makeDeterministic(obj)
             obj.tau = 1e-8 * ones(size(obj.tau));
         end
-        
-        function phi = phi(obj, state)
-            if (nargin == 1)
-                phi = feval(obj.basis);
-                return
-            end
-            phi = feval(obj.basis, state);
-        end
+
         
         function params = getParams(obj)
             logv  = logistic(obj.theta(end-obj.dim+1:end), obj.tau);
