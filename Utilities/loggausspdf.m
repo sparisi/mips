@@ -1,11 +1,13 @@
 function y = loggausspdf(X, mu, Sigma)
-% Logarithm of multivariate normal probability density function.
+% LOGGAUSSPDF Logarithm of multivariate normal probability density function.
 %
-% Written by Michael Chen (sth4nth@gmail.com).
+% =========================================================================
+% ACKNOWLEDGEMENT
+% http://www.mathworks.com/matlabcentral/fileexchange/26184-em-algorithm-for-gaussian-mixture-model
 
 d = size(X,1);
 X = bsxfun(@minus, X, mu);
-[U, p]= chol(Sigma);
+[U, p] = chol(Sigma);
 if p ~= 0
     error('Sigma is not positive-definite.');
 end

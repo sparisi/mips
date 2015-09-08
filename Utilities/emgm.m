@@ -1,13 +1,21 @@
 function [label, model, llh] = emgm(X, W, init)
-% EMGM Performs weighted EM algorithm for fitting a Gaussian Mixture Model.
+% EMGM Weighted EM for fitting a Gaussian mixture model.
 %
 %    INPUT
-%     - X    : D-by-N data matrix
-%     - W    : N-by-1 weights vector
-%     - init : K (1-by-1) or label (1-by-N, 1 <= label(i) <= K) or center 
-%              (D-by-K)
+%     - X     : D-by-N data matrix
+%     - W     : N-by-1 weights vector
+%     - init  : K (1-by-1) or label (1-by-N, 1 <= label(i) <= K) or center 
+%               (D-by-K)
 %
-% Based on the function written by Michael Chen (sth4nth@gmail.com).
+%    OUTPUT
+%     - label : 
+%     - model : struct with means (mu), covariances (sigma) and mixing
+%               proportions (ComponentProportion)
+%     - llh   : log-likelihood of the model
+%
+% =========================================================================
+% ACKNOWLEDGEMENT
+% http://www.mathworks.com/matlabcentral/fileexchange/26184-em-algorithm-for-gaussian-mixture-model
 
 R = initialization(X, init);
 [~, label(1,:)] = max(R, [], 2);
