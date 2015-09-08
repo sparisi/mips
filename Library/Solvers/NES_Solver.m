@@ -7,17 +7,15 @@ classdef NES_Solver < handle
 % Natural Evolution Strategy (2014)
     
     properties(GetAccess = 'public', SetAccess = 'private')
-        lrate;
-        N;       % number of samples
+        lrate;   % learning rate
         policy;  % distribution for sampling the episodes
     end
     
     methods
         
         %% CLASS CONSTRUCTOR
-        function obj = NES_Solver(lrate, N, policy)
+        function obj = NES_Solver(lrate, policy)
             obj.lrate = lrate;
-            obj.N = N;
             obj.policy = policy;
         end
         

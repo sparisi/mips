@@ -11,7 +11,7 @@ robj = 1;
 
 N = 20;
 N_MAX = 10*N;
-solver = REPS_Solver(0.9,N_MAX,pol_high);
+solver = REPS_Solver(0.9,pol_high);
 
 J = zeros(N_MAX,n_obj);
 Theta = zeros(pol_high.dim,N_MAX);

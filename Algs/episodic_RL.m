@@ -7,8 +7,8 @@ robj = 1;
 N = 40;
 N_MAX = N*10;
 
-% solver = REPS_Solver(0.9,N_MAX,pol_high);
-solver = NES_Solver(1,N_MAX,pol_high);
+% solver = REPS_Solver(0.9,pol_high);
+solver = NES_Solver(1,pol_high);
 
 J = zeros(N_MAX,n_obj);
 Theta = zeros(pol_high.dim,N_MAX);
