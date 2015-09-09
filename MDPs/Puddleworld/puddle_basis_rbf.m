@@ -14,7 +14,6 @@ if nargin == 0
     return
 end
 
-% Full second degree polynomial
 phi = basis_krbf(n_centers,range,state);
 
 % Basis depending only on the state

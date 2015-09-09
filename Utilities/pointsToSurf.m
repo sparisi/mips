@@ -1,6 +1,6 @@
-function h = pointsToSurf(x, y, z, nPoints_X, nPoints_Y)
-% POINTSTOSURF Plots a surface from scattered data (X,Y,Z). NPOINTS_X and
-% N_POINTS_Y define the density of the plot.
+function h = pointsToSurf(x, y, z, nPoints_X, nPoints_Y, opacity)
+% POINTSTOSURF Plots a surface from scattered data (X,Y,Z) with desired 
+% OPACITY. NPOINTS_X and N_POINTS_Y define the density of the plot.
 
 if nPoints_X < 1 || nPoints_Y < 1
     error('Less than 1 point selected.')
@@ -15,5 +15,10 @@ Z = griddata(x,y,z,X,Y);
 figure
 h = surf(X,Y,Z);
 % h = mesh(X,Y,Z);
+
+if nargin < 6
+    opacity = 1;
+end
+alpha(h,opacity)
 
 end
