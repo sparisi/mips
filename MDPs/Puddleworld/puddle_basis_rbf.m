@@ -2,9 +2,9 @@ function phi = puddle_basis_rbf(state, action)
 
 env = puddle_environment();
 mdp_vars = puddle_mdpvariables();
-n_centers = 10;
+n_centers = 5;
 n_actions = length(mdp_vars.action_list);
-range = [env.xmin,env.xmax;env.ymin,env.ymax];
+range = [env.minstate, env.maxstate];
 numfeatures = basis_krbf(n_centers,range);
 dim_phi = numfeatures * (n_actions - 1);
 

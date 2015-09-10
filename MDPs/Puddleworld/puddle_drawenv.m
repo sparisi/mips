@@ -2,12 +2,12 @@ p1 = [0.1 0.75; % Centers of the first puddle
     0.45 0.75];
 p2 = [0.45 0.4; % Centers of the second puddle
     0.45 0.8];
-radius = 0.1;
-ratio = 400; % Total number of cells
 
-figure, hold all
-count = 0;
-reward = 0;
+radius = 0.1;
+
+% figure, hold all
+puddle1 = [];
+puddle2 = [];
 
 for x = 0 : 0.01 : 1
     for y = 0 : 0.01 : 1
@@ -30,17 +30,32 @@ for x = 0 : 0.01 : 1
             d2 = abs(state(1) - p2(1,1));
         end
         
-        min_distance_from_puddle = min(d1, d2);
-        if min_distance_from_puddle <= radius
-            plot(state(1),state(2),'k.')
-            reward = reward - ratio * (radius - min_distance_from_puddle);
+        if d1 > 0 && d1 <= radius
+            puddle1 = [puddle1; state'];
+        elseif d2 > 0 && d2 <= radius
+            puddle2 = [puddle2; state'];
         end
-        
-        count = count + 1;
         
     end
 end
 
-axis([0 1 0 1])
+%%
+z1 = zeros(size(puddle1,1),1);
+z2 = zeros(size(puddle2,1),1);
 
-meanRew = reward / count; % mean reward per cell
+hold all
+
+tri = delaunay(puddle1(:,1),puddle1(:,2));
+trisurf(tri, puddle1(:,1), puddle1(:,2), z1);
+tri = delaunay(puddle2(:,1),puddle2(:,2));
+trisurf(tri, puddle2(:,1), puddle2(:,2), z2);
+
+alpha(0.7)
+light('Position',[-50 -15 29]);
+lighting phong
+shading interp
+    
+rectangle('Position',[0.95,0.95,2,2],'FaceColor',[1 .5 .5],'EdgeColor','r',...
+    'LineWidth',3)
+
+axis([0 1 0 1])

@@ -1,4 +1,4 @@
-function surfFromScatter(x, y, z, opacity)
+function h = surfFromScatter(x, y, z, opacity)
 % SURFFROMSCATTER Plots a surface from scattered data (X,Y,Z) with desired
 % OPACITY.
 
