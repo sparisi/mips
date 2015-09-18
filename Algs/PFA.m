@@ -2,15 +2,16 @@
 % Finds the Pareto-frontier using the Pareto-Following Algorithm and the 
 % Natural Gradient.
 % 
-% Reference: S Parisi, M Pirotta, N Smacchia, L Bascetta, M Restelli (2014)
+% Reference: S Parisi, M Pirotta, N Smacchia, L Bascetta, M Restelli 
 % Policy gradient approaches for multi-objective sequential decision making
+% (2014)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 clear all
 
 verboseOut = true; % to print output messages
 
-domain = 'dam';
+domain = 'deep';
 makeDet = 0; % if we want to consider stochastic or deterministic policies
 [N_obj, init_pol, episodes, steps, gamma] = feval([domain '_settings']);
 N_params = length(init_pol.theta);

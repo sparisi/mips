@@ -1,7 +1,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Reference: M P Deisenroth, G Neumann, J Peters (2013)
+% Reference: M P Deisenroth, G Neumann, J Peters 
 % A Survey on Policy Search for Robotics, Foundations and Trends
-% in Robotics.
+% in Robotics (2013)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 clear all
@@ -33,7 +33,7 @@ while true
             Theta(:,k) = solver.policy.drawAction;
         end
     end
-        
+
     % Enqueue the new samples and remove the old ones
     J = [J_iter; J(1:N_MAX-N,:)];
     Theta = [Theta_iter, Theta(:, 1:N_MAX-N)];

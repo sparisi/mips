@@ -2,8 +2,9 @@
 % Finds the Pareto-frontier using the Radial Algorithm and the Natural 
 % Gradient.
 % 
-% Reference: S Parisi, M Pirotta, N Smacchia, L Bascetta, M Restelli (2014)
+% Reference: S Parisi, M Pirotta, N Smacchia, L Bascetta, M Restelli 
 % Policy gradient approaches for multi-objective sequential decision making
+% (2014)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 clear all

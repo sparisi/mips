@@ -1,5 +1,5 @@
 clear all
-domain = 'deep';
+domain = 'puddle';
 robj = 1;
 [n_obj, pol, episodes, steps, gamma] = feval([domain '_settings']);
 iter = 0;

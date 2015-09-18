@@ -1,7 +1,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Reference: D Wierstra, T Schaul, T Glasmachers, Y Sun, J Peters, 
-% J Schmidhuber (2014)
-% Natural Evolution Strategy
+% J Schmidhuber 
+% Natural Evolution Strategy (2014)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function [nat_grad, stepsize] = NESbase (pol_high, J, Theta, lrate)
