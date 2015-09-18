@@ -6,7 +6,7 @@
 
 tic;
 
-step = 10; % Inverse of the stepsize in the weights interval
+step = 40; % Inverse of the stepsize in the weights interval
 N_obj = 3;
 
 LQR = lqr_init(N_obj);

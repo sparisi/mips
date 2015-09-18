@@ -1,6 +1,6 @@
 function mdp_vars = lqr_mdpvariables()
 
-dim = 3;
+dim = 2;
 mdp_vars.dim = dim;
 mdp_vars.nvar_state = dim;
 mdp_vars.nvar_action = dim;

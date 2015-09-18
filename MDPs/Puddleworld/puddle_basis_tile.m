@@ -1,40 +1,20 @@
-function phi = puddle_basis_tile(state, action)
-
-mdp_vars = puddle_mdpvariables();
+function phi = puddle_basis_tile(state)
 
 numfeatures = 7;
 
-% The basis functions are repeated for each action but the last one
-numbasis = numfeatures * (length(mdp_vars.action_list) - 1);
-
 % If no arguments just return the number of basis functions
 if nargin == 0
-    phi = numbasis;
+    phi = numfeatures;
     return
 end
 
-tmp = zeros(numfeatures,1);
-tmp(1) = 1;
-tmp(2) = (state(1)+0.1);
-tmp(3) = (state(2)+0.1);
-tmp(4) = (state(1) > 0.95);
-tmp(5) = (state(2) > 0.95);
-tmp(6) = (state(2) >= 0.75 && state(1) < 0.45);
-tmp(7) = (state(1) >= 0.45);
-
-% Features depending only on the state
-if nargin == 1
-    phi = tmp;
-    return
-end
-
-% Initialize
-phi = zeros(numbasis,1);
-
-% Find the starting position
-base = numfeatures;
-
-i = action - 1;
-phi(base*i+1:base*i+base) = tmp;
+phi = zeros(numfeatures,1);
+phi(1) = 1;
+phi(2) = (state(1)+0.1);
+phi(3) = (state(2)+0.1);
+phi(4) = (state(1) > 0.95);
+phi(5) = (state(2) > 0.95);
+phi(6) = (state(2) >= 0.75 && state(1) < 0.45);
+phi(7) = (state(1) >= 0.45);
 
 return

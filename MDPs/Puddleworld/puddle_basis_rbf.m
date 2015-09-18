@@ -1,31 +1,16 @@
-function phi = puddle_basis_rbf(state, action)
+function phi = puddle_basis_rbf(state)
 
 env = puddle_environment();
-mdp_vars = puddle_mdpvariables();
-n_centers = 5;
-n_actions = length(mdp_vars.action_list);
+n_centers = 4;
 range = [env.minstate, env.maxstate];
 numfeatures = basis_krbf(n_centers,range);
-dim_phi = numfeatures * (n_actions - 1);
 
 % If no arguments just return the number of basis functions
 if nargin == 0
-    phi = dim_phi;
+    phi = numfeatures + 1;
     return
 end
 
-phi = basis_krbf(n_centers,range,state);
-
-% Basis depending only on the state
-if nargin == 1
-    return
-end
-
-% Basis depending also on the action
-tmp = zeros(dim_phi,1);
-base = numfeatures;
-i = action - 1;
-tmp(base*i+1:base*i+base) = phi;
-phi = tmp;
+phi = [1; basis_krbf(n_centers,range,state)];
 
 return;

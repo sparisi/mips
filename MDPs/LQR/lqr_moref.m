@@ -13,7 +13,7 @@ if n_obj == 2 % starting from [10, 10]
     
     if outPlot
         hold on
-        plot(front(:,1), front(:,2),'bo')
+        plot(front(:,1), front(:,2),'b.-')
         xlabel 'Obj 1'
         ylabel 'Obj 2'
         hold off
