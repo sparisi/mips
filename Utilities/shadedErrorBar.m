@@ -1,4 +1,4 @@
-function H=shadedErrorBar(x,y,errBar,lineProps,transparent,plotLog)
+function H=shadedErrorBar(x,y,errBar,lineProps,opacity,plotLog)
 % Copyright (c) 2010, Rob Campbell
 % All rights reserved.
 % 
@@ -129,8 +129,8 @@ if ~iscell(lineProps)
 end
 
 
-if nargin<5 || ~isnumeric(transparent)
-    transparent=0; 
+if nargin<5 || ~isnumeric(opacity)
+    opacity=0; 
 end
 
 
@@ -159,8 +159,8 @@ end
 col=get(H.mainLine,'color');
 edgeColor=col+(1-col)*0.55;
 patchSaturation=0.5; %How de-saturated or transparent to make the patch
-if transparent
-    faceAlpha=patchSaturation;
+if opacity
+    faceAlpha=opacity;
     patchColor=col;
     set(gcf,'renderer','openGL')
 else
