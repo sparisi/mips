@@ -39,9 +39,8 @@ classdef gmm_constant
         end
         
         function obj = weightedMLUpdate(obj, weights, Action)
-            weights = max(weights,1e-8);
-            weights = weights / sum(weights);
-            [~, gmm] = emgm(Action, weights, obj.gmax);
+            assert(min(weights>=0));
+            [~, gmm] = emgm(Action, obj.gmax, weights);
             obj.p = gmm.ComponentProportion';
             obj.mu = gmm.mu';
             obj.Sigma = gmm.Sigma;

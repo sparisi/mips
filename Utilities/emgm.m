@@ -1,21 +1,28 @@
-function [label, model, llh] = emgm(X, W, init)
-% EMGM Weighted EM for fitting a Gaussian mixture model.
+function [label, model, llh] = emgm(X, init, W)
+% EMGM Weighted EM for fitting a Gaussian Mixture Model.
 %
 %    INPUT
 %     - X     : D-by-N data matrix
-%     - W     : N-by-1 weights vector
 %     - init  : K (1-by-1) or label (1-by-N, 1 <= label(i) <= K) or center 
 %               (D-by-K)
+%     - W     : (optional) N-by-1 weights vector (1 by default)
 %
 %    OUTPUT
-%     - label : 
-%     - model : struct with means (mu), covariances (sigma) and mixing
-%               proportions (ComponentProportion)
+%     - label : 1-by-N vector indicating which Gaussian is associated to
+%               each sample
+%     - model : struct with means (mu), covariances (Sigma) and component
+%               proportions of the mixture model
 %     - llh   : log-likelihood of the model
 %
 % =========================================================================
 % ACKNOWLEDGEMENT
 % http://www.mathworks.com/matlabcentral/fileexchange/26184-em-algorithm-for-gaussian-mixture-model
+
+if nargin < 3
+    W = ones(size(X,2),1);
+else
+    assert(min(W>=0));
+end
 
 R = initialization(X, init);
 [~, label(1,:)] = max(R, [], 2);
@@ -28,10 +35,8 @@ converged = false;
 t = 1;
 
 while ~converged && t < maxiter
-
     t = t + 1;
-    R = bsxfun(@times, R, W);
-    model = maximization(X, R);
+    model = maximization(X, R, W);
     [R, llh(t)] = expectation(X, model);
     
     [~, label(:)] = max(R, [], 2);
@@ -41,17 +46,15 @@ while ~converged && t < maxiter
     else
         converged = llh(t) - llh(t-1) < tol * abs(llh(t));
     end
-    
 end
-
 llh = llh(2:t);
-% if converged
-%     fprintf('Converged in %d steps.\n',t-1);
-% else
-%     fprintf('Not converged in %d steps.\n',maxiter);
-% end
+
+if ~converged
+    warning('Not converged in %d steps.\n',maxiter);
+end
 
 end
+
 
 %% Init
 function R = initialization(X, init)
@@ -80,6 +83,7 @@ end
 
 end
 
+
 %% Expectation
 function [R, llh] = expectation(X, model)
 
@@ -97,7 +101,7 @@ end
 
 logRho = bsxfun(@plus, logRho, log(w));
 T = logsumexp(logRho,2);
-llh = sum(T) / n; % loglikelihood
+llh = sum(T); % loglikelihood
 logR = bsxfun(@minus, logRho, T);
 R = exp(logR);
 
@@ -105,22 +109,25 @@ end
 
 
 %% Maximization
-function model = maximization(X, R)
+function model = maximization(X, R, W)
 
-[d,n] = size(X);
+d = size(X,1);
 k = size(R,2);
 
+R = bsxfun(@times,R,W);
 nk = sum(R,1);
-w = nk / n;
+w = nk / sum(W);
 mu = bsxfun(@times, X * R, 1 ./ nk);
 
 Sigma = zeros(d,d,k);
 sqrtR = sqrt(R);
 for i = 1 : k
-    Xo = bsxfun(@minus, X, mu(:,i));
-    Xo = bsxfun(@times, Xo, sqrtR(:,i)');
+    Xo = bsxfun(@minus,X,mu(:,i));
+    Xo = bsxfun(@times,Xo,sqrtR(:,i)');
     Sigma(:,:,i) = Xo * Xo' / nk(i);
-    Sigma(:,:,i) = Sigma(:,:,i) + 1e-6 * eye(d); % add a prior for numerical stability
+    Z = (sum(R(:,i))^2 - sum(R(:,i).^2)) / sum(R(:,i))^2;
+    Sigma(:,:,i) = Sigma(:,:,i) / Z;
+    Sigma(:,:,i) = nearestSPD(Sigma(:,:,i));
 end
 
 model.mu = mu;
