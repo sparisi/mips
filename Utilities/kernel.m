@@ -25,10 +25,7 @@ switch type
     case 'gauss'
         dist = L2_distance(X',Y');
         if nargin < 4
-            tmp = dist;
-            tmp(tmp==0) = inf;
-            tmp = min(tmp);
-            param = size(X,2)^2*mean(tmp);
+            param = mean(mean(dist.^2))/size(X,1);
         end
         K = exp(-dist.^2 ./ (2*param.^2));
         

@@ -25,7 +25,7 @@ parfor i = 1 : N_pol
     
 %     [~, J_sample] = collect_samples(domain, episodes, steps, policy);
     [~, J_sample] = collect_samples_rele(domain, episodes, steps, policy);
-    
+
     J(i,:) = J_sample;
 
 end

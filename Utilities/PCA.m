@@ -19,9 +19,6 @@ if nargin < 2
     d = size(x,2);
 end
 
-% Normalize weights
-w              = w / sum(w);
-
 % Weight observations
 x              = bsxfun(@times,x,sqrt(w));
 
