@@ -2,6 +2,7 @@
 clear all
 
 domain = 'damC';
+robj = 1;
 context_fun = [domain '_context'];
 dim_ctx = length(feval(context_fun));
 [~, pol_low, ~, steps] = feval([domain '_settings']);
@@ -13,20 +14,29 @@ pol_low = pol_low.makeDeterministic;
 
 
 %% Init CREPS and high-level policy
-phi_policy = @(varargin)basis_poly(2,dim_ctx,0,varargin{:});
-phi_vfun = @(varargin)basis_poly(1,dim_ctx,0,varargin{:});
+phi_policy = @(varargin)basis_poly(1,dim_ctx,1,varargin{:});
+phi_vfun = @(varargin)basis_poly(1,dim_ctx,1,varargin{:});
 
 K0 = zeros(dim_theta,phi_policy());
 mu0 = zeros(dim_theta,1);
 Sigma0 = 100 * eye(dim_theta); % change according to the domain
 
 %%% Simple Gaussians
-% pol_high = gaussian_linear(phi_policy, dim_theta, W0, Sigma0);
-% pol_high = gaussian_diag_linear(phi_policy, dim_theta, W0, sqrt(diag(Sigma0)));
-pol_high = gaussian_linear_full(phi_policy, dim_theta, mu0, K0, Sigma0);
+pol_high = gaussian_linear(phi_policy, dim_theta, K0, Sigma0);
+% pol_high = gaussian_diag_linear(phi_policy, dim_theta, K0, sqrt(diag(Sigma0)));
+% pol_high = gaussian_linear_full(phi_policy, dim_theta, mu0, K0, Sigma0);
+
+%%% Mixture Model
+n_gauss = 5;
+for i = 1 : n_gauss
+    A(:,:,i) = K0;
+    Sigma(:,:,i) = Sigma0;
+end
+p = ones(1,n_gauss) / n_gauss;
+pol_high = gmm_linear(phi_policy, A, Sigma, p, n_gauss);
 
 epsilon = 0.9;
-N = 20; % number of rollouts per iteration
+N = 50; % number of rollouts per iteration
 N_MAX = N*10; % max number of rollouts used for the policy update
 MAX_ITER = 100;
 solver = CREPS_Solver(epsilon,pol_high,phi_vfun);
@@ -45,32 +55,12 @@ while iter < MAX_ITER
     
     iter = iter + 1;
     
-    PhiPolicy_iter = zeros(N,solver.policy.basis());
-    PhiVfun_iter = zeros(N,solver.basis());
-    Theta_iter = zeros(N,dim_theta);
-    J_iter = zeros(1,N);
-
-    % Sample theta
-    for k = 1 : N
-        % Get context
-        context = feval(context_fun);
-        PhiPolicy_iter(k,:) = solver.policy.basis(context);
-        PhiVfun_iter(k,:) = solver.basis(context);
-        
-        % Draw theta from the high-level distribution
-        theta = solver.policy.drawAction(context);
-        pol_tmp = pol_low;
-        pol_tmp.theta(1:dim_theta) = theta; % set only the mean, not the variance
-        Theta_iter(k,:) = theta;
-
-        % Rollout
-        [ds, J_ep] = collect_samples_ctx_rele(domain, 1, steps, pol_tmp, context);
-        J_iter(k) = J_ep;
-    end
+    [J_iter, Theta_iter, PhiPolicy_iter, PhiVfun_iter] = ...
+        collect_episodes_ctx(domain, N, solver);
     
     % First, fill the pool to maintain the samples distribution
     if iter == 1
-        J(:) = min(J_iter);
+        J = repmat(min(J_iter,[],2),1,N_MAX);
         parfor k = 1 : N_MAX
             random_context = feval(context_fun); % generate random context
             PhiPolicy(k,:) = solver.policy.basis(random_context);
@@ -86,9 +76,9 @@ while iter < MAX_ITER
     PhiPolicy = [PhiPolicy_iter; PhiPolicy(1:N_MAX-N, :)];
     
     % Get the weights for policy update
-    [weights, divKL] = solver.optimize(J, PhiVfun);
+    [weights, divKL] = solver.optimize(J(robj,:), PhiVfun);
 
-    avgRew = mean(J_iter);
+    avgRew = mean(J_iter(robj,:));
     J_history = [J_history, J_iter'];
     fprintf( 'Iter: %d, Avg Reward: %.4f, KL Div: %.2f, Entropy: %.3f\n', ...
         iter, avgRew, divKL, solver.policy.entropy );
