@@ -60,7 +60,7 @@ How the Simulator Works
 Here is a short description of the main functions responsible for simulating the MDPs and collecting the relevant data.
 
 - *execute*           : it is the lowest level function. It calls the specific simulators and runs a single episode,
-- *collect_samples    : it calls *execute* and returns a dataset with all the information about the simulated episodes (steps, action, reward, features),
+- *collect_samples    : it calls execute* and returns a dataset with all the information about the simulated episodes (steps, action, reward, features),
 - *collect_episodes*  : used for episodic RL. It calls *collect_samples* multiple times and returns only the relevant high-level information for episodic algorithms (parameters drawn at the beginning of the episode and cumulative reward at the end of it),
 - *evaluate_policies* : a wrapper for calling *collect_samples* with an additional option to evaluate only deterministic policies. If the environment is also deterministic, the evaluation is done on a single episode,
 - *evaluate_policies_ep* : similar to the previous function but for episodic algorithms.
