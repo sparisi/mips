@@ -4,7 +4,7 @@ function [label, model, llh] = emgm(X, init, W)
 %    INPUT
 %     - X     : D-by-N data matrix
 %     - init  : K (1-by-1) or label (1-by-N, 1 <= label(i) <= K) or center 
-%               (D-by-K)
+%               (D-by-K) or model (struct)
 %     - W     : (optional) N-by-1 weights vector (1 by default)
 %
 %    OUTPUT
@@ -101,7 +101,7 @@ end
 
 logRho = bsxfun(@plus, logRho, log(w));
 T = logsumexp(logRho,2);
-llh = sum(T); % loglikelihood
+llh = sum(T) / n; % loglikelihood
 logR = bsxfun(@minus, logRho, T);
 R = exp(logR);
 
