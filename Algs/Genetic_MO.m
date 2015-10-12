@@ -36,6 +36,7 @@ current_J = evaluate_policies(current_population, domain, makeDet);
 
 iter = 0;
 dim = max_pop_size;
+fitness_history = [];
 
 %% Learning
 while true
@@ -46,6 +47,7 @@ while true
     % Evaluate the population
     [front, front_pol] = pareto(current_J, current_population');
     current_fitness = fitness(front);
+    fitness_history = [fitness_history, current_fitness];
     
     fprintf( 'Iteration %d, Fitness: %.4f, Population Size: %d\n', ...
         iter, current_fitness, numel(current_population) );

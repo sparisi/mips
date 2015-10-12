@@ -21,19 +21,9 @@ K0 = zeros(dim_theta,phi_policy());
 mu0 = zeros(dim_theta,1);
 Sigma0 = 100 * eye(dim_theta); % change according to the domain
 
-%%% Simple Gaussians
 pol_high = gaussian_linear(phi_policy, dim_theta, K0, Sigma0);
 % pol_high = gaussian_diag_linear(phi_policy, dim_theta, K0, sqrt(diag(Sigma0)));
 % pol_high = gaussian_linear_full(phi_policy, dim_theta, mu0, K0, Sigma0);
-
-%%% Mixture Model
-n_gauss = 5;
-for i = 1 : n_gauss
-    A(:,:,i) = K0;
-    Sigma(:,:,i) = Sigma0;
-end
-p = ones(1,n_gauss) / n_gauss;
-pol_high = gmm_linear(phi_policy, A, Sigma, p, n_gauss);
 
 epsilon = 0.9;
 N = 50; % number of rollouts per iteration

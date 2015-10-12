@@ -1,4 +1,4 @@
-function h = puddle2_drawreward()
+function h = puddle2_plotreward()
 
 domain = 'puddle2';
 n = 30;

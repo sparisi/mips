@@ -12,12 +12,33 @@ classdef gmm_constant
     
     methods
         
-        function obj = gmm_constant(mu, Sigma, p, gmax)
-            obj.mu = mu;
-            obj.Sigma = Sigma;
-            obj.p = p;
-            obj.gmax = gmax;
-            obj.dim = size(mu,2);
+        function obj = gmm_constant(varargin)
+            if nargin == 3 % initialize with a single Gaussian
+                mu0 = varargin{1};
+                sigma0 = varargin{2};
+                obj.gmax = varargin{3};
+                
+                n_params = length(mu0);
+                initGauss = gaussian_constant(n_params,mu0,sigma0);
+                obj.mu = zeros(obj.gmax,n_params);
+                obj.Sigma = zeros(n_params,n_params,obj.gmax);
+                for i = 1 : obj.gmax
+                    obj.mu(i,:) = initGauss.drawAction;
+                    obj.Sigma(:,:,i) = sigma0;
+                end
+                obj.p = ones(obj.gmax,1) / obj.gmax;
+            elseif nargin == 4 % directly init with all components
+                obj.mu = varargin{1};
+                obj.Sigma = varargin{2};
+                obj.gmax = varargin{3};
+                obj.p = varargin{4};
+            else
+                error('Wrong number of input arguments.')
+            end
+            [k,d] = size(obj.mu);
+            [d1,d2,d3] = size(obj.Sigma);
+            assert(d1 == d & d2 == d & d3 == k);
+            obj.dim = size(obj.mu,2);
         end
         
         function action = drawAction(obj)

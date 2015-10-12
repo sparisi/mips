@@ -29,7 +29,6 @@ parfor k = 1 : maxepisodes
     Theta(k,:) = theta;
     
     % Rollout
-%     [~, J_ep] = collect_samples_ctx_rele(domain, 1, steps, pol_tmp, context);
     [~, J_ep] = collect_samples_ctx(domain, 1, steps, pol_tmp, context);
     J(:,k) = J_ep;
 
