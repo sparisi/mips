@@ -6,7 +6,7 @@ function R = nds(P)
 %     - P : N-by-D matrix, where N is the number of points and D is the
 %           number of elements (objectives) of each point.
 %
-%    INPUT
+%    OUTPUT
 %     - R : N-by-3 matrix. First column has the number of solutions by 
 %           which each solution is weakly dominated. Second column has the 
 %           sub-front where each solution belongs. Third column has a 
@@ -15,10 +15,11 @@ function R = nds(P)
 % =========================================================================
 % WARNING
 % The crowding distance used in this code is not exactly the one described
-% in NSGA-II. In this implementation, it is the average Euclidean distance 
-% between each solution and the solutions belonging to the same sub-front.
-% Also notice that the distance is negated to sort the solution correctly 
-% (as we prefer sparse solution, the higher the distance the better).
+% in NSGA-II. In this implementation, it is the average normalized 
+% Euclidean distance between each solution and the solutions belonging to 
+% the same sub-front. Also notice that the distance is negated to sort the 
+% solution correctly (as we prefer sparse solution, the higher the distance
+% the better).
 %
 % =========================================================================
 % REFERENCE
@@ -99,10 +100,11 @@ while ~isempty(tmp)
         C, 'UniformOutput', false );
     % We take only 'nonzeros' elements because 0 distances are due to duplicates
     avgdist(idx_P) = vertcat(subdist{:});
-    
+    avgdist(idx_P) = avgdist(idx_P) / sum(avgdist(idx_P));
+
 end
 
-avgdist(isnan(avgdist)) = Inf; % NaN will occur if a subfront has only one element
+avgdist(isnan(avgdist)) = 1; % NaN will occur if a subfront has only one element
 
 % Count the number of solutions by which every solution is weakly dominated
 C = mat2cell(P,ones(n,1),d);

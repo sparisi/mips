@@ -20,7 +20,7 @@ function hv = hypervolume(F, AU, U, N)
 %     - N  : number of sample for the approximation
 %
 %    OUTPUT
-%    - hv : hypervolume
+%     - hv : hypervolume
 
 [n_sol, dim] = size(F);
 
