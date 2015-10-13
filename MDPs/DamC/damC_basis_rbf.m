@@ -6,7 +6,8 @@ width = 60;
 if nargin == 0
     phi = basis_rrbf(n_centers,width,range) + 1;
 else
-    phi = [1; basis_rrbf(n_centers,width,range,state)];
+    assert(size(state,1) == 1);
+    phi = [ones(1,size(state,2)); basis_rrbf(n_centers,width,range,state)];
 end
 
 return;

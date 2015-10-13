@@ -1,14 +1,13 @@
-function phi = mce_basis_rbf(state,action)
+function phi = mce_basis_rbf(state)
 
 n_centers = 4;
+range = [-2 1; -4 4];
+
 if nargin == 0
-    phi = 3 * (basis_krbf(n_centers, [-2 1; -4 4]) + 1);
+    phi = basis_krbf(n_centers,range) + 1;
 else
-    Phi = [1; basis_krbf(n_centers, [-2 1; -4 4], state)];
-    dim_phi = length(Phi);
-    phi = zeros(3*dim_phi,1);
-    i = action - 1;
-    phi(dim_phi*i+1 : dim_phi*i+dim_phi) = Phi;
-end 
+    assert(size(state,1) == 2);
+    phi = [ones(1,size(state,2)); basis_krbf(n_centers,range,state)];
+end
 
 end

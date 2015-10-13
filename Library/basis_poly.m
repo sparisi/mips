@@ -11,29 +11,34 @@ function Phi = basis_poly(degree, dim, offset, state)
 %     - dim    : dimension of the state
 %     - offset : 1 if you want to include the 0-degree component,
 %                0 otherwise
-%     - state  : (optional) the state to evaluate
+%     - state  : (optional) X-by-Y matrix with the Y states of size X 
+%                to evaluate
 %
 %    OUTPUT
-%     - Phi              : if a state is provided as input, the function 
-%                          returns the feature vector representing it; 
-%                          otherwise it returns the number of features
+%     - Phi    : if a state is provided as input, the function 
+%                returns the feature vectors representing it; 
+%                otherwise it returns the number of features
 %
 % =========================================================================
 % EXAMPLE
 % basis_poly(2,3,1,[3,5,6]') = [1, 3, 5, 6, 15, 18, 30]'
 
+dimPhi = nmultichoosek(dim+1,degree);
 if nargin == 3
-    Phi = nmultichoosek(dim+1,degree);
+    Phi = dimPhi;
     if ~offset
         Phi = Phi - 1;
     end
 else
     assert(size(state,1) == dim)
-    assert(size(state,2) == 1);
-    C = nmultichoosek([1; state],degree);
-    Phi = prod(C,2);
+    n = size(state,2);
+    Phi = zeros(dimPhi,n);
+    for i = 1 : n
+        C = nmultichoosek([1; state(:,i)],degree);
+        Phi(:,i) = prod(C,2);
+    end
     if ~offset
-        Phi(1) = [];
+        Phi(1,:) = [];
     end
 end
 

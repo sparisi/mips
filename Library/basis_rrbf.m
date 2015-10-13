@@ -7,11 +7,12 @@ function Phi = basis_rrbf(n_centers, widths, range, state)
 %     - widths    : array of widths for each dimension
 %     - range     : N-by-2 matrix with min and max values for the
 %                   N-dimensional input state
-%     - state     : (optional) the state to evaluate
+%     - state     : (optional) X-by-Y matrix with the Y states of size X 
+%                   to evaluate
 %
 %    OUTPUT
 %     - Phi       : if a state is provided as input, the function 
-%                   returns the feature vector representing it; 
+%                   returns the feature vectors representing it; 
 %                   otherwise it returns the number of features
 %
 % =========================================================================
@@ -46,12 +47,12 @@ if ~exist('state','var')
     
 else
 
-    Phi = zeros(dim_phi,1);
     B = diag(1./widths.^2);
-    
-    for i = 1 : dim_phi
-        x = (state - centers(:,i));
-        Phi(i) = exp( -sqrt( x' * B * x ) );
+    N = size(state,2);
+    Phi = zeros(dim_phi,N);
+    for j = 1 : N
+        x = bsxfun(@minus,state(:,j),centers);
+        Phi(:,j) = diag(exp( -sqrt( x' * B * x ) ));
     end
     
 end

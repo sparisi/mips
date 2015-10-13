@@ -9,12 +9,13 @@ function Phi = basis_krbf(n_centers, range, state)
 %     - n_centers : number of centers (the same for all dimensions)
 %     - range     : N-by-2 matrix with min and max values for the
 %                   N-dimensional input state
-%     - state     : (optional) the state to evaluate
+%     - state     : (optional) X-by-Y matrix with the Y states of size X 
+%                   to evaluate
 %
 %    OUTPUT
-%     - Phi       : if a state is provided as input, the function returns
-%                   the feature vector representing it; otherwise it 
-%                   returns the number of features
+%     - Phi       : if a state is provided as input, the function 
+%                   returns the feature vectors representing it; 
+%                   otherwise it returns the number of features
 %
 % =========================================================================
 % EXAMPLE
@@ -55,14 +56,14 @@ if ~exist('state','var')
     
 else
     
-    Phi = zeros(dim_phi,1);
-    
     B = 0.5 * diag(1./b);
-    
-    for i = 1 : dim_phi
-        x = state - centers(:,i);
-        Phi(i) = exp(-x' * B * x);
+    N = size(state,2);
+    Phi = zeros(dim_phi,N);
+    for j = 1 : N
+        x = bsxfun(@minus,state(:,j),centers);
+        Phi(:,j) = diag(exp(-x' * B * x));
     end
+    
 %     Phi = Phi ./ sum(Phi);
 
 end

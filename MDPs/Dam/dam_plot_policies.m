@@ -1,4 +1,4 @@
-function dam_draw_policies(policies, episodic)
+function dam_plot_policies(policies, episodic)
 % Plots some policies with single-dimensional state and action.
 % Set 'episodic' to 1 if the policies are obtained with an episodic-based
 % approach.

@@ -8,10 +8,13 @@ if nargin == 0
     return
 end
 
-phi = zeros(numfeatures,1);
-phi(1) = 1;
-phi(2) = (state(1) == 1 && state(2) == 1); % First cell
-phi(3) = (state(1) == 1 && state(2) ~= 1 && state(2) ~= 10); % First row but first and last column
-phi(4) = (state(2) == 10); % Last column
+[d,n] = size(state);
+assert(d == 2);
+phi = zeros(numfeatures,n);
+
+phi(1,:) = 1;
+phi(2,:) = (state(1,:) == 1 & state(2,:) == 1); % First cell
+phi(3,:) = (state(1,:) == 1 & state(2,:) ~= 1 & state(2,:) ~= 10); % First row but first and last column
+phi(4,:) = (state(2,:) == 10); % Last column
 
 return

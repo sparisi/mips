@@ -8,7 +8,7 @@ if nargin == 0
     return
 end
 
+assert(size(state,1) == var.dim);
 phi = state;
 
 return
-

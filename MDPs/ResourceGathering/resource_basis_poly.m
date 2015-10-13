@@ -10,6 +10,8 @@ if nargin == 0
     return
 end
 
+assert(size(state,1) == 4)
+
 % Full second degree polynomial
 phi = basis_poly(degree, mdp_vars.nvar_state, 1, state);
 

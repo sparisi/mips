@@ -8,6 +8,7 @@ range = [env.minstate, env.maxstate];
 if nargin == 0
     phi = basis_krbf(n_centers,range);
 else
+    assert(size(state,1) == 2);
     phi = [basis_krbf(n_centers,range,state)];
 end
 
