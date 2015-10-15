@@ -1,4 +1,4 @@
-classdef policy
+classdef (Abstract) policy
 % POLICY Generic class for policies.
     
     properties(GetAccess = 'public', SetAccess = 'protected')
@@ -7,32 +7,36 @@ classdef policy
     end
     
     properties(GetAccess = 'public', SetAccess = 'public')
-        theta;
+        theta; % Policy parameters
     end
     
     methods
+        %%% Enable arrays equality, i.e., 
+        %%% [pol1, pol2] == pol3 or [pol1, pol2] == [pol3, pol4]
         function areEq = eq(obj1, obj2)
-            if ~strcmp(class(obj1),class(obj2))
-                areEq = 0;
-                return
-            end
-            if numel(obj1) ~= numel(obj2)
-                if numel(obj1) == 1
-                    areEq = false(size(obj2));
-                    for i = 1 : numel(obj2)
-                        areEq(i) = obj2(i) == obj1;
-                    end
-                elseif numel(obj2) == 1
-                    areEq = false(size(obj1));
-                    for i = 1 : numel(obj1)
-                        areEq(i) = obj1(i) == obj2;
-                    end
-                else
-                    error('Matrix dimensions must agree.')
+            n1 = numel(obj1);
+            n2 = numel(obj2);
+            
+            if n1 == n2
+                areEq = isequal(obj1,obj2);
+            elseif n1 == 1
+                areEq = false(size(obj2));
+                for i = 1 : n2
+                    areEq(i) = isequal(obj2(i),obj1);
                 end
-                return
+            elseif n2 == 1
+                areEq = false(size(obj1));
+                for i = 1 : n1
+                    areEq(i) = isequal(obj1(i),obj2);
+                end
+            else
+                error('Matrix dimensions must agree.')
             end
-            areEq = sum(obj1.theta == obj2.theta) == size(obj1.theta,1);
+        end
+        
+        %%% Update function for policy gradient
+        function obj = update(obj, direction)
+            obj.theta = obj.theta + direction;
         end
     end
     

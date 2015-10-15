@@ -77,5 +77,3 @@ You can find it here: https://github.com/AIRLab-POLIMI/ReLe
 First, you need to mex the files in */ReLe/rele_matlab/src/mexinterface* (you can use the wrapper *MEXMakefile*).
 Then add such folder to the Matlab search path.
 Finally just call *collect_samples_rele* instead of *collect_samples*.
-
-Please notice that, unlike *collect_samples*, *collect_samples_rele* does not return the average entropy over the rollouts.

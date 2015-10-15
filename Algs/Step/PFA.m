@@ -33,7 +33,8 @@ n_iterations = 0; % total number of iterations (policy evaluations)
 while true
 
     n_iterations = n_iterations + 1;
-    [ds, J_init, S] = collect_samples(domain, episodes, steps, init_pol);
+    [ds, J_init] = collect_samples(domain, episodes, steps, init_pol);
+    S = init_pol.entropy(horzcat(ds.s));
 
     [nat_grad, stepsize_single] = eNACbase(init_pol,ds,gamma,N_obj,lrate_single);
     dev = norm(nat_grad);
@@ -78,7 +79,8 @@ for obj = -[-(N_obj-1) : -1] % for all the remaining objectives ...
             n_iterations = n_iterations + 1;
             current_iter = current_iter + 1;
     
-            [ds, current_J, S] = collect_samples(domain, episodes, steps, current_pol);
+            [ds, current_J] = collect_samples(domain, episodes, steps, current_pol);
+            S = current_pol.entropy(horzcat(ds.s));
 
             [nat_grad_step, stepsize_step] = eNACbase(current_pol,ds,gamma,obj,lrate_step);
             dev = norm(nat_grad_step);
@@ -105,7 +107,8 @@ for obj = -[-(N_obj-1) : -1] % for all the remaining objectives ...
             
             while true % correction phase
                 
-                [ds, current_J, S] = collect_samples(domain, episodes, steps, current_pol);
+                [ds, current_J] = collect_samples(domain, episodes, steps, current_pol);
+                S = current_pol.entropy(horzcat(ds.s));
 
                 M = zeros(N_params,N_obj);
                 for j = 1 : N_obj

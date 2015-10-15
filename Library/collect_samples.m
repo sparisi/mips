@@ -1,4 +1,4 @@
-function [dataset, J, S] = collect_samples(domain, ...
+function [dataset, J] = collect_samples(domain, ...
     maxepisodes, maxsteps, policy)
 % COLLECT_SAMPLES Collects full episodes, i.e., it returns a DATASET 
 % containing information also about the single steps for each episode.
@@ -16,7 +16,6 @@ empty_sample.terminal = [];
 dataset = repmat(empty_sample, 1, maxepisodes);
 
 J = 0;
-S = 0;
 
 % Main loop
 parfor episodes = 1 : maxepisodes
@@ -27,10 +26,9 @@ parfor episodes = 1 : maxepisodes
     initial_state = feval(simulator);
     
     % Run one episode (up to the max number of steps)
-    [sample, totrew, totentropy] = ...
+    [sample, totrew] = ...
         execute(domain, initial_state, simulator, policy, maxsteps);
     J = J + totrew;
-    S = S + totentropy;
     
     % Normalize rewards
     sample.r = bsxfun(@times,sample.r,1./maxr);
@@ -48,6 +46,5 @@ parfor episodes = 1 : maxepisodes
 end
 
 J = J / maxepisodes;
-S = S / maxepisodes;
 
 return

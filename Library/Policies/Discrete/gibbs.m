@@ -1,5 +1,5 @@
-classdef gibbs < policy
-% GIBBS Gibbs (soft-max) distribution with preferences on all but last 
+classdef gibbs < policy_discrete
+% GIBBS Gibbs (softmax) distribution with preferences on all but last 
 % action. The temperature is fixed.
     
     properties(GetAccess = 'public', SetAccess = 'private')
@@ -14,7 +14,9 @@ classdef gibbs < policy
     methods
         
         function obj = gibbs(basis, theta, action_list)
-            % Class constructor
+            assert(isvector(action_list))
+            assert(basis()*(length(action_list)-1) == length(theta))
+
             obj.basis = basis;
             obj.theta = theta;
             obj.action_list = action_list;
@@ -22,67 +24,33 @@ classdef gibbs < policy
             obj.dim_explore = 0;
             obj.dim = 1;
         end
-        
-        function prob_list = distribution(obj, state)
-            assert(size(state,2) == 1);
-            
+  
+        function [prob_list, qfun] = distribution(obj, States)
+            nstates = size(States,2);
             it = obj.inverse_temperature;
             nactions = length(obj.action_list);
-            num = zeros(nactions, 1);
-            den = 0;
+            num = zeros(nactions, nstates);
+            qfun = zeros(nactions, nstates);
+            den = zeros(1, nstates);
             dphi = feval(obj.basis);
-            phi = feval(obj.basis,state);
+            phi = feval(obj.basis,States);
             for i = 1 : nactions - 1
-                loc_phi = zeros(dphi*(nactions-1),1);
-                loc_phi((i-1)*dphi+1:(i-1)*dphi+dphi) = phi;
+                loc_phi = zeros(dphi*(nactions-1),nstates);
+                loc_phi((i-1)*dphi+1:(i-1)*dphi+dphi,:) = phi;
                 loc_Q = obj.theta'*loc_phi;
-                num(i) = exp(it*loc_Q);
-                den = den + num(i);
+                num(i,:) = exp(it*loc_Q);
+                qfun(i,:) = loc_Q;
+                den = den + num(i,:);
             end
             den = den + 1;
-            num(end) = 1;
+            num(end,:) = 1;
+            qfun(end,:) = 0;
             
-            prob_list = num / den;
+            prob_list = bsxfun(@times,num,1./den);
             % A NaN can occur if the exp was Inf
             prob_list(isnan(prob_list)) = 1;
             % Ensure that the sum is 1
-            prob_list = prob_list / sum(prob_list);
-        end
-        
-        function probability = evaluate(obj, state, action)
-            assert(size(state,2) == 1);
-            assert(size(action,2) == 1);
-
-            % Assert that the action belongs to the known actions
-            idx = find(obj.action_list == action);
-            assert(length(idx) == 1);
-            
-            % Get action probability
-            prob_list = obj.distribution(state);
-            probability = prob_list(idx);
-        end
-        
-        function action = drawAction(obj, state)
-            assert(size(state,2) == 1);
-            
-            prob_list = obj.distribution(state);
-            [~, action] = find(mnrnd(1, prob_list));
-        end
-        
-        function S = entropy(obj, state)
-            assert(size(state,2) == 1);
-            
-            nactions = length(obj.action_list);
-            prob_list = obj.distribution(state);
-
-            S = 0;
-            for i = 1 : nactions
-                % Usual checks for the entropy
-                if ~(isinf(prob_list(i)) || isnan(prob_list(i)) || prob_list(i) == 0)
-                    S = S + (-prob_list(i)*log2(prob_list(i)));
-                end
-            end
-            S = S / log2(nactions);
+            prob_list = bsxfun(@times,prob_list,1./sum(prob_list));
         end
         
         %%% Derivative of the logarithm of the policy
@@ -92,7 +60,6 @@ classdef gibbs < policy
                 return
             end
             assert(size(state,2) == 1);
-            assert(size(action,2) == 1);
             % Assert that the action belongs to the known actions
             idx = find(obj.action_list == action);
             assert(length(idx) == 1);
@@ -131,33 +98,12 @@ classdef gibbs < policy
             end
         end
         
-        function obj = update(obj, direction)
-            obj.theta = obj.theta + direction;
-        end
-        
-        function obj = makeDeterministic(obj)
-            obj.inverse_temperature = 1e8;
-        end
-        
-        function obj = randomize(obj, factor)
-            obj.theta = obj.theta ./ factor;
-        end
-        
-        function areEq = eq(obj1, obj2)
-            areEq = eq@policy(obj1,obj2);
-            if max(areEq)
-                areEqTemp = bsxfun( @and, [obj1(:).inverse_temperature], [obj2(:).inverse_temperature] );
-                if size(areEq,1) ~= size(areEqTemp,1)
-                    areEqTemp = areEqTemp';
-                end
-                areEq = bitand(areEq, areEqTemp);
-            else
-                return;
-            end
-        end
-        
         % Basis function depending from the action
         function Aphi = Abasis(obj, state, action)
+            assert(size(state,2) == 1)
+            i = find(obj.action_list == action);
+            assert(length(i) == 1);
+
             dphi = feval(obj.basis);
             nactions = length(obj.action_list) - 1;
             if nargin == 1
@@ -166,8 +112,11 @@ classdef gibbs < policy
             end
             phi = obj.basis(state);
             Aphi = zeros(dphi*nactions,1);
-            i = find(obj.action_list == action);
             Aphi((i-1)*dphi+1:(i-1)*dphi+dphi) = phi;
+        end
+        
+        function obj = makeDeterministic(obj)
+            obj.inverse_temperature = 1e8;
         end
         
     end

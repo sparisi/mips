@@ -1,4 +1,4 @@
-function [new_results, totrew, totentropy] = execute(domain, ...
+function [new_results, totrew] = execute(domain, ...
     initial_state, simulator, policy, maxsteps)
 
 % Get MDP characteristics
@@ -12,7 +12,6 @@ isAvg = mdp_vars.isAvg;
 
 % Initialize variables
 totrew = zeros(nvar_reward,1);
-totentropy = 0;
 steps = 0;
 endsim = 0;
 
@@ -38,9 +37,6 @@ while ( (steps < maxsteps) && (~endsim) )
     
     % Select action
     action = policy.drawAction(state);
-    
-    % Compute entropy
-    totentropy = totentropy + policy.entropy(state);
     
     % Simulate
     [nextstate, reward, endsim] = feval(simulator, state, action);
@@ -73,7 +69,5 @@ new_results.terminal = results.terminal(:, 1:steps);
 if isAvg && gamma == 1
     totrew = totrew / steps;
 end
-
-totentropy = totentropy / steps;
 
 return

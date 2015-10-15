@@ -17,7 +17,8 @@ count = 1;
 while true
     
     iter = iter + 1;
-    [data, J, S] = collect_samples(domain, episodes, steps, policy);
+    [data, J] = collect_samples(domain, episodes, steps, policy);
+    S = policy.entropy(horzcat(data.s));
 
     for trial = 1 : max(size(data));
         maxsteps = size(data(trial).a,2);

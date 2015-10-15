@@ -1,4 +1,4 @@
-function [dataset, J, S] = collect_samples_ctx(domain, ...
+function [dataset, J] = collect_samples_ctx(domain, ...
     maxepisodes, maxsteps, policy, context)
 % COLLECT_SAMPLES_CTX Collects full contextual episodes, i.e., it returns a 
 % DATASET containing information also about the single steps for each 
@@ -17,7 +17,6 @@ empty_sample.terminal = [];
 dataset = repmat(empty_sample, 1, maxepisodes);
 
 J = 0;
-S = 0;
 
 % Main loop
 parfor episodes = 1 : maxepisodes
@@ -28,10 +27,9 @@ parfor episodes = 1 : maxepisodes
     initial_state = feval(simulator);
     
     % Run one episode (up to the max number of steps)
-    [sample, totrew, totentropy] = ...
+    [sample, totrew] = ...
         execute_ctx(domain, initial_state, simulator, policy, maxsteps, context);
     J = J + totrew;
-    S = S + totentropy;
     
     % Normalize rewards
     sample.r = bsxfun(@times,sample.r,1./maxr);
@@ -49,6 +47,5 @@ parfor episodes = 1 : maxepisodes
 end
 
 J = J / maxepisodes;
-S = S / maxepisodes;
 
 return

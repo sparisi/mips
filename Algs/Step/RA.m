@@ -59,7 +59,8 @@ parfor k = 1 : N_sol
         
         n_iterations = n_iterations + 1;
 
-        [ds, J, S] = collect_samples(domain, episodes, steps, curr_pol);
+        [ds, J] = collect_samples(domain, episodes, steps, curr_pol);
+        S = curr_pol.entropy(horzcat(ds.s));
 
         M = zeros(N_params,N_obj); % jacobian
         Mn = zeros(N_params,N_obj); % jacobian with normalized gradients
