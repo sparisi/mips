@@ -39,7 +39,7 @@ function R = nds(P)
 %
 % nds(P)
 %     0    0    -0.3878
-%     3    2    -Inf
+%     3    2     1.0000
 %     0    0    -0.4473
 %     1    1    -0.2666
 %     2    1    -0.4706
@@ -66,7 +66,7 @@ function R = nds(P)
 %     1     1     -0.2666   |   0.1898    0.4758  <- First subfront
 %     1     1     -0.2493   |   0.0220    0.5690
 %     -----------------------------------------
-%     3     2     -Inf      |   0.2649    0.2967  <- Second subfront
+%     3     2      1.0000   |   0.2649    0.2967  <- Second subfront
 
 tmp = P;
 uniqueP = unique(P,'rows');
@@ -100,7 +100,7 @@ while ~isempty(tmp)
         C, 'UniformOutput', false );
     % We take only 'nonzeros' elements because 0 distances are due to duplicates
     avgdist(idx_P) = vertcat(subdist{:});
-    avgdist(idx_P) = avgdist(idx_P) / sum(avgdist(idx_P));
+    avgdist(idx_P) = avgdist(idx_P) / sum(avgdist(idx_P)); % Normalize distance
 
 end
 

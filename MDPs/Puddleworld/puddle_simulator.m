@@ -16,20 +16,21 @@ elseif nargin == 1
 end
 
 % Transition function
+state = state + normrnd(0,0.01,2,1);
 switch action
     case 1 % Left
-        state(1) = max(state(1) - env.step, env.minstate(1));
+        state(1) = state(1) - env.step;
     case 2 % Right
-        state(1) = min(state(1) + env.step, env.maxstate(1));
+        state(1) = state(1) + env.step;
     case 3 % Up
-        state(2) = min(state(2) + env.step, env.maxstate(2));
+        state(2) = state(2) + env.step;
     case 4 % Down
-        state(2) = max(state(2) - env.step, env.minstate(2));
+        state(2) = state(2) - env.step;
     otherwise
         error('Unknown action.')
 end
 
-nextstate = state + normrnd(0,0.01,2,1);
+nextstate = min(max(state,env.minstate),env.maxstate);
 reward = zeros(2,1);
 
 % Distance from the nearest edge of the puddle plus penalty for being far from the goal

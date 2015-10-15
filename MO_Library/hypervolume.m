@@ -17,7 +17,7 @@ function hv = hypervolume(F, AU, U, N)
 %     - F  : the Pareto front to evaluate
 %     - AU : antiutopia point
 %     - U  : utopia point
-%     - N  : number of sample for the approximation
+%     - N  : number of samples for the approximation
 %
 %    OUTPUT
 %     - hv : hypervolume

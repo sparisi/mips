@@ -1,14 +1,14 @@
-function [nextState, reward, absorb] = mce_simulator(state, action)
+function [nextstate, reward, absorb] = mce_simulator(state, action)
 
 if nargin == 0
     
     % Initial state
-    nextState = [-0.5; 0];
+    nextstate = [-0.5; 0];
     return
     
 elseif nargin == 1
     
-    nextState = state;
+    nextstate = state;
     return
     
 end
@@ -25,7 +25,7 @@ psecond = ddp(model, position, velocity, throttle);
 
 pNext = position + model.dt * velocity + 0.5 * model.dt * model.dt * psecond;
 vNext = velocity + model.dt * psecond;
-nextState = [pNext vNext]';
+nextstate = [pNext vNext]';
 
 % Compute reward
 [reward, absorb] = mcar_reward(model, pNext, vNext);
@@ -33,15 +33,6 @@ nextState = [pNext vNext]';
 end
 
 %% Helper functions
-function hill_val = hill(pos)
-% Equation of the hill
-if (pos < 0.0)
-    hill_val = pos.^2 + pos;
-else
-    hill_val = pos ./ sqrt(1 + 5*pos.^2);
-end
-end
-
 function dhill_val = dhill(pos)
 % Derivative of the hill
 if (pos < 0.0)

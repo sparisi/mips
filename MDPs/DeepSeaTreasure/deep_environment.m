@@ -1,7 +1,9 @@
 function [ treasure, isWhite ] = deep_environment( )
 
-mdp_vars = deep_mdpvariables;
-treasure = zeros(mdp_vars.state_dim(1),mdp_vars.state_dim(2));
+nrows = 11;
+ncols = 10;
+
+treasure = zeros(nrows,ncols);
 treasure(2,1) = 1;
 treasure(3,2) = 2;
 treasure(4,3) = 3;
@@ -14,8 +16,8 @@ treasure(10,9) = 74;
 treasure(11,10) = 124;
 
 % Map to distinguish between white and black cells
-isWhite = true(mdp_vars.state_dim(1),mdp_vars.state_dim(2));
-for i = 3 : mdp_vars.state_dim(1)
+isWhite = true(nrows,ncols);
+for i = 3 : nrows
     for j = 1 : i - 2
         isWhite(i,j) = false;
     end

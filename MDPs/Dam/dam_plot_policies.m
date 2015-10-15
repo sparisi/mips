@@ -9,16 +9,15 @@ n_pol = length(policies);
 [~, policy] = dam_settings;
 policy = policy.makeDeterministic;
 env = dam_environment;
-x = [];
-y = [];
-y2 = [];
-z = [];
+
+n_samples = 50;
+x = linspace(0,160,n_samples);
+
+y_free = zeros(n_samples,n_pol);
+y_constr = zeros(n_samples,n_pol);
+z = zeros(n_samples,n_pol);
 
 for h = 1 : n_pol
-    
-    a = [];
-    a_real = [];
-    s = [];
     
     if episodic
         pol_high = policies(h).makeDeterministic;
@@ -28,36 +27,26 @@ for h = 1 : n_pol
         policy = policies(h).makeDeterministic;
     end
     
-    for i = 0 : 5 : 160
-        
-        s = [s; i];
-        j = policy.drawAction(i);
-        a = [a; j];
-        
-        min_a = max(i - env.S_MIN_REL, 0);
-        max_a = i;
-        if min_a > j || max_a < j
-            j = max(min_a, min(max_a, j));
-        end
-        
-        a_real = [a_real; j];
-        
-    end
-    x = [x s];
-    y = [y a];
-    y2 = [y2 a_real];
-    z = [z h*ones(33,1)];
+    a = policy.drawAction(x);
+    y_free(:,h) = a;
+    min_a = max(x - env.S_MIN_REL, 0);
+    max_a = x;
+    idx = min_a > a | max_a < a;
+    a(idx) = max(min_a(idx), min(max_a(idx), a(idx)));
+    y_constr(:,h) = a;
+
+    z(:,h) = h*ones(n_samples,1);
     
 end
 
 figure; hold on
 if n_pol == 1
-    plot(x,y2,'-b');
-    plot(x,y,'-.r','LineWidth',2);
+    plot(x,y_constr,'-b');
+    plot(x,y_free,'-.r','LineWidth',2);
 else
     for i = 1 : n_pol
-        plot3(z(:,i),x(:,i),y2(:,i),'-b');
-        plot3(z(:,i),x(:,i),y(:,i),'-.r','LineWidth',2);
+        plot3(z(:,i),x(:,i),y_constr(:,i),'-b');
+        plot3(z(:,i),x(:,i),y_free(:,i),'-.r','LineWidth',2);
         ylabel state
         zlabel action
         set(gca,'XTick',[]);

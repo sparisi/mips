@@ -1,6 +1,6 @@
-function mcs_animation(episode)
+function mce_animation(episode)
 
-env = mcs_environment;
+env = mce_environment;
 
 xEnv = linspace(env.xLB,env.xUB,100)';
 yEnv = hill(xEnv);

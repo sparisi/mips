@@ -1,7 +1,7 @@
 function [nextstate, reward, absorb] = deep_simulator(state, action)
 
-mdp_vars = deep_mdpvariables();
 [treasure, isWhite] = deep_environment();
+[nrows, ncols] = size(isWhite);
 
 if nargin == 0
     
@@ -19,7 +19,7 @@ end
 i = state(1);
 j = state(2);
 
-% Transition function
+% Transition function (coordinates are (Y,X)!)
 switch action
     case 1 % Left
         nextj = max(1,j-1);
@@ -28,7 +28,7 @@ switch action
         end
         nextstate = [i; nextj];
     case 2 % Right
-        nextj = min(mdp_vars.state_dim(2),j+1);
+        nextj = min(ncols,j+1);
         if ~isWhite(i,nextj)
             nextj = j;
         end
@@ -40,7 +40,7 @@ switch action
         end
         nextstate = [nexti; j];
     case 4 % Down
-        nexti = min(mdp_vars.state_dim(1),i+1);
+        nexti = min(nrows,i+1);
         if ~isWhite(nexti,j)
             nexti = i;
         end

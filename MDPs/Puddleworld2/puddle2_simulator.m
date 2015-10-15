@@ -17,6 +17,7 @@ end
 action = min(action, env.step);
 action = max(action, -env.step);
 nextstate = state + action + normrnd(0,0.01,2,1);
+nextstate = min(max(nextstate,env.minstate),env.maxstate);
 
 % Distance from the nearest edge of the puddle plus penalty for being far from the goal
 reward = puddle2_reward_distance(nextstate) - 0.1*norm(nextstate - env.goal);
