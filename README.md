@@ -5,7 +5,7 @@ MiPS (Minimal Policy Search) is a toolbox for Matlab providing the implementatio
 
 It requires the Statistics Toolbox and the Optimization Toolbox.
 
-Some utility functions are imported from MathWorks (original authors are always acknowledged).
+Some utility functions are imported from File Exchange (original authors are always acknowledged).
 
 
 Code Structure
