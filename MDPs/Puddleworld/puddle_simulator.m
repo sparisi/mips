@@ -40,11 +40,7 @@ reward(1) = puddle_reward_distance(nextstate);
 reward(2) = -1;
 
 % Terminal condition
-if norm(nextstate - env.goal) <= env.step
-    absorb = 1;
-else
-    absorb = 0;
-end
+absorb = norm(nextstate - env.goal) <= env.step;
 
 end
 

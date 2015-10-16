@@ -1,8 +1,5 @@
 function [nextstate, reward, absorb] = deep_simulator(state, action)
 
-[treasure, isWhite] = deep_environment();
-[nrows, ncols] = size(isWhite);
-
 if nargin == 0
     
     % Initial state
@@ -16,6 +13,8 @@ elseif nargin == 1
     
 end
 
+[treasure, isWhite] = deep_environment();
+[nrows, ncols] = size(isWhite);
 i = state(1);
 j = state(2);
 
@@ -49,15 +48,9 @@ switch action
         error('Unknown action.');
 end
 
-% Treasure value
-reward1 = treasure(nextstate(1), nextstate(2));
-% Time
-reward2 = -1;
-if reward1 == 0
-    absorb = 0;
-else
-    absorb = 1;
-end
-reward = [reward1; reward2];
+reward1 = treasure(nextstate(1), nextstate(2)); % Treasure value
+reward2 = -1; % Time
+reward = [reward1; reward2]; 
+absorb = (reward1 > 0);
 
 return

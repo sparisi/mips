@@ -3,8 +3,6 @@ domain = 'deep';
 robj = 1;
 [n_obj, pol, episodes, steps, gamma] = feval([domain '_settings']);
 iter = 0;
-
-tolerance = 0.01;
 lrate = 1;
 
 

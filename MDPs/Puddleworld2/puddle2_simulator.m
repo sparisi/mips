@@ -23,11 +23,7 @@ nextstate = min(max(nextstate,env.minstate),env.maxstate);
 reward = puddle2_reward_distance(nextstate) - 0.1*norm(nextstate - env.goal);
 
 % Terminal condition
-if norm(nextstate - env.goal) <= env.step
-    absorb = 1;
-else
-    absorb = 0;
-end
+absorb = norm(nextstate - env.goal) <= env.step;
 
 end
 
