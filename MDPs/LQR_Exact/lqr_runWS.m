@@ -6,7 +6,7 @@
 
 tic;
 
-step = 40; % Inverse of the stepsize in the weights interval
+step = 50; % Inverse of the stepsize in the weights interval
 N_obj = 3;
 
 LQR = lqr_init(N_obj);
@@ -21,7 +21,6 @@ W = convexWeights(N_obj, step);
 N_sol = size(W,1);
 FrontJ = zeros(N_sol, N_obj);
 FrontK = cell(N_sol,1);
-FrontSigma = cell(N_sol,1);
 
 parfor k = 1 : N_sol
 
@@ -47,7 +46,6 @@ parfor k = 1 : N_sol
     end
     FrontJ(k,:) = J;
     FrontK{k} = K;
-    FrontSigma{k} = Sigma;
     
 end
     

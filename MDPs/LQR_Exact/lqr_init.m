@@ -1,9 +1,11 @@
-function LQR = lqr_init ( n )
-% Initializes a LQR with N conflictual objectives.
+function LQR = lqr_init (n_obj)
+% Reference: Parisi et al, Studio e analisi di algoritmi di apprendimento 
+% per rinforzo policy gradient per la risoluzione di problemi decisionali 
+% multiobiettivo (2014)
 
-LQR.dim = n;
+LQR.dim = n_obj;
 
-if n == 1
+if n_obj == 1
     
     LQR.g = 0.95;
     LQR.A = 1;
@@ -20,16 +22,16 @@ end
 
 LQR.e = 0.1;
 LQR.g = 0.9;
-LQR.A = eye(n);
-LQR.B = eye(n);
-LQR.E = eye(n);
-LQR.S = zeros(n);
-LQR.Sigma = eye(n);
-LQR.x0 = 10 * ones(n,1);
+LQR.A = eye(n_obj);
+LQR.B = eye(n_obj);
+LQR.E = eye(n_obj);
+LQR.S = zeros(n_obj);
+LQR.Sigma = eye(n_obj);
+LQR.x0 = 10 * ones(n_obj,1);
 
-for i = 1 : n
-    LQR.Q{i} = eye(n) * LQR.e;
-    LQR.R{i} = eye(n) * (1-LQR.e);
+for i = 1 : n_obj
+    LQR.Q{i} = eye(n_obj) * LQR.e;
+    LQR.R{i} = eye(n_obj) * (1-LQR.e);
     LQR.Q{i}(i,i) = 1-LQR.e;
     LQR.R{i}(i,i) = LQR.e;
 end

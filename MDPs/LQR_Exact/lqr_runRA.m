@@ -28,7 +28,6 @@ W = convexWeights(N, step);
 N_sol = size(W,1);
 FrontJ = zeros(N_sol, N); % Pareto-frontier solutions
 FrontK = cell(N_sol,1);
-inter_J = []; % intermediate solutions
 
 % Initial policy
 initK = -0.5 * eye(N);
@@ -61,7 +60,7 @@ parfor k = 1 : N_sol
         M = zeros(N^2,N);
         for j = 1 : N
             J(j) = lqr_return(A,B,Q{j},R{j},K,Sigma,x0,g);
-            nat_grad = calcNatGradient(A,B,Q{j},R{j},K,Sigma,g);
+            nat_grad = lqr_natural(A,B,Q{j},R{j},K,Sigma,g);
             M(:,j) = nat_grad(:);
         end
 
@@ -92,8 +91,6 @@ parfor k = 1 : N_sol
             break;
         end
         
-%         inter_J = [inter_J; J'];
-%         inter_K = [inter_K; K];
         level = level + 1;
 
         K = K - lrate * reshape(dir,N,N);

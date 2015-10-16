@@ -21,7 +21,7 @@ Sigma = LQR.Sigma;
 % Initial policy
 initK = -0.5 * eye(N);
 
-tolerance_step = 0.1; % Tolerance on the norm of the gradient (stopping condition) for the optimization step
+tolerance_step = 0.1; % Tolerance on the norm of the gradient (ending condition) for the optimization step
 tolerance_corr = 0.1; % The same, but for the correction step
 lrate_single = 0.1; % Lrate for the single-objective optimization phase
 lrate_step = 0.05; % Lrate for the optimization step
@@ -33,7 +33,7 @@ total_iter = 0; % Total number of iterations (policy evaluations)
 while true
 
     total_iter = total_iter + 1;
-    nat_grad_init = calcNatGradient(A,B,Q{N},R{N},initK,Sigma,g);
+    nat_grad_init = lqr_natural(A,B,Q{N},R{N},initK,Sigma,g);
     dev = norm(diag(nat_grad_init));
     if dev < tolerance_step
         break
@@ -48,8 +48,6 @@ for i = 1 : N
 end
 FrontK = {initK}; % store Pareto-frontier policies
 FrontJ = initJ; % store Pareto-frontier
-interK = {}; % store not-Pareto-optimal policies found during correction steps
-interJ = []; % store not-Pareto-optimal solutions
 
 
 %% Learn the remaining objectives
@@ -69,7 +67,7 @@ for obj = 1 : N-1 % for all the remaining objectives ...
     
 %             lrate_step = 5*1e-4*current_iter; % adaptive lrate to obtain a uniform frontier
 
-            nat_grad_step = calcNatGradient(A,B,Q{obj},R{obj},current_K,Sigma,g);
+            nat_grad_step = lqr_natural(A,B,Q{obj},R{obj},current_K,Sigma,g);
             dev = norm(diag(nat_grad_step));
             if dev < tolerance_step % break if the objective has been learned
                 current_J = zeros(1,N);
@@ -92,7 +90,7 @@ for obj = 1 : N-1 % for all the remaining objectives ...
                 
                 M = zeros(N^2,N); % jacobian
                 for j = 1 : N
-                    nat_grad_corr = calcNatGradient(A,B,Q{j},R{j},current_K,Sigma,g);
+                    nat_grad_corr = lqr_natural(A,B,Q{j},R{j},current_K,Sigma,g);
                     M(:,j) = nat_grad_corr(:);
                 end
                 options = optimset('Display','off');
@@ -105,9 +103,6 @@ for obj = 1 : N-1 % for all the remaining objectives ...
                     FrontJ = [FrontJ; current_J];
                     break
                 end
-
-                interK = [interK; current_K]; % save intermediate solution
-                interJ = [interJ; current_J];
 
                 nat_grad_corr = vec2mat(dir,N);
                 current_K = current_K - lrate_corr * nat_grad_corr; % move towards the frontier
