@@ -29,7 +29,9 @@ classdef (Abstract) policy_discrete < policy
         function Actions = drawAction(obj, States)
             nstates = size(States,2); % Draw one action for each state
             prob_list = obj.distribution(States);
-            [~, Actions] = find(mnrnd(ones(nstates,1), prob_list'));
+            [idsample, Actions] = find(mnrnd(ones(nstates,1), prob_list'));
+            [~, idx] = sort(idsample);
+            Actions = Actions(idx)';
         end
         
         function obj = randomize(obj, factor)
