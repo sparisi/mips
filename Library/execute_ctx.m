@@ -19,13 +19,12 @@ endsim = 0;
 state = initial_state;
 
 % Allocate memory for new samples
-results.s = -9999*ones(nvar_state, maxsteps+1);
-results.phi = -9999*ones(policy.basis(), maxsteps+1);
-results.nexts = -9999*ones(nvar_state, maxsteps+1);
-results.a = -9999*ones(nvar_action, maxsteps+1);
-results.r = -9999*ones(nvar_reward, maxsteps+1);
-results.terminal = -9999*ones(1, maxsteps+1);
-results.s(:,1) = state;
+results.s = -9999*ones(nvar_state, maxsteps);
+results.phi = -9999*ones(policy.basis(), maxsteps);
+results.nexts = -9999*ones(nvar_state, maxsteps);
+results.a = -9999*ones(nvar_action, maxsteps);
+results.r = -9999*ones(nvar_reward, maxsteps);
+results.terminal = -9999*ones(1, maxsteps);
 
 % Run the episodes
 while ( (steps < maxsteps) && (~endsim) )
@@ -45,7 +44,7 @@ while ( (steps < maxsteps) && (~endsim) )
     results.phi(:,steps) = phi;
     results.a(:,steps) = action;
     results.r(:,steps) = reward;
-    results.s(:,steps+1) = nextstate;
+    results.s(:,steps) = state;
     results.nexts(:,steps) = nextstate;
     results.terminal(:,steps) = endsim;
     
