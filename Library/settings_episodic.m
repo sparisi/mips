@@ -7,9 +7,9 @@ function [n_obj, policy] = settings_episodic(domain, isDet)
 %                0 otherwise
 %
 %    OUTPUT
-%     - n_obj  : number of parameters of the low-level policy to be learnt
-%     - policy : high-level policy, i.e., distribution used to draw 
-%                low-level policy parameters
+%     - n_obj  : number of the objective of the MDP
+%     - policy : high-level policy, i.e., distribution used to draw the
+%                parameters of the low-level
 
 [n_obj, pol_low] = feval([domain '_settings']);
 n_params = length(pol_low.theta) - pol_low.dim_explore * isDet;
@@ -24,8 +24,8 @@ sigma0 = 100 * eye(n_params); % Dam
 sigma0 = sigma0 + diag(abs(mu0));
 
 % policy = gaussian_constant(n_params,mu0,sigma0); % REPS
-% policy = gaussian_chol_constant(n_params,mu0,chol(sigma0)); % REPS / NES
-% policy = gaussian_diag_constant(n_params,mu0,sqrt(diag(sigma0))); % NES / REPS
-policy = gmm_constant(mu0,sigma0,5); % REPS
+policy = gaussian_chol_constant(n_params,mu0,sigma0); % REPS / NES
+% policy = gaussian_diag_constant(n_params,mu0,sigma0); % NES / REPS
+% policy = gmm_constant(mu0,sigma0,5); % REPS
 
 end

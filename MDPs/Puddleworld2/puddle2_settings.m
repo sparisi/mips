@@ -6,7 +6,7 @@ n_act = mdp_vars.nvar_action;
 gamma = mdp_vars.gamma;
 
 bfs = @puddle2_basis_rbf;
-policy = gaussian_diag_linear(bfs, n_act, zeros(n_act,bfs()), [10; 10]);
+policy = gaussian_diag_linear(bfs, n_act, zeros(n_act,bfs()), diag([10; 10]));
 
 episodes = 15;
 steps = 10;
