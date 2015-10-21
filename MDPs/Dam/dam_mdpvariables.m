@@ -2,7 +2,7 @@ function mdp_vars = dam_mdpvariables()
 % Reference: Castelletti et al, Tree-based fitted q-iteration for MOMDP
 % (2013)
 
-dim = 3;
+dim = 2;
 mdp_vars.nvar_state = 1;
 mdp_vars.nvar_action = 1;
 mdp_vars.nvar_reward = dim;
