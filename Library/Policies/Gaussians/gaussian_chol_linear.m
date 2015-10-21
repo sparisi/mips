@@ -75,10 +75,10 @@ classdef gaussian_chol_linear < policy_gaussian
                 end
             end
             
-            dlogpdt_cholUT = dlogpdt_cholU';
-            dlogpdt_cholUT = dlogpdt_cholUT(tril(true(obj.dim), 0)).';
+            dlogpdt_cholU = dlogpdt_cholU';
+            dlogpdt_cholU = dlogpdt_cholU(tril(true(obj.dim), 0)).';
             
-            dlogpdt = [dlogpdt_A(:); dlogpdt_cholUT'];
+            dlogpdt = [dlogpdt_A(:); dlogpdt_cholU'];
         end
         
         function obj = weightedMLUpdate(obj, weights, Action, Phi)

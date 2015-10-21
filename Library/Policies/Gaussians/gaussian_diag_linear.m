@@ -71,10 +71,10 @@ classdef gaussian_diag_linear < policy_gaussian
             mu = A*phi;
             std = params.std;
             invSigma = diag(std.^-2);
-            phimat = kron(eye(obj.dim),phi');
+            phimat = kron(phi',eye(obj.dim));
             diff = action - mu;
             
-            dm = feval(obj.basis);
+            dm = feval(obj.basis)*obj.dim;
             ds = obj.dim_explore;
             hlogpdt = zeros(length(obj.theta));
             
@@ -82,28 +82,27 @@ classdef gaussian_diag_linear < policy_gaussian
             hlogpdt(1:dm,1:dm) = - phimat' * invSigma * phimat;
 
             % dlogpdt / (dsigma dsigma)
-            hlogpdt(dm+1:dm+ds,dm+1:dm+ds) = invSigma - 3.0 * diff.^2 * std.^-4;
+            hlogpdt(dm+1:dm+ds,dm+1:dm+ds) = invSigma - 3.0 * diff.^2 * (std.^-4)';
             
             % dlogpdt / (dmu dsigma)
-            hlogpdt(dm+1:dm+ds, 1:dm) = - 2 * phimat * diff * std.^-3;
-            hlogpdt(1:dm, dm+1:dm+ds) = hlogpdt(dm+1:dm+ds, 1:dm);
+            hlogpdt(dm+1:dm+ds, 1:dm) = - 2 * diff * (std.^-3)' * phimat;
+            hlogpdt(1:dm, dm+1:dm+ds) = hlogpdt(dm+1:dm+ds, 1:dm)';
         end
         
         function obj = weightedMLUpdate(obj, weights, Action, Phi)
             assert(min(weights)>=0) % weights cannot be negative
-            Sigma = zeros(obj.dim);
             D = diag(weights);
-            N = size(Action,1);
             A = (Phi' * D * Phi + 1e-8 * eye(size(Phi,2))) \ Phi' * D * Action;
             A = A';
-            for k = 1 : N
-                Sigma = Sigma + (weights(k) * ( Action(k,:)' - A*Phi(k,:)') ...
-                    * (Action(k,:)' - A*Phi(k,:)')' );
+            std = zeros(obj.dim,1);
+            for k = 1 : size(Action,1)
+                std = std + (weights(k) * (Action(k,:)' - A*Phi(k,:)').^2);
             end
             Z = (sum(weights)^2 - sum(weights.^2)) / sum(weights);
-            Sigma = Sigma / Z;
-            Sigma = diag(diag(Sigma));
-            obj.theta = [A(:); diag(sqrt(Sigma))];
+            std = std / Z;
+            std = sqrt(std);
+            
+            obj.theta = [A(:); std];
         end
         
     end

@@ -14,16 +14,17 @@ tau = ones(dim,1);
 % policy = gaussian_chol_linear(bfs, dim, A0, Sigma0);
 % policy = gaussian_diag_linear(bfs, dim, A0, Sigma0);
 % policy = gaussian_linear(bfs, dim, A0, Sigma0);
-policy = gaussian_linear_full(bfs, dim, a0, A0, Sigma0);
+% policy = gaussian_linear_full(bfs, dim, a0, A0, Sigma0);
 % policy = gaussian_logistic_linear(bfs, dim, A0, w0, tau);
 % policy = gaussian_fixedvar_linear(bfs, dim, A0, Sigma0);
+policy = gaussian_fixedvar_linear_diagmean(bfs, dim, diag(A0), Sigma0);
 
 %%% Evaluation
 episodes = 150;
 steps = 50;
 
 %%% Learning
-% episodes = 10;
-% steps = 30;
+episodes = 10;
+steps = 30;
 
 end

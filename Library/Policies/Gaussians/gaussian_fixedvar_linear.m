@@ -61,7 +61,7 @@ classdef gaussian_fixedvar_linear < policy_gaussian
             end
             
             phi = feval(obj.basis, state);
-            phimat = kron(eye(obj.dim),phi');
+            phimat = kron(phi',eye(obj.dim));
             hlpdt = -phimat' / obj.Sigma * phimat;
         end
         

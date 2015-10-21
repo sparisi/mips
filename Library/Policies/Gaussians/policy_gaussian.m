@@ -33,14 +33,15 @@ classdef (Abstract) policy_gaussian < policy
                 
             end
             
-            Sigma = params.Sigma;
+            try
+                U = params.cholU;
+            catch
+                Sigma = params.Sigma;
+                U = chol(Sigma);
+            end
             mu = params.mu;
             Actions = bsxfun(@minus, Actions, mu);
             d = size(Actions,1);
-            [U, p] = chol(Sigma);
-            if p ~= 0
-                error('Sigma is not positive-definite.')
-            end
             Q = U' \ Actions;
             q = dot(Q,Q,1); % quadratic term (M distance)
             c = d * log(2*pi) + 2 * sum(log(diag(U))); % normalization constant
