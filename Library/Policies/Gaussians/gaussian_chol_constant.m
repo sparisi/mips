@@ -53,20 +53,11 @@ classdef gaussian_chol_constant < policy_gaussian
 
             dlogpdt_A = invSigma * (action - mu);
             
-            R = invU' * (action - mu) * (action - mu)' * invSigma;
-            dlogpdt_cholU = zeros(obj.dim);
-            for i = 1 : obj.dim
-                for j = i : obj.dim
-                    if i == j
-                        dlogpdt_cholU(i,j) = R(i,j) - 1 / cholU(i,i);
-                    else
-                        dlogpdt_cholU(i,j) = R(i,j);
-                    end
-                end
-            end
-            
+            dlogpdt_cholU = invU'*(-eye(obj.dim) + (action-mu)*(action-mu)'*invSigma);
+            dlogpdt_cholU = triu(dlogpdt_cholU);
             dlogpdt_cholU = dlogpdt_cholU';
             dlogpdt_cholU = dlogpdt_cholU(tril(true(obj.dim), 0)).';
+
             dlogpdt = [dlogpdt_A(:); dlogpdt_cholU'];
         end
         

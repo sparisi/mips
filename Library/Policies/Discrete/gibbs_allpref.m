@@ -91,18 +91,19 @@ classdef gibbs_allpref < policy_discrete
             dlpdt = it*loc_phi - num ./ den;
         end
         
-        % Basis function depending from the action
+        % Basis function depending on the action
         function Aphi = Abasis(obj, state, action)
-            assert(size(state,2) == 1)
-            i = find(obj.action_list == action);
-            assert(length(i) == 1);
-
             dphi = feval(obj.basis);
             nactions = length(obj.action_list);
             if nargin == 1
                 Aphi = dphi * nactions;
                 return
             end
+            
+            assert(size(state,2) == 1)
+            i = find(obj.action_list == action);
+            assert(length(i) == 1);
+
             phi = obj.basis(state);
             Aphi = zeros(dphi*nactions,1);
             Aphi((i-1)*dphi+1:(i-1)*dphi+dphi) = phi;
