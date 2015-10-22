@@ -92,11 +92,11 @@ classdef gibbs_allpref < policy_discrete
         end
         
         % Basis function depending on the action
-        function Aphi = Abasis(obj, state, action)
+        function phiA = basisA(obj, state, action)
             dphi = feval(obj.basis);
             nactions = length(obj.action_list);
             if nargin == 1
-                Aphi = dphi * nactions;
+                phiA = dphi * nactions;
                 return
             end
             
@@ -105,8 +105,8 @@ classdef gibbs_allpref < policy_discrete
             assert(length(i) == 1);
 
             phi = obj.basis(state);
-            Aphi = zeros(dphi*nactions,1);
-            Aphi((i-1)*dphi+1:(i-1)*dphi+dphi) = phi;
+            phiA = zeros(dphi*nactions,1);
+            phiA((i-1)*dphi+1:(i-1)*dphi+dphi) = phi;
         end
         
         function obj = makeDeterministic(obj)
