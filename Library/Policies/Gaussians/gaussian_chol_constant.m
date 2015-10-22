@@ -95,7 +95,7 @@ classdef gaussian_chol_constant < policy_gaussian
         function obj = weightedMLUpdate(obj, weights, Action)
             assert(min(weights)>=0) % weights cannot be negative
             mu = Action * weights / sum(weights);
-            Sigma = zeros(size(obj.dim));
+            Sigma = zeros(obj.dim);
             for k = 1 : size(Action,2)
                 Sigma = Sigma + (weights(k) * (Action(:,k) - mu) * (Action(:,k) - mu)');
             end
