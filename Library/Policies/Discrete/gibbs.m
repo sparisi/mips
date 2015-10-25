@@ -2,13 +2,8 @@ classdef gibbs < policy_discrete
 % GIBBS Gibbs (softmax) distribution with preferences on all but last 
 % action. The temperature is fixed.
     
-    properties(GetAccess = 'public', SetAccess = 'private')
-        basis;
-        action_list;
-    end
-    
     properties(GetAccess = 'public', SetAccess = 'public')
-        inverse_temperature;
+        inverse_temperature
     end
     
     methods
@@ -87,33 +82,37 @@ classdef gibbs < policy_discrete
             num = phi_term * exp_term;
             den = sum(exp_term);
 
-            loc_phi = zeros(dphi*nactions,1);
-            i = find(obj.action_list == action);
-            loc_phi((i-1)*dphi+1:(i-1)*dphi+dphi) = phi;
-            
             if action == obj.action_list(end)
                 dlpdt = - num ./ (1 + den);
             else
+                loc_phi = zeros(dphi*nactions,1);
+                i = find(obj.action_list == action);
+                loc_phi((i-1)*dphi+1:(i-1)*dphi+dphi) = phi;
                 dlpdt = it*loc_phi - num ./ (1 + den);
             end
         end
         
         % Basis function depending on the action
-        function phiA = basisA(obj, state, action)
+        function phiA = basisA(obj, States, Actions)
             dphi = feval(obj.basis);
-            nactions = length(obj.action_list) - 1;
+            nactions = length(obj.action_list);
             if nargin == 1
-                phiA = dphi * nactions;
+                phiA = dphi * (nactions - 1);
                 return
             end
             
-            assert(size(state,2) == 1)
-            i = find(obj.action_list == action);
-            assert(length(i) == 1);
+            nstates = size(States,2);
+            [found,~] = (ismember(Actions,obj.action_list));
+            assert(min(found) == 1);
+            assert(isrow(Actions))
+            assert(length(Actions) == nstates)
 
-            phi = obj.basis(state);
-            phiA = zeros(dphi*nactions,1);
-            phiA((i-1)*dphi+1:(i-1)*dphi+dphi) = phi;
+            phi = obj.basis(States); % Compute phi(s)
+            start_idx = (Actions-1)*dphi+1 + [0:nstates-1]*dphi*nactions; % Column start linear indices
+            all_idx = bsxfun(@plus,start_idx,[0:dphi-1]'); % All linear indices
+            phiA = zeros(dphi*nactions,nstates); % Initialize output array with zeros
+            phiA(all_idx) = phi; % Insert values from phi into output array
+            phiA(end-dphi+1:end,:) = []; % Last action does not have any explicit preference
         end
         
         function obj = makeDeterministic(obj)

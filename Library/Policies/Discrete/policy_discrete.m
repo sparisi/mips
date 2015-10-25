@@ -1,6 +1,11 @@
 classdef (Abstract) policy_discrete < policy
 % POLICY_DISCRETE Generic class for policies with discrete actions.
     
+    properties(GetAccess = 'public', SetAccess = 'protected')
+        basis
+        action_list
+    end
+    
     methods (Abstract)
         distribution(obj)
     end
@@ -9,21 +14,27 @@ classdef (Abstract) policy_discrete < policy
         
         % In all methods, STATES are matrices S-by-N, where S is the size
         % of one state and N is the number of states.
-        % Actions are always scalar values.
+        % Similarly, ACTIONS are matrices A-by-N.
 
         function v = vfunction(obj, States)
             [probs, q] = obj.distribution(States);
             v = mean(q .* probs);
         end        
         
-        function probability = evaluate(obj, States, action)
-            % Assert that the action belongs to the known actions
-            idx = find(obj.action_list == action);
-            assert(length(idx) == 1);
+        function probability = evaluate(obj, States, Actions)
+            % Evaluate pairs (state, action)
+            [found,idx] = (ismember(Actions,obj.action_list));
+            assert(min(found) == 1);
+            assert(isrow(Actions))
+            assert(length(Actions) == size(States,2))
             
             % Get action probability
             prob_list = obj.distribution(States);
-            probability = prob_list(idx,:);
+            nlist = length(obj.action_list);
+            naction = length(Actions);
+            idx = [1 : nlist : naction*nlist] + idx - 1;
+            prob_list = prob_list(:);
+            probability = prob_list(idx)';
         end
         
         function Actions = drawAction(obj, States)

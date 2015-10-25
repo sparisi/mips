@@ -2,13 +2,8 @@ classdef gibbs_allpref < policy_discrete
 % GIBBS_ALLPREF Gibbs (soft-max) distribution with preferences on all 
 % actions. The temperature is fixed.
     
-    properties(GetAccess = 'public', SetAccess = 'private')
-        basis;
-        action_list;
-    end
-    
     properties(GetAccess = 'public', SetAccess = 'public')
-        inverse_temperature;
+        inverse_temperature
     end
     
     methods
@@ -92,7 +87,7 @@ classdef gibbs_allpref < policy_discrete
         end
         
         % Basis function depending on the action
-        function phiA = basisA(obj, state, action)
+        function phiA = basisA(obj, States, Actions)
             dphi = feval(obj.basis);
             nactions = length(obj.action_list);
             if nargin == 1
@@ -100,13 +95,17 @@ classdef gibbs_allpref < policy_discrete
                 return
             end
             
-            assert(size(state,2) == 1)
-            i = find(obj.action_list == action);
-            assert(length(i) == 1);
+            nstates = size(States,2);
+            [found,~] = (ismember(Actions,obj.action_list));
+            assert(min(found) == 1);
+            assert(isrow(Actions))
+            assert(length(Actions) == nstates)
 
-            phi = obj.basis(state);
-            phiA = zeros(dphi*nactions,1);
-            phiA((i-1)*dphi+1:(i-1)*dphi+dphi) = phi;
+            phi = obj.basis(States); % Compute phi(s)
+            start_idx = (Actions-1)*dphi+1 + [0:nstates-1]*dphi*nactions; % Column start linear indices
+            all_idx = bsxfun(@plus,start_idx,[0:dphi-1]'); % All linear indices
+            phiA = zeros(dphi*nactions,nstates); % Initialize output array with zeros
+            phiA(all_idx) = phi; % Insert values from phi into output array
         end
         
         function obj = makeDeterministic(obj)
