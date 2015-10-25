@@ -1,5 +1,5 @@
 function S = metric_hv(J, HVF)
-% METRIC_ND Scalarizes a set of solution for multi-objective problem (i.e., 
+% METRIC_HV Scalarizes a set of solution for multi-objective problem (i.e., 
 % an approximate Pareto frontier). A solution is ranked according to its
 % contribution to the hypervolume of the frontier.
 %

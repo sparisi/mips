@@ -10,7 +10,7 @@ classdef (Abstract) policy_gaussian < policy
         
         % In all methods, STATES are matrices S-by-N, where S is the size
         % of one state and N is the number of states.
-        % Similarly, ACTIONS are matricies A-by-N.
+        % Similarly, ACTIONS are matrices A-by-N.
         
         %%% Logarithm of probability density function
         function logprob = logpdf(obj, varargin)

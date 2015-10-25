@@ -4,7 +4,7 @@ function hv = hypervolume(F, AU, U, N)
 % antiutopia points. Second, it counts the number of samples dominated by 
 % the front.  The hypervolume is approximated as the ratio 
 % 'dominated points / total points'.
-% Please notice that the choice of the utopia and antiutopia point is
+% Please notice that the choice of the utopia and antiutopia points is
 % crucial: using points very far from the frontier will result in similar
 % hypervolume even for very different frontiers (if the utopia is too far 
 % away, the hypervolume will be always low; if the antiutopia is too far 
