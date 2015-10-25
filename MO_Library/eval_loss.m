@@ -14,7 +14,7 @@ diff_J = (max(reference_front) - min(reference_front));
 
 loss = 0;
 
-for i = 1 : size(weights,1)
+parfor i = 1 : size(weights,1)
     w = weights(i,:)';
     front_w = front * w;
     reference_front_w = reference_front * w;

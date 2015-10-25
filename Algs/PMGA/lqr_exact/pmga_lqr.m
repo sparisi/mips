@@ -7,29 +7,33 @@ clear all
 reset(symengine)
 
 domain = 'lqr';
-loss_type = 'mix3';
 param_type = 'P1';
 
 [true_front, ~, utopia, antiutopia] = feval([domain '_moref'],0);
 dim_J = feval([domain '_settings']);
 
-[J_sym, theta, rho, t, ~, ~, D_t_theta, D_rho_theta] = ...
-    feval(['settings_lqr' num2str(dim_J)], loss_type, param_type );
+[theta, rho, t, D_t_theta, D_rho_theta, J_sym] = params_lqr( param_type );
 
 dim_rho = length(rho);
 dim_t = length(t);
 J_fun = matlabFunction(J_sym);
 
+if dim_J == 2
+    hypervfun = @(varargin)hypervolume2d(varargin{:},antiutopia,utopia);
+else
+    hypervfun = @(varargin)mexHypervolume(varargin{:},antiutopia,utopia,1e6);
+end
+
 
 %% Settings
+loss_type = 'mix3';
 % beta = [1, 1]; % MIX2: beta1 * L_AU / L_U - beta2
 beta = 1;      % MIX3: L_AU * (1 - w * L_U)
 
 tolerance = 0.00001;
 lrate = 0.1;
 
-% #points t used to estimate the integral
-n_points = 5;
+n_points = 5; % #points t used to estimate the integral
 lo = zeros(dim_t,1);
 hi = ones(dim_t,1);
 if dim_t == 1
@@ -50,6 +54,7 @@ MAX_ITER = 1000;
 %% Reset learning
 rho_learned = [1 1 0 0];
 % rho_learned = [3 7];
+rho_learned = rand(1,dim_rho);
 
 rho_history = [];
 Jr_history = [];
@@ -72,12 +77,13 @@ while iter < MAX_ITER
     D_rho_theta_iter = subs(D_rho_theta, rho, rho_learned);
     
     %%% Evaluation
-    points_eval = linspace(0,1,n_points_eval);
+    points_eval = samplePoints(lo, hi, n_points_eval, 1, 1);
     rho_arg = num2cell(rho_learned);
-    front_learned = -J_fun(rho_arg{:},points_eval');
+    t_arg = mat2cell(points_eval', size(points_eval,2), ones(1,dim_t));
+    front_learned = -J_fun(rho_arg{:},t_arg{:});
     front_learned = pareto(front_learned);
     loss = eval_loss(front_learned, domain);
-    hv = hypervolume2d(front_learned,antiutopia,utopia);
+    hv = hypervfun(front_learned);
     loss_history = [loss_history; loss];
     hv_history = [hv_history; hv];
     fprintf('%d ) Loss: %.4f, Hyperv: %.4f\n', iter, loss, hv);

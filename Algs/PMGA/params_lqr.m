@@ -2,7 +2,8 @@ function [theta, ...     % parameters of the objective functions, theta = phi_rh
     rho, ...             % parameters of theta
     t, ...               % free variable of theta
     D_t_theta, ...       % derivative of theta wrt t
-    D_rho_theta] = ...   % derivative of theta wrt rho
+    D_rho_theta, ...     % derivative of theta wrt rho
+    J] = ...             % objective functions in closed form
     params_lqr(param_type)
 
 mpd_var = lqr_mdpvariables();
@@ -47,7 +48,7 @@ elseif mpd_var.nvar_reward == 3
         error('Unknown param type.');
     end
     
-elseif mpd_var.nvar_reward == 3
+elseif mpd_var.nvar_reward == 5
     
     %%% Unconstrained
     t = sym('t',[1,4]);
@@ -64,10 +65,29 @@ elseif mpd_var.nvar_reward == 3
 
     for i = 1 : dim_theta
         idx = rho_per_theta*(i-1);
-        theta(i) = -sum([rho(1+idx), rho(1+idx+1:idx+rho_per_theta).*A]);
+        theta(i) = -1 / (1 + exp( sum([rho(1+idx), rho(1+idx+1:idx+rho_per_theta).*A]) ));
     end
 
 end
 
 D_t_theta = jacobian(theta,t);
 D_rho_theta = jacobian(theta,rho);
+
+if nargout == 6
+    dim = mpd_var.nvar_reward;
+    LQR   = lqr_init(dim);
+    g     = LQR.g;
+    B     = LQR.B;
+    Q     = LQR.Q;
+    R     = LQR.R;
+    x0    = LQR.x0;
+    Sigma = LQR.Sigma;
+    
+    J = sym('J',[1,dim]);
+    K = diag(theta);
+    
+    for i = 1 : dim
+        P = (Q{i}+K*R{i}*K)*(eye(dim)-g*(eye(dim)+2*K+K^2))^-1;
+        J(i) = transpose(x0)*P*x0 + (1/(1-g))*trace(Sigma*(R{i}+g*transpose(B)*P*B));
+    end
+end
