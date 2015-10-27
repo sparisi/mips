@@ -24,7 +24,7 @@ episodes = 150;
 steps = 50;
 
 %%% Learning
-episodes = 10;
-steps = 30;
+episodes = 150;
+steps = 50;
 
 end

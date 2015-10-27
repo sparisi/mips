@@ -1,21 +1,21 @@
 clear all
-domain = 'dam';
+domain = 'lqr';
 [n_obj, pol] = feval([domain '_settings']);
 [~, ~, utopia, antiutopia] = feval([domain '_moref'],0);
 dim_theta = length(pol.theta);
 
 % Settings
 makeDet = 0; % evaluate only deterministic policies?
-max_pop_size = 150;
+max_pop_size = 1000;
 elitism = 0.1;
 mutation = 0.8;
 crossover = @Genetic_Solver.uniformCrossover;
 % mutate = @Genetic_Solver.myMutation;
-mutate = @(theta)Genetic_Solver.gaussianMutation(theta,50*ones(1,dim_theta),0.2);
+mutate = @(theta)Genetic_Solver.gaussianMutation(theta,0.1*ones(1,dim_theta),0.2);
 
 % fitness = @(varargin)-eval_loss(varargin{:},domain);
-% fitness = @(varargin)hypervolume(varargin{:},antiutopia,utopia,1e6);
-fitness = @(varargin)hypervolume2d(varargin{:},antiutopia,utopia);
+fitness = @(varargin)hypervolume(varargin{:},antiutopia,utopia,1e6);
+% fitness = @(varargin)hypervolume2d(varargin{:},antiutopia,utopia);
 
 solver = SMSEMOA_Solver(elitism, mutation, fitness, crossover, mutate, max_pop_size);
 % solver = NSGA2_Solver(elitism, mutation, crossover, mutate, max_pop_size);
@@ -23,7 +23,7 @@ solver = SMSEMOA_Solver(elitism, mutation, fitness, crossover, mutate, max_pop_s
 % Initial population
 current_population = pol.empty(max_pop_size,0);
 
-dist = gaussian_diag_constant(dim_theta, pol.theta, pol.theta + ones(dim_theta,1));
+dist = gaussian_diag_constant(dim_theta, pol.theta, diag(pol.theta) + eye(dim_theta));
 for i = 1 : max_pop_size
     new_pol = pol;
     new_pol.theta = dist.drawAction;

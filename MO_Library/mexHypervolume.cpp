@@ -56,7 +56,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     double rnd;
     int count = 0;
     for (i = 0; i < N; i++) {
-        for (int j = 0; j < dimF; j++) { // generate a random point P in the hypercuboid between AU and U
+        for (j = 0; j < dimF; j++) { // generate a random point P in the hypercuboid between AU and U
             rnd = rand() / ((double)RAND_MAX);
             P[j] = AU[j] + rnd * (U[j] - AU[j]);
         }        
