@@ -38,7 +38,7 @@ beta = 1;      % MIX3: L_AU * (1 - w * L_U)
 tolerance = 0.00001;
 lrate = 0.1;
 
-n_points = 5; % #points t used to estimate the integral
+n_points = 50; % #points t used to estimate the integral
 lo = zeros(dim_t,1);
 hi = ones(dim_t,1);
 if dim_t == 1
@@ -100,7 +100,7 @@ while iter < MAX_ITER
     t_history{iter} = t_points;
     D_jr_eval = zeros(n_points, dim_rho);
     Jr_eval = zeros(n_points, 1);
-    for i = 1 : size(t_points,1)
+    parfor i = 1 : size(t_points,1)
         [Jr_i, D_jr_i] = executeTPoint(domain, t_points(i,:), theta_iter, D_r_Dtheta, D_t_theta_iter, D_rho_theta_iter, t, rho, rho_learned, loss_type, beta);
         Jr_eval(i) = Jr_i;
         D_jr_eval(i,:) = D_jr_i;

@@ -15,7 +15,7 @@ D_rho_theta_i = double(subs(D_rho_theta_iter, t, t_point));
 pol.theta = theta_i;
 
 % Collect samples and estimate gradients and hessians (ReLe)
-[ds, J, G, H] = collect_samples_rele(domain, episodes, steps, pol);
+[~, J, G, H] = collect_samples_rele(domain, episodes, steps, pol);
 
 % Collect samples and estimate gradients and hessians (Matlab)
 % [ds, J] = collect_samples(domain, episodes, steps, pol);
