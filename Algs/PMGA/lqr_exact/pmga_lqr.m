@@ -18,6 +18,11 @@ dim_rho = length(rho);
 dim_t = length(t);
 J_fun = matlabFunction(J_sym);
 
+D_r_Dtheta = cell(dim_rho,1);
+for j = 1 : dim_rho
+    D_r_Dtheta{j} = diff(D_t_theta,rho(j));
+end
+
 if dim_J == 2
     hypervfun = @(varargin)hypervolume2d(varargin{:},antiutopia,utopia);
 else
@@ -63,7 +68,7 @@ loss_history = [];
 t_history = {};
 iter = 0;
 
-n_points_eval = 1000;
+n_points_eval = 10000;
 
 
 %% Learning
@@ -82,7 +87,8 @@ while iter < MAX_ITER
     t_arg = mat2cell(points_eval', size(points_eval,2), ones(1,dim_t));
     front_learned = -J_fun(rho_arg{:},t_arg{:});
     front_learned = pareto(front_learned);
-    loss = eval_loss(front_learned, domain);
+    loss = 0;
+%     loss = eval_loss(front_learned, domain);
     hv = hypervfun(front_learned);
     loss_history = [loss_history; loss];
     hv_history = [hv_history; hv];
@@ -95,7 +101,7 @@ while iter < MAX_ITER
     D_jr_eval = zeros(n_points, dim_rho);
     Jr_eval = zeros(n_points, 1);
     for i = 1 : size(t_points,1)
-        [Jr_i, D_jr_i] = executeTPoint(domain, t_points(i,:), theta_iter, D_t_theta, D_t_theta_iter, D_rho_theta_iter, t, rho, rho_learned, loss_type, beta);
+        [Jr_i, D_jr_i] = executeTPoint(domain, t_points(i,:), theta_iter, D_r_Dtheta, D_t_theta_iter, D_rho_theta_iter, t, rho, rho_learned, loss_type, beta);
         Jr_eval(i) = Jr_i;
         D_jr_eval(i,:) = D_jr_i;
     end
@@ -115,13 +121,14 @@ end
 
 %% Plot results
 close all
-points_eval = linspace(0,1,n_points_eval);
+points_eval = samplePoints(lo, hi, n_points_eval, 1, 1);
 figure
 for j = 1 : size(rho_history,1)
     clf, hold on
     plot(true_front(:,1),true_front(:,2))
     rho_arg = num2cell(rho_history(j,:));
-    front_learned = -J_fun(rho_arg{:},points_eval');
+    t_arg = mat2cell(points_eval', size(points_eval,2), ones(1,dim_t));
+    front_learned = -J_fun(rho_arg{:},t_arg{:});
     plot(front_learned(:,1),front_learned(:,2),'r')
     drawnow
 end

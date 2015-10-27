@@ -13,6 +13,10 @@ param_type = 'P1';
 dim_rho = length(rho);
 dim_t = length(t);
 
+D_r_Dtheta = cell(dim_rho,1);
+for j = 1 : dim_rho
+    D_r_Dtheta{j} = diff(D_t_theta,rho(j));
+end
 
 %% Settings
 loss_type = 'mix2';
@@ -70,7 +74,7 @@ while iter < MAX_ITER
     D_jr_eval = zeros(n_points, dim_rho);
     Jr_eval = zeros(n_points, 1);
     for i = 1 : size(t_points,1)
-        [Jr_i, D_jr_i] = executeTPoint(domain, t_points(i,:), theta_iter, D_t_theta, D_t_theta_iter, D_rho_theta_iter, t, rho, rho_learned, loss_type, beta);
+        [Jr_i, D_jr_i] = executeTPoint(domain, t_points(i,:), theta_iter, D_r_Dtheta, D_t_theta_iter, D_rho_theta_iter, t, rho, rho_learned, loss_type, beta);
         Jr_eval(i) = Jr_i;
         D_jr_eval(i,:) = D_jr_i;
     end
