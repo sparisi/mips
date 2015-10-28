@@ -2,9 +2,6 @@ function h = surfFromScatter(x, y, z, opacity)
 % SURFFROMSCATTER Plots a surface from scattered data (X,Y,Z) with desired
 % OPACITY.
 
-figure
-grid on
-
 tri = delaunay(x,y);
 
 h = trisurf(tri, x, y, z);

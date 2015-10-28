@@ -10,7 +10,7 @@ antiutopia = [0, -20];
 
 if outPlot
     hold on
-    plot(front(:,1), front(:,2),'bo-.')
+    plotfront(front,'s');
     xlabel 'Treasure'
     ylabel 'Time'
     hold off

@@ -146,18 +146,8 @@ for obj = -[-(N_obj-1) : -1] % for all the remaining objectives ...
     
 end
 
-
-%% Plot
-f = evaluate_policies([front_pol; inter_pol], domain, makeDet);
-[f, p] = pareto(f, [front_pol; inter_pol]);
-
-figure; hold all
-if N_obj == 2
-    plot(f(:,1),f(:,2),'g+')
-end
-
-if N_obj == 3
-    scatter3(f(:,1),f(:,2),f(:,3),'g+')
-end
-
+%% Eval
+fr = evaluate_policies([front_pol; inter_pol], domain, makeDet);
+[f, p] = pareto(fr, [front_pol; inter_pol]);
+plotfront(f);
 feval([domain '_moref'],1);

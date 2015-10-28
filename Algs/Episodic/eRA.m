@@ -116,20 +116,9 @@ parfor k = 1 : N_sol
     
 end
 
+%% Eval
 front_pol = vertcat(front_pol{:});
-
-
-%% Plot
 fr = evaluate_policies_episodic(front_pol, domain, makeDet);
 [f, p] = pareto(fr, front_pol);
-
-figure; hold all
-if n_obj == 2
-    plot(f(:,1),f(:,2),'g+')
-end
-
-if n_obj == 3
-    scatter3(f(:,1),f(:,2),f(:,3),'g+')
-end
-
+plotfront(f);
 feval([domain '_moref'],1);

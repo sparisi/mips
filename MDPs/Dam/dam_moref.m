@@ -13,7 +13,7 @@ if n_obj == 2
     
     if outPlot
         hold on
-        plot(front(:,1), front(:,2),'bo-.','DisplayName','SDP approximation')
+        plotfront(front,'s');
         xlabel 'Flooding'
         ylabel 'Water Demand'
         hold off
@@ -28,7 +28,7 @@ elseif n_obj == 3
     
     if outPlot
         hold on
-        scatter3(front(:,1),front(:,2),front(:,3),'bo','DisplayName','SDP approximation')
+        plotfront(front,'o');
         xlabel 'Flooding'
         ylabel 'Water Demand'
         zlabel 'Hydroelectric Demand'

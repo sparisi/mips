@@ -16,7 +16,7 @@ if n_obj == 2 % starting from [10, 10]
     
     if outPlot
         hold on
-        plot(front(:,1), front(:,2),'b.-')
+        plotfront(front,'.');
         xlabel 'Obj 1'
         ylabel 'Obj 2'
         hold off
@@ -31,7 +31,7 @@ elseif n_obj == 3 % starting from [10, 10, 10]
     
     if outPlot
         hold on
-        scatter3(front(:,1), front(:,2), front(:,3), 'bo')
+        plotfront(front,'o');
         xlabel 'Obj 1'
         ylabel 'Obj 2'
         zlabel 'Obj 3'

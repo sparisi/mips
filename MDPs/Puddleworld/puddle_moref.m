@@ -10,7 +10,7 @@ antiutopia = [];
 
 if outPlot
     hold on
-    plot(front(:,1), front(:,2),'bo')
+    plotfront(front,'.');
     xlabel 'Steps'
     ylabel 'Puddle Penalty'
     hold off

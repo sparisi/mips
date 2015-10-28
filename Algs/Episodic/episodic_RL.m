@@ -50,10 +50,4 @@ while true
     
 end
 
-%% Plot results
-figure; shadedErrorBar(1:size(J_history,2), ...
-    mean(J_history), ...
-    2*sqrt(diag(cov(J_history))), ...
-    {'LineWidth', 2'}, 0.1);
-xlabel('Iterations')
-ylabel('Average return')
+plotreturn(J_history)

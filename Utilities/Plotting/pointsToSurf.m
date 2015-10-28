@@ -12,7 +12,6 @@ y_edge = linspace(floor(min(y)), ceil(max(y)), nPoints_Y);
 [X,Y] = meshgrid(x_edge, y_edge);
 Z = griddata(x,y,z,X,Y);
 
-figure
 h = surf(X,Y,Z);
 % h = mesh(X,Y,Z);
 

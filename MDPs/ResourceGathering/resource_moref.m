@@ -10,7 +10,9 @@ antiutopia = [];
 
 if outPlot
     hold on
-    scatter3(front(:,1), front(:,2), front(:,3),'bo')
+    plotfront(front,'o');
+    surfFromScatter(front(:,1),front(:,2),front(:,3),0.1);
+    hold off
     xlabel 'Fight Penalty'
     ylabel 'Gold'
     zlabel 'Gems'
