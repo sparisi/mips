@@ -25,7 +25,7 @@ parfor k = 1 : maxepisodes
     % Draw theta from the high-level distribution
     theta = solver.policy.drawAction(context);
     pol_tmp = pol_low;
-    pol_tmp.theta(1:dim_theta) = theta; % set only the mean, not the variance
+    pol_tmp.theta(1:dim_theta) = theta;
     Theta(k,:) = theta;
     
     % Rollout

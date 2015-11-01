@@ -12,7 +12,7 @@ for k = 1 : size(nexts,2)
     plot(nexts(1,k),nexts(2,k),'ro','MarkerSize',8,'MarkerFaceColor','r'); % Agent
         
     title(['S: [' num2str(nexts(1,k)) ', ' num2str(nexts(2,k)) ... 
-        '], A: [' num2str(actions(1,k)) ', ' num2str(actions(1,k)) ']'])
+        '], A: [' num2str(actions(1,k)) ', ' num2str(actions(2,k)) ']'])
     drawnow
     pause(0.5)
 end

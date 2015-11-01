@@ -88,7 +88,7 @@ classdef (Abstract) policy_gaussian < policy
 
         %%% Zero variance
         function obj = makeDeterministic(obj)
-            obj.theta(end-obj.dim_explore+1:end) = 1e-8;
+            obj.theta(end-obj.dim_explore+1:end) = obj.theta(end-obj.dim_explore+1:end)*1e-8;
         end
 
         %%% Increase variance by factor
