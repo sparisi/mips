@@ -82,4 +82,4 @@ while iter < MAX_ITER
 
 end
 
-plotreturn(J_history)
+plothistory(J_history)

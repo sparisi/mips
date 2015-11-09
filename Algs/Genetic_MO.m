@@ -23,7 +23,7 @@ solver = SMSEMOA_Solver(elitism, mutation, fitness, crossover, mutate, max_pop_s
 % Initial population
 current_population = pol.empty(max_pop_size,0);
 
-dist = gaussian_diag_constant(dim_theta, pol.theta, diag(pol.theta) + eye(dim_theta));
+dist = gaussian_diag_constant(dim_theta, pol.theta, abs(diag(pol.theta)) + eye(dim_theta));
 for i = 1 : max_pop_size
     new_pol = pol;
     new_pol.theta = dist.drawAction;

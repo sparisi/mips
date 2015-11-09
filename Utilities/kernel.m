@@ -5,7 +5,7 @@ function K = kernel(X, Y, type, param)
 %     - X     : N-by-D matrix (N samples, D dimension)
 %     - Y     : M-by-D matrix (N samples, D dimension)
 %     - type  : kernel name
-%     - param : (optional) kernel parameters
+%     - param : kernel parameters
 %
 %    OUTPUT
 %     - K     : N-by-M kernel matrix
@@ -17,16 +17,10 @@ switch type
         
     case 'poly'
         K = X*Y' + 1;
-        if nargin < 4
-            param = 2;
-        end
         K = K.^param;
         
     case 'gauss'
         dist = L2_distance(X',Y');
-        if nargin < 4
-            param = mean(mean(dist.^2))/size(X,1);
-        end
         K = exp(-dist.^2 ./ (2*param.^2));
         
     otherwise

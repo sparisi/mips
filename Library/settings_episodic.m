@@ -14,7 +14,6 @@ function [n_obj, policy] = settings_episodic(domain, isDet)
 [n_obj, pol_low] = feval([domain '_settings']);
 n_params = length(pol_low.theta) - pol_low.dim_explore * isDet;
 mu0 = pol_low.theta(1:n_params);
-mu0(end) = 0;
 
 %%% These are suggested generic covariances 
 % sigma0 = 10 * eye(n_params); % Deep

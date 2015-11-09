@@ -50,4 +50,4 @@ while true
     
 end
 
-plotreturn(J_history)
+plothistory(J_history)
