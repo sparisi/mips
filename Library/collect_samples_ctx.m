@@ -8,7 +8,6 @@ simulator = [domain '_simulator'];
 mdpvars = feval([domain '_mdpvariables']);
 maxr = mdpvars.maxr;
 
-empty_sample.phi = [];
 empty_sample.s = [];
 empty_sample.a = [];
 empty_sample.r = [];
@@ -36,7 +35,6 @@ parfor episodes = 1 : maxepisodes
     
     % Store the new sample
     if ~isempty(sample.a)
-        dataset(episodes).phi = sample.phi;
         dataset(episodes).s = sample.s;
         dataset(episodes).a = sample.a;
         dataset(episodes).r = sample.r;

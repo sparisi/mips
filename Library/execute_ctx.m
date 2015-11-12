@@ -20,7 +20,6 @@ state = initial_state;
 
 % Allocate memory for new samples
 results.s = -9999*ones(nvar_state, maxsteps);
-results.phi = -9999*ones(policy.basis(), maxsteps);
 results.nexts = -9999*ones(nvar_state, maxsteps);
 results.a = -9999*ones(nvar_action, maxsteps);
 results.r = -9999*ones(nvar_reward, maxsteps);
@@ -31,9 +30,6 @@ while ( (steps < maxsteps) && (~endsim) )
     
     steps = steps + 1;
     
-    % Compute features
-    phi = policy.basis(state);
-    
     % Select action
     action = policy.drawAction(state);
     
@@ -41,7 +37,6 @@ while ( (steps < maxsteps) && (~endsim) )
     [nextstate, reward, endsim] = feval(simulator, state, action, context);
     
     % Record sample
-    results.phi(:,steps) = phi;
     results.a(:,steps) = action;
     results.r(:,steps) = reward;
     results.s(:,steps) = state;
@@ -57,7 +52,6 @@ while ( (steps < maxsteps) && (~endsim) )
 end
 
 % Return the results
-new_results.phi = results.phi(:, 1:steps);
 new_results.s = results.s(:, 1:steps);
 new_results.a = results.a(:, 1:steps);
 new_results.r = results.r(:, 1:steps);
