@@ -2,6 +2,11 @@ classdef gibbs < policy_discrete
 % GIBBS Gibbs (softmax) distribution with preferences on all but last 
 % action. The temperature is fixed.
     
+    properties(GetAccess = 'public', SetAccess = 'private')
+        basis
+        action_list
+    end
+    
     properties(GetAccess = 'public', SetAccess = 'public')
         inverse_temperature
     end

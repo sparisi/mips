@@ -2,7 +2,6 @@ classdef (Abstract) policy_discrete < policy
 % POLICY_DISCRETE Generic class for policies with discrete actions.
     
     properties(GetAccess = 'public', SetAccess = 'protected')
-        basis
         action_list
     end
     
@@ -66,18 +65,41 @@ classdef (Abstract) policy_discrete < policy
         end
         
         %% PLOTTING
+        %%% Plot most probable action for 2D states
+        function plotDeterministic(obj, xmin, xmax, ymin, ymax, fig)
+            assert(xmin < xmax)
+            assert(ymin < ymax)
+
+            if nargin == 5, figure, else figure(fig), end
+            
+            nactions = length(obj.action_list);
+            step = 30;
+            xnodes = linspace(xmin,xmax,step);
+            ynodes = linspace(ymin,ymax,step);
+            [X, Y] = meshgrid(xnodes,ynodes);
+            
+            actions = obj.makeDeterministic.drawAction([X(:)';Y(:)']);
+            Z = reshape(actions,step,step);
+            contourf(X,Y,Z)
+            title('Deterministic actions')
+            xlabel x
+            ylabel y
+            
+            cmap = jet(nactions);
+            nonzeroActions = ismember(obj.action_list,actions);
+            cmap = cmap(nonzeroActions,:);
+            colormap(cmap)
+            labels = num2cell(obj.action_list(nonzeroActions));
+            labels = cellfun(@num2str,labels,'uni',0);
+            lcolorbar(labels);
+        end
+        
         %%% Plot actions distribution for 2D states
-        function plot(obj, xmin, xmax, ymin, ymax, fig)
+        function plotActions(obj, xmin, xmax, ymin, ymax, fig)
             assert(xmin < xmax)
             assert(ymin < ymax)
             
-            scrsz = get(groot,'ScreenSize');
-            if nargin == 5
-                figure('Position',[1 scrsz(4)/2 scrsz(3)/2 scrsz(4)/2])
-            else
-                set(fig,'Position',[1 scrsz(4)/2 scrsz(3)/2 scrsz(4)/2])
-                figure(fig)
-            end
+            if nargin == 5, figure, else figure(fig), end
 
             nactions = length(obj.action_list);
             n = floor(sqrt(nactions));
@@ -104,13 +126,7 @@ classdef (Abstract) policy_discrete < policy
             assert(xmin < xmax)
             assert(ymin < ymax)
             
-            scrsz = get(groot,'ScreenSize');
-            if nargin == 5
-                figure('Position',[1 scrsz(4)/2 scrsz(3)/2 scrsz(4)/2])
-            else
-                set(fig,'Position',[1 scrsz(4)/2 scrsz(3)/2 scrsz(4)/2])
-                figure(fig)
-            end
+            if nargin == 5, figure, else figure(fig), end
 
             nactions = length(obj.action_list);
             n = floor(sqrt(nactions));
@@ -137,11 +153,7 @@ classdef (Abstract) policy_discrete < policy
             assert(xmin < xmax)
             assert(ymin < ymax)
             
-            if nargin == 5
-                figure
-            else
-                figure(fig)
-            end
+            if nargin == 5, figure, else figure(fig), end
             
             step = 30;
             xnodes = linspace(xmin,xmax,step);
@@ -154,7 +166,7 @@ classdef (Abstract) policy_discrete < policy
             title('V-function')
             xlabel x
             ylabel y
-        end        
+        end
         
     end
     

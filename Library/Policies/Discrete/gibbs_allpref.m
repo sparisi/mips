@@ -2,6 +2,11 @@ classdef gibbs_allpref < policy_discrete
 % GIBBS_ALLPREF Gibbs (soft-max) distribution with preferences on all 
 % actions. The temperature is fixed.
     
+    properties(GetAccess = 'public', SetAccess = 'private')
+        basis
+        action_list
+    end
+    
     properties(GetAccess = 'public', SetAccess = 'public')
         inverse_temperature
     end
