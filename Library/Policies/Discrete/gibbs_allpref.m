@@ -4,7 +4,6 @@ classdef gibbs_allpref < policy_discrete
     
     properties(GetAccess = 'public', SetAccess = 'private')
         basis
-        action_list
     end
     
     properties(GetAccess = 'public', SetAccess = 'public')
