@@ -25,7 +25,8 @@ How To Add A New MDP
 
 Each MDP requires some mandatory functions:
 
-- *NAME_simulator*    : defines the reward and transition functions,
+- *NAME_simulator*    : defines the reward and transition functions (both 
+                        states and actions are columns vectors),
 
 - *NAME_settings*     : defines the learning setup and returns
   - *n_obj*    : number of objectives of the problem,

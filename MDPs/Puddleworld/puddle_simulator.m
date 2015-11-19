@@ -33,7 +33,7 @@ end
 nextstate = min(max(state,env.minstate),env.maxstate);
 reward = zeros(2,1);
 
-% Distance from the nearest edge of the puddle plus penalty for being far from the goal
+% Distance from the nearest edge of the puddle
 reward(1) = puddle_reward_distance(nextstate);
 
 % Time penalty

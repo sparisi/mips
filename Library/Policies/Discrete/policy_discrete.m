@@ -142,7 +142,7 @@ classdef (Abstract) policy_discrete < policy
                 subplot(n,m,i,'align')
                 Z = reshape(Q(i,:),step,step);
                 contourf(X,Y,Z)
-                title(['Action ' num2str(i)])
+                title(['Q(s,' num2str(i) ')'])
                 xlabel x
                 ylabel y
             end

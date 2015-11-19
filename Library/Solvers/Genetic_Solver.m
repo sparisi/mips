@@ -49,7 +49,7 @@ classdef Genetic_Solver < handle
         end
 
         %% INDIVIDUALS SELECTION
-        function [new_population, new_J] = getNewPopulation( obj, ...
+        function [new_population, new_J] = getNewPopulation(obj, ...
                 current_population, current_J, offspring, offspring_J)
             population_size = numel(current_population);
             
@@ -93,8 +93,7 @@ classdef Genetic_Solver < handle
             new_J = [elites_J; sorted_J(1:n_remaining,:)];
         end
         
-        %% SIMPLE SINGLE-OBJECTIVE FITNESS. MULTI-OBJECTIVE ALGORITHMS 
-        % OVERRIDE IT
+        %% SIMPLE SINGLE-OBJECTIVE FITNESS. MULTI-OBJECTIVE ALGS OVERRIDE IT
         function J = getFitness(obj, J)
             J = -J; % Since population sorting is done in ascending order
         end
