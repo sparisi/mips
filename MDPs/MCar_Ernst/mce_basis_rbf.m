@@ -1,7 +1,8 @@
 function phi = mce_basis_rbf(state)
 
+env = mce_environment();
 n_centers = 4;
-range = [-2 1; -4 4];
+range = [env.xLB env.xUB; env.vLB env.vUB];
 
 if nargin == 0
     phi = basis_krbf(n_centers,range) + 1;
