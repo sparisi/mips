@@ -5,7 +5,7 @@ env = mce_environment;
 xEnv = linspace(env.xLB,env.xUB,100)';
 yEnv = hill(xEnv);
 
-xEp = episode.s(1,:);
+xEp = [episode.s(1,1) episode.nexts(1,:)];
 yEp = hill(xEp);
 
 baseline = min(yEnv) - 0.1;
