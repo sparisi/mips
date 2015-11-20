@@ -22,7 +22,7 @@ if isempty(fig)
         plot(newX{i}, newY{i})
     end
     hold off
-    title(name)
+    fig.CurrentAxes.Title.String = name;
     return
 end
 
