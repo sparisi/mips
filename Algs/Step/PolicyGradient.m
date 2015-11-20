@@ -3,7 +3,7 @@ domain = 'lqr';
 robj = 1;
 [n_obj, pol, episodes, steps, gamma] = feval([domain '_settings']);
 iter = 0;
-lrate = .1;
+lrate = 0.1;
 
 
 %% Learning
@@ -23,4 +23,5 @@ while true
     fprintf('%d ) Entropy: %.2f, Norm: %.4f, J: [ %s ]\n', iter, S, norm_g, str_obj)
     
     pol = pol.update(grad * stepsize);
+    
 end
