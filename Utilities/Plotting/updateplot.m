@@ -1,5 +1,5 @@
 function updateplot(name, newX, newY)
-% UPDATEPLOT Updates plots in a figure with new points.
+% UPDATEPLOT Updates 2d plots with new points.
 %
 %    INPUT
 %     - name : figure name
