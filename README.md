@@ -50,7 +50,8 @@ Additionally, there are some functions used to better organize the code:
 
 - *NAME_environment*  : defines additional details of the problem environment,
 - *NAME_basis*        : defines the features used to represent a state,
-- *NAME_moref*        : returns all the details related to the multi-objective setup, i.e., the reference frontier used for comparison, the utopia and antiutopia points. It also returns a set of weights if the reference front is obtained with a weighted scalarization of the objectives. Both the frontier and the weights are saved in *NAME_ref.dat* and *NAME_w.dat*, respectively.
+- *NAME_moref*        : returns all the details related to the multi-objective setup, i.e., the reference frontier used for comparison, the utopia and antiutopia points. It also returns a set of weights if the reference front is obtained with a weighted scalarization of the objectives. Both the frontier and the weights are saved in *NAME_ref.dat* and *NAME_w.dat*, respectively,
+- *NAME_plot*         : used to plot the environment and the state of the agent.
 
 Finally, the function *settings_episodic* is used as a wrapper to set up the learning for episodic algorithms. Modify this function only to specify the distribution used to collect samples (e.g., a Gaussian with diagonal covariance or a Gaussian Mixture Model).
 
