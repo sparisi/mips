@@ -44,8 +44,8 @@ end
 
 function ddp_val = ddp(model, pos, velocity, throttle)
 % Second derivative of the hill
-A = throttle / ( model.mass * (1 + dhill(pos) * dhill(pos)) );
-B = model.g * dhill(pos) / ( 1 + dhill(pos) * dhill(pos) );
+A = throttle / ( model.mass * (1 + dhill(pos)^2) );
+B = model.g * dhill(pos) / ( 1 + dhill(pos)^2 );
 C = velocity^2 * dhill(pos) * dhill(dhill(pos)) / (1 + dhill(pos)^2);
 ddp_val = A - B - C;
 end

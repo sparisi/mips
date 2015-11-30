@@ -5,14 +5,14 @@ env.mass = 1;   % Mass
 env.g = 9.81;   % Gravity
 
 % Min and max position of the car
-env.xLB = -2;
+env.xLB = -1;
 env.xUB = 1;
 
 % Min and max velocity
-env.vLB = -4;
-env.vUB = 4;
+env.vLB = -3;
+env.vUB = 3;
 
 % Actions
-env.throttle = [-4 0 4]';
+env.throttle = [-4 4]';
 
 end
