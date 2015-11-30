@@ -9,6 +9,6 @@ bfs = @mcc_basis_rbf;
 policy = gaussian_diag_linear(bfs, n_act, zeros(n_act,bfs()), 10);
 
 episodes = 100;
-steps = 100;
+steps = 500;
 
 end
