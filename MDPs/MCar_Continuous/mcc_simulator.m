@@ -17,14 +17,15 @@ elseif nargin == 1
 end
 
 % Parse input
+action = max(min(action, model.aUB), model.aLB); % Bound the action
 position = state(1);
 velocity = state(2);
-acceleration = action;
+throttle = action;
 
 % Update state
-psecond = ddp(model, position, velocity, acceleration);
-pNext = position + model.dt * velocity + 0.5 * model.dt * model.dt * psecond;
-vNext = velocity + model.dt * psecond;
+acceleration = ddp(model, position, velocity, throttle);
+pNext = position + model.dt * velocity + 0.5 * model.dt^2 * acceleration;
+vNext = velocity + model.dt * acceleration;
 nextstate = [pNext vNext]';
 
 % Compute reward
@@ -34,7 +35,7 @@ end
 
 %% Helper functions
 function dhill_val = dhill(pos)
-% Derivative of the hill
+% Derivative of the y-position
 if (pos < 0.0)
     dhill_val = 2*pos + 1;
 else
@@ -42,12 +43,11 @@ else
 end
 end
 
-function ddp_val = ddp(model, pos, velocity, acceleration)
-% Second derivative of the hill
-A = acceleration / ( model.mass * (1 + dhill(pos) * dhill(pos)) );
+function acceleration = ddp(model, pos, velocity, throttle)
+A = throttle / ( model.mass * (1 + dhill(pos) * dhill(pos)) );
 B = model.g * dhill(pos) / ( 1 + dhill(pos) * dhill(pos) );
 C = velocity^2 * dhill(pos) * dhill(dhill(pos)) / (1 + dhill(pos)^2);
-ddp_val = A - B - C;
+acceleration = A - B - C;
 end
 
 function [reward, absorb] = mcar_reward(model, position, velocity)
