@@ -12,9 +12,9 @@ env = cart_environment();
 
 switch action
     case 1 % Left
-        force = -env.force_mag;
+        F = -env.force;
     case 2 % Right
-        force = env.force_mag;
+        F = env.force;
     otherwise
         error('Unknown action.')
 end
@@ -27,18 +27,21 @@ thetad = state(4);
 costheta = cos(theta);
 sintheta = sin(theta);
 
-totalmass = env.masspole + env.masscart;
 polemass_length = env.masspole * env.length;
 
-temp = (force + polemass_length * thetad^2 * sintheta) / totalmass;
-thetadd = (env.g * sintheta - costheta * temp) / (env.length * (4/3 - env.masspole * costheta^2 / totalmass));
-xdd = temp - polemass_length * thetadd * costheta / totalmass;
+F_effective = polemass_length * thetad^2 * sintheta + ...
+    3 / 4 * env.masspole * costheta * (env.mu_p * thetad / polemass_length + env.g * sintheta);
 
-x = x + env.dt * xd;
-xd = xd + env.dt * xdd;
-theta = theta + env.dt * thetad;
+masspole_effective = env.masspole * (1 - 3 / 4 * costheta^2);
+
+xdd = F + F_effective - env.mu_c * sign(xd) / (env.masscart + masspole_effective);
+thetadd = - 3 / 4 / env.length * (xdd * costheta + env.g * sintheta + env.mu_p * thetad / polemass_length);
+
+x = x + env.dt .* xd;
+xd = xd + env.dt .* xdd;
+theta = theta + env.dt .* thetad;
 theta = wrapinpi(theta); % theta in [-pi, pi]
-thetad = thetad + env.dt * thetadd;
+thetad = thetad + env.dt .* thetadd;
 
 nextstate = [x xd theta thetad]';
 
