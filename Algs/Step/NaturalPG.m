@@ -26,17 +26,13 @@ end
 
 if rank(fisher) == dlogpi_r
     dJdtheta = fisher \ grad;
-    if nargin == 6
-        lambda = sqrt(dJdtheta' / fisher * dJdtheta / (4 * lrate));
-        lambda = max(lambda,1e-8); % to avoid numerical problems
-        stepsize = 1 / (2 * lambda);
-    end
 else
     warning('Fisher matrix is lower rank (%d instead of %d).', rank(fisher), dlogpi_r);
     dJdtheta = pinv(fisher) * grad;
-    if nargin == 6
-        lambda = sqrt(dJdtheta' * pinv(fisher) * dJdtheta / (4 * lrate));
-        lambda = max(lambda,1e-8); % to avoid numerical problems
-        stepsize = 1 / (2 * lambda);
-    end
+end
+
+if nargin == 6
+    lambda = sqrt(grad' * dJdtheta / (4 * lrate));
+    lambda = max(lambda,1e-8); % to avoid numerical problems
+    stepsize = 1 / (2 * lambda);
 end
