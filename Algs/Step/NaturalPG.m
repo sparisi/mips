@@ -27,13 +27,12 @@ end
 if rank(fisher) == dlogpi_r
     dJdtheta = fisher \ grad;
 else
-	warning('Fisher matrix is lower rank (%d instead of %d).', rank(fisher), dlogpi_r);
+    warning('Fisher matrix is lower rank (%d instead of %d).', rank(fisher), dlogpi_r);
     dJdtheta = pinv(fisher) * grad;
 end
 
-if nargin >= 6
-    T = eye(length(dJdtheta)); % trasformation in Euclidean space
-    lambda = sqrt(dJdtheta' * T * dJdtheta / (4 * lrate));
+if nargin == 6
+    lambda = sqrt(grad' * dJdtheta / (4 * lrate));
     lambda = max(lambda,1e-8); % to avoid numerical problems
     stepsize = 1 / (2 * lambda);
 end
