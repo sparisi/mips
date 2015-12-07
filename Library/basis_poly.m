@@ -31,12 +31,11 @@ if nargin == 3
     end
 else
     assert(size(state,1) == dim)
-    n = size(state,2);
-    Phi = zeros(dimPhi,n);
-    for i = 1 : n
-        C = nmultichoosek([1; state(:,i)],degree);
-        Phi(:,i) = prod(C,2);
-    end
+    nSamples = size(state,2);
+
+    C = nmultichoosek([ones(1,nSamples); state], degree);
+    Phi = permute(prod(C,2),[1,3,2]);
+
     if ~offset
         Phi(1,:) = [];
     end
