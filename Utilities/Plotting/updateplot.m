@@ -14,7 +14,11 @@ function updateplot(name, newX, newY, cursorOn)
 % Look for a figure with the specified name
 fig = findobj('type','figure','name',name);
 
-if ~iscell(newX), newX = {newX}; newY = {newY}; end % If there is only one plot
+if ~iscell(newX), newX = num2cell(newX); end
+if ~iscell(newY), newY = num2cell(newY); end
+
+% If the plots share the same x coordinates
+if numel(newX) == 1, newX = repmat(newX,1,numel(newY)); end
 
 % If the figure does not exist, create it and plot the first points
 if isempty(fig)
