@@ -25,64 +25,30 @@ function Phi = basis_krbf(n_centers, range, state)
 %     0.0211
 %     0.0015
 
-persistent centers
+persistent centers bands
 
-n_features = size(range,1);
-b = zeros(1, n_features);
-c = cell(n_features, 1);
-
-% Compute bandwidths and centers for each dimension
-for i = 1 : n_features
+% Compute bandwidths and centers only once
+if isempty(centers)
+    n_features = size(range,1);
+    bands = diff(range,[],2).^2 / n_centers^3;
+    m = diff(range,[],2) / n_centers;
     
-    b(i) = (range(i,2) - range(i,1))^2 / n_centers^3;
-    m = abs(range(i,2) - range(i,1)) / n_centers;
-    c{i} = linspace(-m * 0.1 + range(i,1), range(i,2) + m * 0.1, n_centers);
-
-end
-
-% Compute all centers point
-if size(centers,1) == 0
-
+    c = cell(n_features, 1);
+    for i = 1 : n_features
+        c{i} = linspace(-m(i) * 0.1 + range(i,1), range(i,2) + m(i) * 0.1, n_centers);
+    end
     d = cell(1,n_features);
     [d{:}] = ndgrid(c{:});
-    centers = cell2mat( cellfun(@(v)v(:), d, 'UniformOutput',false) )';
-
+    centers = cell2mat( cellfun(@(v)v(:), d, 'UniformOutput', false) )';
 end
-dim_phi = size(centers,2);
 
-if ~exist('state','var')
-    
-    Phi = dim_phi;
-    
+if nargin < 3
+    Phi = size(centers,2);
 else
-    
-    B = 0.5 * diag(1./b);
-    N = size(state,2);
-    Phi = zeros(dim_phi,N);
-    for j = 1 : N
-        x = bsxfun(@minus,state(:,j),centers);
-        Phi(:,j) = diag(exp(-x' * B * x));
-    end
-    
+    B = 0.5 ./ bands;
+    distance = -bsxfun(@minus,state',reshape(centers,[1 size(centers)])).^2;
+    distance = permute(distance,[1 3 2]);
+    expterm = bsxfun(@times,distance,reshape(B',[1,size(B')]));
+    Phi = exp(sum(expterm,3))';
 %     Phi = Phi ./ sum(Phi);
-
-end
-
-% %%% Plotting
-% idx = 1;
-% t = zeros(100, n_features);
-% for i = 1 : n_features
-%     t(:,i)  = linspace(range(i,1), range(i,2), 100);
-% end
-% 
-% u = zeros(100, n_centers);
-% for k = 1 : 100
-%     for j = 1 : n_centers
-%         u(k,j) = exp(-(t(k,idx) - c{idx}(j))^2 / (2*b(idx)));
-%     end
-%     u(k,:) = u(k,:) / sum(u(k,:));
-% end
-% 
-% figure; plot(t(:,idx),u,'Linewidth',2)
-    
 end

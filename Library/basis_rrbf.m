@@ -17,61 +17,38 @@ function Phi = basis_rrbf(n_centers, widths, range, state)
 %
 % =========================================================================
 % EXAMPLE
-% basis_rrbf(2, [30, 20], [0,1; 0,1], [0.2, 0.1]')
-%     0.2983
-%     0.0499
-%     0.0007
-%     0.0000
+% basis_rrbf(2, [0.3; 0.2], [0 1; 0 1], [0.2; 0.1])
+%     0.4346
+%     0.0663
+%     0.0106
+%     0.0053
 
 persistent centers
 
 n_features = size(range,1);
-c = cell(n_features, 1);
 
-% Compute centers for each dimension
-for i = 1 : n_features
-    c{i} = linspace(range(i,1), range(i,2), n_centers);
-end
-
-% Compute all centers point
-if size(centers,1) == 0
+% Compute all centers point only once
+if isempty(centers)
+    c = cell(n_features, 1);
+    for i = 1 : n_features
+        c{i} = linspace(range(i,1), range(i,2), n_centers);
+    end
+    
     d = cell(1,n_features);
     [d{:}] = ndgrid(c{:});
     centers = cell2mat( cellfun(@(v)v(:), d, 'UniformOutput',false) )';
 end
-dim_phi = size(centers,2);
 
-if ~exist('state','var')
-    
-    Phi = dim_phi;
-    
+if nargin == 3
+    Phi = size(centers,2);
 else
-
-    B = diag(1./widths.^2);
-    N = size(state,2);
-    Phi = zeros(dim_phi,N);
-    for j = 1 : N
-        x = bsxfun(@minus,state(:,j),centers);
-        Phi(:,j) = diag(exp( -sqrt( x' * B * x ) ));
-    end
-    
+    if isrow(widths), widths = widths'; end
+    B = 1./widths.^2;
+    distance = bsxfun(@minus,state',reshape(centers,[1 size(centers)])).^2;
+    distance = permute(distance,[1 3 2]);
+    expterm = bsxfun(@times,distance,reshape(B',[1,size(B')]));
+    Phi = exp(-sqrt(sum(expterm,3)))';
+%     Phi = Phi ./ sum(Phi);
 end
-
-% %%% Plotting
-% idx = 1;
-% t = zeros(100, n_features);
-% for i = 1 : n_features
-%     t(:,i)  = linspace(range(i,1), range(i,2), 100);
-% end
-% 
-% u = zeros(100, n_centers);
-% for k = 1 : 100
-%     for j = 1 : n_centers
-%         u(k,j) = exp(-(t(k,idx) - c{idx}(j))^2 / (2*b(idx)));
-%     end
-%     u(k,:) = u(k,:) / sum(u(k,:));
-% end
-% 
-% figure; plot(t(:,idx),u,'Linewidth',2)
 
 end
