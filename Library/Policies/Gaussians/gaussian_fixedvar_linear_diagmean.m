@@ -64,7 +64,7 @@ classdef gaussian_fixedvar_linear_diagmean < policy_gaussian
         end
         
         function obj = makeDeterministic(obj)
-            obj.Sigma = 1e-8 * ones(size(obj.Sigma));
+            obj.Sigma = 1e-8 * eye(size(obj.Sigma));
         end
         
     end
