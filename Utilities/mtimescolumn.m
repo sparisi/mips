@@ -15,9 +15,6 @@ function C = mtimescolumn(A, B)
 %    OUTPUT
 %     - C : N*M-by-D matrix
 
-[N, D] = size(A);
+N = size(A,1);
 M = size(B,1);
-
-A = repmat(A, M, 1);
-B = kron(B, ones(N,1));
-C = reshape(A(:) .* B(:), N*M, D);
+C = reshape(bsxfun(@times,permute(A,[1 3 2]),permute(B,[3 1 2])),N*M,[]) ;
