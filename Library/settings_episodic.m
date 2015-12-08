@@ -21,6 +21,7 @@ sigma0 = 100 * eye(n_params); % Dam
 % sigma0 = 0.1 * eye(n_params); % LQR
 
 sigma0 = sigma0 + diag(abs(mu0));
+sigma0 = nearestSPD(sigma0);
 
 % policy = gaussian_constant(n_params,mu0,sigma0); % REPS
 policy = gaussian_chol_constant(n_params,mu0,sigma0); % REPS / NES
