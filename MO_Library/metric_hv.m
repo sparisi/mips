@@ -9,8 +9,7 @@ function S = metric_hv(J, HVF)
 %     - HVF : hypervolume function handle
 %
 %    OUTPUT
-%     - S   : N-by-1 vector of the non-dominance-based metric value for
-%             each sample
+%     - S   : N-by-1 vector of the hypervolume contribution of each sample
 
 [uniqueJ, ~, idx] = unique(J,'rows'); % avoid duplicates to save time
 front = pareto(uniqueJ);

@@ -5,7 +5,8 @@ function [s, p, idxs] = pareto(s, p)
 %    INPUT
 %     - S    : N-by-D matrix, where N is the number of points and D is the
 %              number of elements (objectives) of each point.
-%     - P    : N-by-D matrix containing the policies that generated S
+%     - P    : (optional) N-by-D matrix containing the policies that 
+%              generated S
 %
 %    OUTPUT
 %     - S    : Pareto-filtered S
@@ -19,10 +20,8 @@ function [s, p, idxs] = pareto(s, p)
 %     f = [1 1 1; 2 0 1]
 %     idxs = [1; 2]
 
-if nargin == 1
-    p = zeros(size(s));
-end
 [i, dim] = size(s);
+if nargin == 1, p = zeros(i,1); end
 idxs = [1 : i]';
 while i >= 1
     old_size = size(s,1);
@@ -32,6 +31,4 @@ while i >= 1
     p(indices) = [];
     idxs(indices) = [];
     i = i - 1 - (old_size - size(s,1)) + sum(indices(i:end));
-end
-
 end
