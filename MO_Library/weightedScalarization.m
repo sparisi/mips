@@ -2,9 +2,9 @@ function rw = weightedScalarization(r,w,metric,u)
 % SCALARIZEREWARD Scalarizes rewards according to a weighted function.
 %
 %    INPUT
-%     - r      : N-by-D matrix, where N is the number of reward samples and D
-%                is the dimension of the reward vector
-%     - w      : D-by-1 vector with the weights for the scalarization
+%     - r      : [N x D] matrix, where N is the number of reward samples 
+%                and D is the dimension of the reward vector
+%     - w      : [D x 1] vector with the weights for the scalarization
 %     - metric : string defining the scalarization function
 %     - u      : utopia point (needed by only some metrics)
 %

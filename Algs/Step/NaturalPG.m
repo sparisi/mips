@@ -1,38 +1,41 @@
-function [dJdtheta, stepsize] = NaturalPG(alg, policy, data, gamma, robj, lrate)
+function [grad_nat, stepsize] = NaturalPG(alg, policy, data, gamma, lrate)
+% GRAD_NAT is a [D x R] matrix, where D is the length of the gradient and R
+% is the number of immediate rewards received at each time step.
 
-dlogpi_r = policy.dlogPidtheta;
-fisher = zeros(dlogpi_r,dlogpi_r);
+dlogpi = policy.dlogPidtheta(horzcat(data.s),horzcat(data.a));
+episodeslength = horzcat(data.length);
+totepisodes = numel(data);
+dparams = policy.dparams;
 
-num_trials = max(size(data));
-parfor trial = 1 : num_trials
-	for step = 1 : max(size(data(trial).a)) 
-		loggrad = policy.dlogPidtheta(data(trial).s(:,step), data(trial).a(:,step));
-        fisher = fisher + loggrad * loggrad';
-	end
+timesteps = cell2mat(arrayfun(@(x)1:x,episodeslength,'uni',0));
+allgamma = gamma.^(timesteps-1);
+sumdlog = cumsumidx(bsxfun(@times,dlogpi,allgamma),cumsum(episodeslength));
+F = sumdlog * sumdlog';
+
+F = F / totepisodes;
+
+switch alg
+    case 'r'
+        grad = eREINFORCE(policy, data, gamma);
+    case 'rb'
+        grad = eREINFORCEbase(policy, data, gamma);
+    case 'g'
+        grad = GPOMDP(policy, data, gamma);
+    case 'gb'
+        grad = GPOMDPbase(policy, data, gamma);
+    otherwise
+        error('Unknown algoritm.');
 end
-fisher = fisher / num_trials;
 
-if strcmp(alg, 'r')
-    grad = eREINFORCE(policy, data, gamma, robj);
-elseif strcmp(alg, 'rb')
-    grad = eREINFORCEbase(policy, data, gamma, robj);
-elseif strcmp(alg, 'g')
-    grad = GPOMDP(policy, data, gamma, robj);
-elseif strcmp(alg, 'gb')
-    grad = GPOMDPbase(policy, data, gamma, robj);
+if rank(F) == policy.dparams
+    grad_nat = F \ grad;
 else
-    error('Unknown algoritm.');
+	warning('Fisher matrix is lower rank (%d instead of %d).', rank(F), dparams);
+    grad_nat = pinv(F) * grad;
 end
 
-if rank(fisher) == dlogpi_r
-    dJdtheta = fisher \ grad;
-else
-    warning('Fisher matrix is lower rank (%d instead of %d).', rank(fisher), dlogpi_r);
-    dJdtheta = pinv(fisher) * grad;
-end
-
-if nargin == 6
-    lambda = sqrt(grad' * dJdtheta / (4 * lrate));
+if nargin == 5
+    lambda = sqrt(diag(grad' * grad_nat) / (4 * lrate));
     lambda = max(lambda,1e-8); % to avoid numerical problems
-    stepsize = 1 / (2 * lambda);
+    stepsize = 1 ./ (2 * lambda');
 end

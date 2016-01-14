@@ -3,8 +3,8 @@ function out = mcint(f, in, lo, hi, useSimplex)
 %
 %    INPUT
 %     - f          : handle to the (vectorial column) function to integrate
-%     - in         : N-by-dim matrix containing the sample points (N is the 
-%                    number of samples, dim is the number of variables)
+%     - in         : [N x D] matrix containing the sample points (N is the 
+%                    number of samples, D is the number of variables)
 %     - lo         : lower bounds of integration
 %     - hi         : upper bounds of integration
 %     - useSimplex : if the points were sampled from the simplex
@@ -12,11 +12,11 @@ function out = mcint(f, in, lo, hi, useSimplex)
 %    OUTPUT
 %     - out        : (vector column) result
 
-dim = length(lo);
+D = length(lo);
 N = size(in,1);
 
-arg_in = cell(dim,1);
-for i = 1 : dim
+arg_in = cell(D,1);
+for i = 1 : D
     arg_in{i} = in(:,i)';
 end
 
@@ -24,8 +24,8 @@ z = f(arg_in{:});
 s = sum(z,2);
 
 if useSimplex
-    pp = zeros(dim+1, dim);
-    for i = 1 : dim
+    pp = zeros(D+1, D);
+    for i = 1 : D
         p = lo';
         p(i) = hi(i);
         pp(i,:) = p;

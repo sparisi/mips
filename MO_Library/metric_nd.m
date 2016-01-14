@@ -4,11 +4,11 @@ function S = metric_nd(J)
 % numer of other solutions dominating it. For more details, see NDS.
 %
 %    INPUT
-%     - J : N-by-M matrix of samples to evaluate, where N is the number of
+%     - J : [N x M] matrix of samples to evaluate, where N is the number of
 %           samples and M the number of objectives
 %
 %    OUTPUT
-%     - S : N-by-1 vector of the non-dominance-based metric value for each
+%     - S : [N x 1] vector of the non-dominance-based metric value for each
 %           sample
 
 C = nds(J);

@@ -4,12 +4,12 @@ function S = metric_hv(J, HVF)
 % contribution to the hypervolume of the frontier.
 %
 %    INPUT
-%     - J   : N-by-M matrix of samples to evaluate, where N is the number
+%     - J   : [N x M] matrix of samples to evaluate, where N is the number
 %             of samples and M the number of objectives
 %     - HVF : hypervolume function handle
 %
 %    OUTPUT
-%     - S   : N-by-1 vector of the hypervolume contribution of each sample
+%     - S   : [N x 1] vector of the hypervolume contribution of each sample
 
 [uniqueJ, ~, idx] = unique(J,'rows'); % avoid duplicates to save time
 front = pareto(uniqueJ);

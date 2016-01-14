@@ -1,77 +1,54 @@
-Description
------------
+# Description
+-------------
 
-MiPS (Minimal Policy Search) is a toolbox for Matlab providing the implementation of some of the most famous policy search algorithms, as well as some recent multi-objective methods and benchmark problems in reinforcement learning.
+**Mi**nimal **P**olicy **S**earch is a toolbox for Matlab providing the implementation of some of the most famous policy search algorithms, as well as some recent multi-objective methods and benchmark problems in reinforcement learning.
 
-It requires the Statistics Toolbox and the Optimization Toolbox.
+It requires the *Statistics Toolbox* and the *Optimization Toolbox*.
 
 Some utility functions are imported from File Exchange (original authors are always acknowledged).
 
 
-Code Structure
---------------
+# Code Structure
+----------------
 
-Launch `INSTALL` to add the path of all folders:
+Launch `INSTALL` to add the path of all folders.
 
-- `Algs` contains all the algorithms,
-- `Library` contains all the policies, solvers, generic basis functions, and functions for sampling and evaluation,
-- `MDPs` contains the models and the simulators of the MPDs,
-- `MO_Library` contains functions used in the multi-objective framework,
-- `Utilities` contains utility functions.
+### Algs
+All the algorithms and solvers are located in this folder, as well as some script to run them. By using scripts, it is possible to interrupt and resume the learning process without losing any data.
+The only parameters that you might want to change are the learning rates and the number of rollouts per iteration.
+Also, a history of the results is usually kept. For example, `J_history` stores the average return at each iteration.
 
+### Experiments
+This folder contains some scripts to set up experiments. Each script inizializes the MDP, the policies and the number of samples and episodes per learning iteration.
+After running a setup script, just run an algorithm script to start the learning.
 
-How To Add A New MDP
---------------------
+Notice that, in the case of episodic (black box) RL, these scripts define both the *low level policy* (the one used by the agent) and the *high level policy* (the sampling distribution used to draw the low level policy parameters).
+In this setting, it is important to set up the variable `makeDet`: if `true`, the low level policy is deterministic (e.g., the covariance of a Gaussian is zeroed and the high level policy only draws its mean).
 
-Each MDP requires some mandatory functions:
+### Library
+The folder contains some policies, generic basis functions, and functions for sampling and evaluation. The most important functions are
 
-- `NAME_simulator`    : defines the reward and transition functions (both 
-                        states and actions are columns vectors),
+- `collect_samples`, which stores low level tuples `(s,a,r,s')` into a struct,
+- `collect_episodes`, which collects high level data, i.e. pairs `(return,policy)`,
+- `evaluate_policies`, which evaluates low level policies on several episodes.
 
-- `NAME_settings`     : defines the learning setup and returns
-  - `n_obj`    : number of objectives of the problem,
-  - `policy`   : policy used to solve the problem,
-  - `episodes` : number of episodes used for evaluation / learning,
-  - `steps`    : max number of steps of each episode,
-  - `gamma`    : discount factor,
+Policies are modeled as objects. Their most important method is `drawAction`, but depending on the class some additional properties might be mandatory.
 
-- `NAME_mdpvariables` : defines the details of the problem, i.e.,
-  - `mdp_vars.nvar_state`   : dimensionality of the state,
-  - `mdp_vars.nvar_action`  : dimensionality of the action,
-  - `mdp_vars.nvar_reward`  : dimensionality of the reward,
-  - `mdp_vars.maxr`         : maximum magnitude of the reward (used as normalization factor),
-  - `mdp_vars.gamma`        : discount factor,
-  - `mdp_vars.isAvg`        : 1 if we want to consider the average reward, 0 otherwise,
-  - `mdp_vars.isStochastic` : 1 if the environment is stochastic, 0 otherwise.
+> **IMPORTANT!** All data is stored in **COLUMNS**, e.g., states are matrices `S x N`, where `S` is the size of one state and `N` is the number of states. Similarly, actions are matrices `A x N` and features are matrices `F x N`.
 
-Please notice that you have to manually change the number of episodes and steps in `NAME_settings` according to your needs (e.g., according to the algorithm used).
+### MDPs
+Each MDP is modeled as an object (`MDP.m`) and requires some properties (dimension of state and action spaces, bounds, etc...) and methods (for simulating and plotting).
+There are also some extension, that are *Contextual MDPs* (`CMDP.m`) and *Multi-objective MDPs* (`MOMDP.m`).
 
-Additionally, there are some functions used to better organize the code:
+### MO_Library
+This folder contains functions used in the multi-objective framework, e.g., hypervolume estimators and Pareto-optimality filters.
 
-- `NAME_environment`  : defines additional details of the problem environment,
-- `NAME_basis`        : defines the features used to represent a state,
-- `NAME_moref`        : returns all the details related to the multi-objective setup, i.e., the reference frontier used for comparison, the utopia and antiutopia points. It also returns a set of weights if the reference front is obtained with a weighted scalarization of the objectives. Both the frontier and the weights are saved in `NAME_ref.dat` and `NAME_w.dat`, respectively,
-- `NAME_plot`         : used to plot the environment and the state of the agent.
-
-Finally, the function `settings_episodic` is used as a wrapper to set up the learning for episodic algorithms. Modify this function only to specify the distribution used to collect samples (e.g., a Gaussian with diagonal covariance or a Gaussian Mixture Model).
+### Utilities
+Utility functions used for matrix operations, plotting and sampling are stored in this folder.
 
 
-How the Simulator Works
------------------------
-
-Here is a short description of the main functions responsible for simulating the MDPs and collecting the relevant data.
-
-- `execute`           : it is the lowest level function. It calls the specific simulators and runs a single episode,
-- `collect_samples`   : it calls `execute` and returns a dataset with all the information about the simulated episodes (steps, action, reward, features),
-- `collect_episodes`  : used for episodic RL. It calls `collect_samples` multiple times and returns only the relevant high-level information for episodic algorithms (parameters drawn at the beginning of the episode and cumulative reward at the end of it),
-- `evaluate_policies` : a wrapper for calling `collect_samples` with an additional option to evaluate only deterministic policies. If the environment is also deterministic, the evaluation is done on a single episode,
-- `evaluate_policies_ep` : similar to the previous function but for episodic algorithms.
-
-Finally, for contextual policy search the same functions have *_ctx* appended at the end of their name.
-
-
-ReLe Interface
---------------
+# ReLe Interface
+----------------
 
 For collecting samples and computing gradients and hessians, you can also use *ReLe*, a powerful toolbox in C. 
 You can find it here: https://github.com/AIRLab-POLIMI/ReLe
@@ -79,3 +56,4 @@ You can find it here: https://github.com/AIRLab-POLIMI/ReLe
 First, you need to mex the files in `/ReLe/rele_matlab/src/mexinterface` (you can use the wrapper `MEXMakefile`).
 Then add such folder to the Matlab search path.
 Finally just call `collect_samples_rele` instead of `collect_samples`.
+However, notice that not all the MDPs might be supported.

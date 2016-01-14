@@ -1,59 +1,56 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Reference: www.scholarpedia.org/article/Policy_gradient_methods
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [dJdtheta, stepsize] = GPOMDPbase(policy, data, gamma, robj, lrate)
+function [grad, stepsize] = GPOMDPbase(policy, data, gamma, lrate)
+% Gradient of a Partially Observable Markov Decision Process with optimal
+% baseline.
+% GRAD is a [D x R] matrix, where D is the length of the gradient and R is
+% the number of immediate rewards received at each time step.
+%
+% =========================================================================
+% REFERENCE
+% J Baxter and P L Bartlett
+% Infinite-Horizon Policy-Gradient Estimation (2001)
 
-dlp = policy.dlogPidtheta;
-dJdtheta = zeros(dlp,1);
+dlogpi = policy.dlogPidtheta(horzcat(data.s),horzcat(data.a));
+episodeslength = horzcat(data.length);
+totstep = sum(episodeslength);
+totepisodes = numel(data);
+dreward = size(data(1).r,1);
 
-totstep = 0;
-
-% Compute baselines
-num_trials = max(size(data));
-
-actions = cell(1,numel(data));
-[actions{:}] = data.a;
-lengths = cellfun('length',actions);
-
-bnum = zeros(dlp, max(lengths));
-bden = zeros(dlp, max(lengths));
-for trial = 1 : num_trials
-	sumdlogPi = zeros(dlp,1);
-    num_steps = size(data(trial).a,2);
-
-	for step = 1 : num_steps
-		sumdlogPi = sumdlogPi + ...
-			policy.dlogPidtheta(data(trial).s(:,step), data(trial).a(:,step));
-		rew = gamma^(step - 1) * data(trial).r(robj,step);
-		sumdlogPi2 = sumdlogPi .* sumdlogPi;
-		bnum(:,step) = bnum(:, step) + sumdlogPi2 * rew;
-		bden(:,step) = bden(:, step) + sumdlogPi2; 
-	end
+% Compute optimal baseline
+bnum = zeros(policy.dparams, max([data.length]), dreward);
+bden = zeros(policy.dparams, max([data.length]));
+for i = 1 : totepisodes
+    idx1 = sum(episodeslength(1:i-1))+1;
+    idx2 = idx1 + episodeslength(i)-1;
+    sumdlog2 = cumsum(dlogpi(:,idx1:idx2),2).^2;
+    steps = data(i).length;
+    rewgamma = bsxfun(@times,gamma.^(0:steps-1),data(i).r);
+    bden(:,1:steps) = bden(:,1:steps) + sumdlog2;
+    bnum(:,1:steps,:) = bnum(:,1:steps,:) + bsxfun(@times,sumdlog2,reshape(rewgamma',[1 size(rewgamma')]));
 end
+bden = repmat(bden,1,1,dreward);
 b = bnum ./ bden;
 b(isnan(b)) = 0; % When 0 / 0
 
 % Compute gradient
-for trial = 1 : num_trials
-	sumdlogPi = zeros(dlp,1);
-	for step = 1 : size(data(trial).a,2)
-        sumdlogPi = sumdlogPi + ...
-			policy.dlogPidtheta(data(trial).s(:,step), data(trial).a(:,step));
-        rew = gamma^(step-1) * data(trial).r(robj,step);
-		dJdtheta = dJdtheta + sumdlogPi .* (ones(dlp, 1) * rew - b(:,step));
-        totstep = totstep + 1;
-	end
+grad = zeros(policy.dparams,dreward);
+for i = 1 : totepisodes
+    idx1 = sum(episodeslength(1:i-1))+1;
+    idx2 = idx1 + episodeslength(i)-1;
+    sumdlog = cumsum(dlogpi(:,idx1:idx2),2);
+    steps = data(i).length;
+    rewgamma = bsxfun(@times,gamma.^(0:steps-1),data(i).r);
+%     keyboard
+    grad = grad + squeeze(sum(bsxfun(@times, sumdlog, bsxfun(@plus,permute(rewgamma,[3 2 1]),-b(:,1:steps,:))),2));
 end
-
+    
 if gamma == 1
-    dJdtheta = dJdtheta / totstep;
+    grad = grad / totstep;
 else
-    dJdtheta = dJdtheta / num_trials;
+    grad = grad / totepisodes;
 end
 
-if nargin >= 5
-    T = eye(length(dJdtheta)); % trasformation in Euclidean space
-    lambda = sqrt(dJdtheta' * T * dJdtheta / (4 * lrate));
-    lambda = max(lambda,1e-8); % to avoid numerical problems
-    stepsize = 1 / (2 * lambda);
+if nargin == 4
+    normgrad = matrixnorms(grad,2);
+    lambda = max(normgrad,1e-8); % to avoid numerical problems
+    stepsize = sqrt(lrate) ./ lambda;
 end

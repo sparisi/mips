@@ -1,57 +1,49 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Reference: www.scholarpedia.org/article/Policy_gradient_methods
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [w, stepsize] = eNACbase(policy, data, gamma, robj, lrate)
+function [grad_nat, stepsize] = eNACbase(policy, data, gamma, lrate)
+% Episodic Natural Actor Critic with optimal baseline.
+% GRAD_NAT is a [D x R] matrix, where D is the length of the gradient and R
+% is the number of immediate rewards received at each time step.
+%
+% =========================================================================
+% REFERENCE
+% J Peters, S Vijayakumar, S Schaal
+% Natural Actor-Critic (2008)
 
-dlp = policy.dlogPidtheta();
-F = zeros(dlp+1, dlp+1); % Fisher matrix
-g = zeros(dlp+1, 1); % Vanilla gradient
-el = zeros(dlp+1, 1); % Elegibility
-aR = 0; % Average reward
+dlogpi = policy.dlogPidtheta(horzcat(data.s),horzcat(data.a));
+episodeslength = horzcat(data.length);
+totepisodes = numel(data);
+dparams = policy.dparams;
 
-num_trials = max(size(data));
-for trial = 1 : num_trials
-	phi = [zeros(dlp,1); 1];
-    R = 0; % Cumulated reward
+timesteps = cell2mat(arrayfun(@(x)1:x,episodeslength,'uni',0));
+allgamma = gamma.^(timesteps-1);
+sumdlog = cumsumidx(bsxfun(@times,dlogpi,allgamma),cumsum(episodeslength));
+sumdlog = [sumdlog; ones(1,totepisodes)];
+F = sumdlog * sumdlog';
+rewgamma = cumsumidx(bsxfun(@times,horzcat(data.r),allgamma),cumsum(episodeslength));
+g = sumdlog * rewgamma';
+aR = sum(rewgamma,2);
+el = sum(sumdlog,2);
 
-    for step = 1 : size(data(trial).a,2)
-		% Derivative of the logarithm of the policy in (s_t, a_t)
-		dlogpidtheta = policy.dlogPidtheta(data(trial).s(:,step), data(trial).a(:,step));
-
-		% Basis functions
- 		phi = phi + [gamma^(step - 1) * dlogpidtheta; 0];
-		
-		% Discounted reward
-		R = R + gamma^(step - 1) * data(trial).r(robj,step);
-    end
-    
-    aR = aR + R;
-    F = F + phi * phi';
-    g = g + phi * R;
-    el = el + phi;
-end
-
-F = F / num_trials;
-g = g / num_trials;
-el = el / num_trials;
-aR = aR / num_trials;
+F = F / totepisodes;
+g = g / totepisodes;
+el = el / totepisodes;
+aR = aR / totepisodes;
 
 rankF = rank(F);
-if rankF == dlp + 1
-    Q = 1 / num_trials * (1 + el' / (num_trials * F - el * el') * el);
-    b = Q * (aR - el' / F * g);
-    w = F \ (g - el * b);
+if rankF == dparams + 1
+    Q = 1 / totepisodes * (1 + el' / (totepisodes * F - el * el') * el);
+    b = Q * (aR' - el' / F * g);
+    grad_nat = F \ (g - el * b);
 else
-% 	warning('Fisher matrix is lower rank (%d instead of %d).', rankF, dlp+1);
-    Q = 1 / num_trials * (1 + el' * pinv(num_trials * F - el * el') * el);
-    b = Q * (aR - el' * pinv(F) * g);
-    w = pinv(F) * (g - el * b);
+% 	warning('Fisher matrix is lower rank (%d instead of %d).', rankF, dparams+1);
+    Q = 1 / totepisodes * (1 + el' * pinv(totepisodes * F - el * el') * el);
+    b = Q * (aR' - el' * pinv(F) * g);
+    grad_nat = pinv(F) * (g - el * b);
 end
 
-if nargin >= 5
-    lambda = sqrt((g - el * b)' * w / (4 * lrate));
+if nargin == 4
+    lambda = sqrt(diag(g' * grad_nat) / (4 * lrate));
     lambda = max(lambda,1e-8);
-    stepsize = 1 / (2 * lambda);
+    stepsize = 1 ./ (2 * lambda)';
 end
 
-w = w(1:end-1);
+grad_nat = grad_nat(1:end-1,:);

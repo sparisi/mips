@@ -1,33 +1,69 @@
-function J = evaluate_policies (policies, domain, makeDet)
-% EVALUATE_POLICIES Given a set of low-level POLICIES, it returns the 
-% corresponding return J in the objectives space.
-% Set MAKEDET to 1 if you want to make the policies deterministic.
+function J = evaluate_policies(mdp, episodes, maxsteps, policies, contexts)
+% EVALUATE_SAMPLES Evaluates a set of policies. For each policy, several 
+% episodes are simulated.
+% The function is very similar to COLLECT_SAMPLES, but it accepts many
+% policies as input and it does not return the low level dataset.
+%
+%    INPUT
+%     - mdp      : the MDP to be solved
+%     - episodes : number of episodes per policy
+%     - maxsteps : max number of steps per episode
+%     - policy   : policies to be evaluated
+%     - contexts : (optional) contexts of each episode
+%
+%    OUTPUT
+%     - J        : returns of each policy
 
-[n_obj, ~, episodes, steps] = feval([domain '_settings']);
-mdp_vars = feval([domain '_mdpvariables']);
-isStochastic = mdp_vars.isStochastic;
-if makeDet && ~isStochastic
-    episodes = 1;
-end
+npolicy = numel(policies);
+totepisodes = episodes * npolicy;
+if iscolumn(policies), policies = policies'; end
+policies = repmat(policies,1,episodes);
 
-N_pol = numel(policies);
-J = zeros(N_pol, n_obj);
+% Get MDP characteristics
+nvar_reward = mdp.dreward;
+gamma = mdp.gamma;
+isAveraged = mdp.isAveraged;
 
-parfor i = 1 : N_pol
+% Initialize variables
+J = zeros(nvar_reward,totepisodes);
+step = 0;
+
+% Initialize simulation
+simulator = @mdp.simulator;
+initial_state = mdp.initstate(totepisodes);
+state = initial_state;
+
+% Keep track of the states which did not terminate
+ongoing = true(1,totepisodes);
+
+% Run the episodes until maxsteps or all ends
+while ( (step < maxsteps) && sum(ongoing) > 0 )
     
-%     fprintf('Evaluating policy %d of %d ...\n', i, N_pol)
+    step = step + 1;
+    running_states = state(:,ongoing);
+        
+    % Select action
+    action = policies(ongoing).drawAction(running_states);
     
-    if makeDet
-        policy = policies(i).makeDeterministic;
+    % Simulate one step of all running episodes at the same time
+    if nargin < 5
+        [nextstate, reward, endsim] = feval(simulator, running_states, action);
     else
-        policy = policies(i);
+        [nextstate, reward, endsim] = feval(simulator, running_states, action, contexts(:,ongoing));
     end
     
-    [~, J_sample] = collect_samples(domain, episodes, steps, policy);
-%     [~, J_sample] = collect_samples_rele(domain, episodes, steps, policy);
-
-    J(i,:) = J_sample;
-
+    % Update the total reward
+    J(:,ongoing) = J(:,ongoing) + (gamma)^(step-1) .* reward;
+    
+    % Continue
+    state(:,ongoing) = nextstate;
+    ongoing(ongoing) = ~endsim;
+    
 end
 
-end
+J = mean(reshape(J,[nvar_reward npolicy episodes]),3);
+
+% If we are in the average reward setting, then normalize the return
+if isAveraged && gamma == 1, J = J / step; end
+
+return

@@ -1,0 +1,4 @@
+- Removed loop from sampling functions and almost all algorithms. Bsxfun and vectorization is used whenever possible. This allows for much faster computation, especially when few cores are available.
+- Added several MDPs. MDPs are now better organized in objects.
+- Policies are better organized.
+- Still need to add some stuff and to check for possible bugs.

@@ -11,8 +11,7 @@ function Phi = basis_poly(degree, dim, offset, state)
 %     - dim    : dimension of the state
 %     - offset : 1 if you want to include the 0-degree component,
 %                0 otherwise
-%     - state  : (optional) X-by-Y matrix with the Y states of size X 
-%                to evaluate
+%     - state  : (optional) [D x N] matrix of N states of size D to evaluate
 %
 %    OUTPUT
 %     - Phi    : if a state is provided as input, the function 
@@ -30,7 +29,8 @@ if nargin == 3
         Phi = Phi - 1;
     end
 else
-    assert(size(state,1) == dim)
+    assert(size(state,1) == dim, ...
+        'State size is %d. Should be %d.', size(state,1),dim)
     nSamples = size(state,2);
 
     C = nmultichoosek([ones(1,nSamples); state], degree);

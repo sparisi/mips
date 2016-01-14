@@ -3,11 +3,11 @@ function R = nds(P)
 % ignored for the dominance count and are assigned all the same rank.
 %
 %    INPUT
-%     - P : N-by-D matrix, where N is the number of points and D is the
+%     - P : [N x D] matrix, where N is the number of points and D is the
 %           number of elements (objectives) of each point.
 %
 %    OUTPUT
-%     - R : N-by-3 matrix. First column has the number of solutions by 
+%     - R : [N x 3] matrix. First column has the number of solutions by 
 %           which each solution is weakly dominated. Second column has the 
 %           sub-front where each solution belongs. Third column has a 
 %           crowding distance.
@@ -90,10 +90,10 @@ while ~isempty(tmp)
     rank(idx_P) = j;
     tmp(idx_tmp,:) = [];
     j = j + 1;
-    
+
     % Assign the crowding distance
     subfront = P(idx_P,:); % Include duplicates for correct indexing
-    subfront = bsxfun(@times,1./max(subfront),subfront); % Normalize the objectives
+    subfront = normalize_points(subfront,min(subfront),max(subfront)); % Normalize the objectives
     C = mat2cell(subfront,ones(size(subfront,1),1),d);
     subdist = cellfun( ...
         @(X)mean( nonzeros( sqrt( sum( bsxfun(@plus, X, -subfront).^2, 2) ) ) ), ...

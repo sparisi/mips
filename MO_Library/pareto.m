@@ -3,9 +3,9 @@ function [s, p, idxs] = pareto(s, p)
 % points that are dominated (both weakly and strongly) are filtered.
 %
 %    INPUT
-%     - S    : N-by-D matrix, where N is the number of points and D is the
+%     - S    : [N x D] matrix, where N is the number of points and D is the
 %              number of elements (objectives) of each point.
-%     - P    : (optional) N-by-D matrix containing the policies that 
+%     - P    : (optional) [N x D] matrix containing the policies that 
 %              generated S
 %
 %    OUTPUT

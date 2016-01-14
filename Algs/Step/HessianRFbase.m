@@ -1,53 +1,41 @@
-function h = HessianRFbase(policy, data, gamma, robj)
+function h = HessianRFbase(policy, data, gamma)
+% Computes the hessian of a policy wrt its parameters using the optimal
+% baseline.
+% H is a [D x D x R] matrix, where D is the length of the policy parameters
+% and R is the number of immediate rewards received at each time step. Each 
+% page of H corresponds to the hessian wrt an objective.
 
-dlp = policy.dlogPidtheta;
-hlp = policy.hlogPidtheta;
-h = zeros(hlp, hlp);
+actions = horzcat(data.a);
+states = horzcat(data.s);
+dlogpi = policy.dlogPidtheta(states,actions);
+hlogpi = policy.hlogPidtheta(states,actions);
+episodeslength = horzcat(data.length);
+totstep = sum(episodeslength);
+totepisodes = numel(data);
+dreward = size(data(1).r,1);
 
-totstep = 0;
+sumdlog = cumsumidx(dlogpi,cumsum(episodeslength));
+sumdlog2 = bsxfun(@times,permute(sumdlog,[1 3 2]),permute(sumdlog,[3 1 2]));
+sumhlog = cumsumidx3(hlogpi,cumsum(episodeslength));
+sumrew = cumsumidx(horzcat(data.gammar),cumsum(episodeslength));
 
-% Compute optimal baseline
-num_trials = max(size(data));
-bnum = zeros(hlp,hlp);
-bden = zeros(hlp,hlp);
-parfor trial = 1 : num_trials
-    sumrew = 0;
-    sumhlogPi = zeros(hlp,hlp);
-    sumdlogPi = zeros(dlp,1);
-    
-    for step = 1 : size(data(trial).a,2)
-        sumdlogPi = sumdlogPi + ...
-            policy.dlogPidtheta(data(trial).s(:,step), data(trial).a(:,step));
-        sumhlogPi = sumhlogPi + ...
-            policy.hlogPidtheta(data(trial).s(:,step), data(trial).a(:,step));
-        sumrew = sumrew + gamma^(step-1) * data(trial).r(robj,step);
-    end
-    bnum = bnum + (sumdlogPi * sumdlogPi' + sumhlogPi).^2 * sumrew;
-    bden = bden + (sumdlogPi * sumdlogPi' + sumhlogPi).^2;
-end
+% Compute the optimal baseline
+tmp = (sumdlog2 + sumhlog).^2;
+bden = sum(tmp,3);
+bden = repmat(bden,1,1,dreward);
+bnum = squeeze( sum( bsxfun(@times, tmp, reshape(sumrew',[1 1 size(sumrew')])), 3) );
 b = bnum ./ bden;
 b(isnan(b)) = 0; % When 0 / 0
 
-% Compute hessian
-parfor trial = 1 : num_trials
-    sumrew = 0;
-    sumhlogPi = zeros(hlp,hlp);
-    sumdlogPi = zeros(dlp,1);
-    for step = 1 : max(size(data(trial).a))
-        dlogpidtheta = policy.dlogPidtheta(data(trial).s(:,step), data(trial).a(:,step));
-        sumdlogPi = sumdlogPi + dlogpidtheta;
-        hlogpidtheta = policy.hlogPidtheta(data(trial).s(:,step), data(trial).a(:,step));
-        sumhlogPi = sumhlogPi + hlogpidtheta;
-        sumrew = sumrew + gamma^(step-1) * data(trial).r(robj,step);
-        totstep = totstep + 1;
-    end
-    h = h + (sumrew - b) .* (sumdlogPi * sumdlogPi' + sumhlogPi);
-end
+% Compute the hessian
+rewb = bsxfun(@plus, -b, reshape(sumrew,[1 1 size(sumrew)]));
+sumhd = sumdlog2 + sumhlog;
+h = squeeze( sum( repmat(sumhd,1,1,1,dreward).*permute(rewb,[1 2 4 3]), 3) );
 
 if gamma == 1
     h = h / totstep;
 else
-    h = h / num_trials;
+    h = h / totepisodes;
 end
 
 end

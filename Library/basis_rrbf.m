@@ -5,10 +5,10 @@ function Phi = basis_rrbf(n_centers, widths, range, state)
 %    INPUT
 %     - n_centers : number of centers (the same for all dimensions)
 %     - widths    : array of widths for each dimension
-%     - range     : N-by-2 matrix with min and max values for the
-%                   N-dimensional input state
-%     - state     : (optional) X-by-Y matrix with the Y states of size X 
-%                   to evaluate
+%     - range     : [D x 2] matrix with min and max values for the
+%                   D-dimensional input state
+%     - state     : (optional) [D x N] matrix of N states of size D to 
+%                   evaluate
 %
 %    OUTPUT
 %     - Phi       : if a state is provided as input, the function 
@@ -25,16 +25,16 @@ function Phi = basis_rrbf(n_centers, widths, range, state)
 
 persistent centers
 
-n_features = size(range,1);
+dim_state = size(range,1);
 
 % Compute all centers point only once
 if isempty(centers)
-    c = cell(n_features, 1);
-    for i = 1 : n_features
+    c = cell(dim_state, 1);
+    for i = 1 : dim_state
         c{i} = linspace(range(i,1), range(i,2), n_centers);
     end
     
-    d = cell(1,n_features);
+    d = cell(1,dim_state);
     [d{:}] = ndgrid(c{:});
     centers = cell2mat( cellfun(@(v)v(:), d, 'UniformOutput',false) )';
 end

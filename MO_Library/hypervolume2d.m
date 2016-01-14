@@ -10,10 +10,10 @@ function hv = hypervolume2d(f, antiutopia, utopia)
 % better to choose [124, -20] as antiutopia.
 %
 %    INPUT
-%     - f          : N-by-D matrix representing a D-dimensional Pareto 
+%     - f          : [N x D] matrix representing a D-dimensional Pareto 
 %                    front of N points
-%     - antiutopia : antiutopia point (1-by-D vector)
-%     - utopia     : utopia point (1-by-D vector)
+%     - antiutopia : [1 x D] vector of antiutopia point
+%     - utopia     : [1 x D] vector of utopia point
 %
 %    OUTPUT
 %     - hv         : hypervolume

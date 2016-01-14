@@ -2,13 +2,13 @@ function K = kernel(X, Y, type, param)
 % KERNEL Computes kernel function for matrices of points.
 %
 %    INPUT
-%     - X     : N-by-D matrix (N samples, D dimension)
-%     - Y     : M-by-D matrix (N samples, D dimension)
+%     - X     : [N x D] matrix (N samples, D dimension)
+%     - Y     : [M x D] matrix (N samples, D dimension)
 %     - type  : kernel name
 %     - param : kernel parameters
 %
 %    OUTPUT
-%     - K     : N-by-M kernel matrix
+%     - K     : [N x M] kernel matrix
 
 switch type
     

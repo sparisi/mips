@@ -4,7 +4,7 @@ function minNorm = paretoDirectionNorm(D_theta_J)
 % finds the norm of the min-norm Pareto-ascent direction. 
 % The general problem requires to solve a quadratic programming problem.
 % This function solves a very special case, i.e., when the number of
-% objectives J and of parameters theta is the same and is less then four.
+% objectives J is less then four and equal to the number of parameters theta.
 %
 % =========================================================================
 % REFERENCE

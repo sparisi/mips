@@ -1,47 +1,34 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Reference: D Wierstra, T Schaul, T Glasmachers, Y Sun, J Peters, 
-% J Schmidhuber 
+function [nat_grad, stepsize] = NESbase(pol_high, J, Theta, lrate)
+% Natural Evolution Strategy with optimal baseline.
+% NAT_GRAD is a [D x R] matrix, where D is the length of the gradient and R
+% is the number of immediate rewards received at each time step.
+%
+% =========================================================================
+% REFERENCE
+% D Wierstra, T Schaul, T Glasmachers, Y Sun, J Peters, J Schmidhuber 
 % Natural Evolution Strategy (2014)
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [nat_grad, stepsize] = NESbase (pol_high, J, Theta, lrate)
+[n_objectives, n_episodes] = size(J);
+dlogPidtheta = pol_high.dlogPidtheta(Theta);
+grad = zeros(pol_high.dparams, n_objectives);
 
-n_episodes = length(J);
+for i = 1 : n_objectives
+    den = sum(dlogPidtheta.^2,2);
+    num = sum(bsxfun(@times,dlogPidtheta.^2,J(i,:)),2);
+    b = num ./ den;
+    b(isnan(b)) = 0;
 
-num = 0;
-den = 0;
-dlogPidtheta = zeros(pol_high.dlogPidtheta,n_episodes);
-
-% Compute optimal baseline
-for k = 1 : n_episodes
-    
-    dlogPidtheta(:,k) = pol_high.dlogPidtheta(Theta(:,k));
-    
-    num = num + dlogPidtheta(:,k).^2 * J(k);
-    den = den + dlogPidtheta(:,k).^2;
-    
+    grad(:,i) = mean(dlogPidtheta .* bsxfun(@minus,J(i,:),b),2);
 end
 
-b = num ./ den;
-b(isnan(b)) = 0;
-% b = mean(J);
-
-% Estimate gradient and Fisher information matrix
-grad = 0;
-F = 0;
-for k = 1 : n_episodes
-    grad = grad + dlogPidtheta(:,k) .* (J(k) - b);
-    F = F + dlogPidtheta(:,k) * dlogPidtheta(:,k)';
-end
-grad = grad / n_episodes;
-F = F / n_episodes;
-
-% If we can compute the FIM in closed form, use it
+% If we can compute the FIM in closed form, we use it
 if ismethod(pol_high,'fisher')
     F = pol_high.fisher;
+else
+    F = dlogPidtheta * dlogPidtheta' / n_episodes;
 end
 
-% If we can compute the FIM inverse in closed form, use it
+% If we can compute the FIM inverse in closed form, we use it
 if ismethod(pol_high,'inverseFisher')
     invF = pol_high.inverseFisher;
     nat_grad = invF * grad;
@@ -52,10 +39,10 @@ else
     nat_grad = pinv(F) * grad;
 end
 
-if nargin >= 4
-    lambda = sqrt(grad' * nat_grad / (4 * lrate));
+if nargin == 4
+    lambda = sqrt(diag(grad' * nat_grad) / (4 * lrate));
     lambda = max(lambda,1e-8); % to avoid numerical problems
-    stepsize = 1 / (2 * lambda);
+    stepsize = 1 ./ (2 * lambda);
 end
 
 end

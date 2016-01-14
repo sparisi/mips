@@ -1,28 +1,40 @@
-function [J, Theta] = collect_episodes(domain, maxepisodes, pol_high)
-% COLLECT_EPISODES Collects episodes for the specified domain. The 
-% low-level policy is deterministic and its parameters are drawn from a 
-% high-level distribution (POL_HIGH).
+function [J, Theta, Context] = collect_episodes(mdp, episodes, steps, pol_high, pol_low)
+% COLLECT_EPISODES Collects episodes, meant as pairs (J,Theta). Each 
+% parameter vector Theta(:,i) identifies a low level policy and is drawn 
+% from the high level policy. The parameters are kept fixed during the 
+% whole episode.
+%
+% See also EVALUATE_POLICIES.
+%
+%    INPUT
+%     - mdp      : the MDP to be solved
+%     - episodes : episodes to collect
+%     - maxsteps : max number of steps per episode
+%     - pol_low  : low level policy
+%     - high_pol : high level policy
+%
+%    OUTPUT
+%     - J        : returns averaged over all the episodes
+%     - Theta    : parameters of the low level policy sampled from the high
+%                  level one
+%     - Context  : (only for contextual MDPs)
 
-[n_obj, pol_low, ~, steps] = feval([domain '_settings']);
-pol_low = pol_low.makeDeterministic;
+pol_low = repmat(pol_low,1,episodes);
 
-J = zeros(maxepisodes,n_obj);
-dim_theta = pol_high.dim;
-Theta = zeros(dim_theta,maxepisodes);
-
-parfor k = 1 : maxepisodes
+% In contextual MDPs, the high level policy draws the parameters depending on the context
+if isprop(pol_high,'basis') 
+    Context = mdp.getcontext(episodes);
+    Theta = pol_high.drawAction(Context);
+    for i = 1 : episodes
+        pol_low(i) = pol_low(i).update(Theta(:,i));
+    end
+    J = evaluate_policies(mdp, 1, steps, pol_low, Context);
     
-    % Draw theta from the high-level policy and perform a rollout
-    pol_tmp = pol_low;
-    theta = pol_high.drawAction;
-    pol_tmp.theta(1:dim_theta) = theta;
-    Theta(:,k) = theta;
-
-   [~, J_ep] = collect_samples(domain, 1, steps, pol_tmp);
-%      [~, J_ep] = collect_samples_rele(domain, 1, steps, pol_tmp);
-
-    J(k,:) = J_ep;
+else
+    Theta = pol_high.drawAction(episodes);
+    for i = 1 : episodes
+        pol_low(i) = pol_low(i).update(Theta(:,i));
+    end
+    J = evaluate_policies(mdp, 1, steps, pol_low);
     
-end
-
 end

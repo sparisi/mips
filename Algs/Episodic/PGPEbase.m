@@ -1,43 +1,30 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Reference: F Sehnke, C Osendorfer, T Rueckstiess, A Graves, J Peters, 
-% Juergen Schmidhuber 
-% Parameter-exploring Policy Gradients (2010)
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 function [grad, stepsize] = PGPEbase (pol_high, J, Theta, lrate)
+% Policy Gradient with Parameter-based Exporation with optimal baseline.
+% GRAD is a [D x R] matrix, where D is the length of the gradient and R is
+% the number of immediate rewards received at each time step.
+%
+% =========================================================================
+% REFERENCE
+% F Sehnke, C Osendorfer, T Rueckstiess, A Graves, J Peters, J Schmidhuber 
+% Parameter-exploring Policy Gradients (2010)
 
-n_episodes = length(J);
+[n_objectives, ~] = size(J);
+dlogPidtheta = pol_high.dlogPidtheta(Theta);
+grad = zeros(pol_high.dparams, n_objectives);
 
-num = 0;
-den = 0;
-dlogPidtheta = zeros(pol_high.dlogPidtheta,n_episodes);
+for i = 1 : n_objectives
+    den = sum(dlogPidtheta.^2,2);
+    num = sum(bsxfun(@times,dlogPidtheta.^2,J(i,:)),2);
+    b = num ./ den;
+    b(isnan(b)) = 0;
 
-% Compute optimal baseline
-for k = 1 : n_episodes
-    
-    dlogPidtheta(:,k) = pol_high.dlogPidtheta(Theta(:,k));
-    
-    num = num + dlogPidtheta(:,k).^2 * J(k);
-    den = den + dlogPidtheta(:,k).^2;
-    
+    grad(:,i) = mean(dlogPidtheta .* bsxfun(@minus,J(i,:),b),2);
 end
 
-b = num ./ den;
-b(isnan(b)) = 0;
-% b = mean(J);
-
-% Estimate gradient
-grad = 0;
-for k = 1 : n_episodes
-    grad = grad + dlogPidtheta(:,k) .* (J(k) - b);
-end
-grad = grad / n_episodes;
-
-if nargin >= 4
-    T = eye(length(grad));
-    lambda = sqrt(grad' * T * grad / (4 * lrate));
-    lambda = max(lambda,1e-8); % to avoid numerical problems
-    stepsize = 1 / (2 * lambda);
+if nargin == 4
+    normgrad = matrixnorms(grad,2);
+    lambda = max(normgrad,1e-8); % to avoid numerical problems
+    stepsize = sqrt(lrate) ./ lambda;
 end
 
 end
