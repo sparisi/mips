@@ -56,4 +56,4 @@ You can find it here: https://github.com/AIRLab-POLIMI/ReLe
 First, you need to mex the files in `/ReLe/rele_matlab/src/mexinterface` (you can use the wrapper `MEXMakefile`).
 Then add such folder to the Matlab search path.
 Finally just call `collect_samples_rele` instead of `collect_samples`.
-However, notice that not all the MDPs might be supported.
+However, please notice that not all the MDPs might be supported.
