@@ -1,30 +1,20 @@
-function fig = plot3dPlane(pointA, pointB, pointC, opacity)
-% PLOT3DPLANE Plots a 3d plane passing through three points. Use optional 
-% input argument OPACITY to regulate the opacity of the plane.
+function fig = plot3dPlane(pointA, pointB, pointC, color, opacity, fig)
+% PLOT3DPLANE Plots a 3d plane passing through three points. If given, the
+% plane is plotted in the figure FIG. Otherwise, a new figure is returned.
 
-normal = cross(pointA-pointB, pointA-pointC); % calculate plane normal
+normal = cross(pointA-pointB, pointA-pointC);
 
-% transform points to x, y, z
+d = -pointA * normal';
+
 x = [pointA(1) pointB(1) pointC(1)];
 y = [pointA(2) pointB(2) pointC(2)];
-z = [pointA(3) pointB(3) pointC(3)];
+[xx, yy] = ndgrid(x,y);
 
-% find all coefficients of plane equation
-A = normal(1); B = normal(2); C = normal(3);
-D = -dot(normal,pointA);
+z = (-normal(1) * xx - normal(2) * yy - d) / normal(3);
 
-% decide on a suitable showing range
-xLim = [min(x) max(x)];
-zLim = [min(z) max(z)];
-[X,Z] = meshgrid(xLim,zLim);
-Y = (A * X + C * Z + D)/ (-B);
-reOrder = [1 2 4 3];
+if nargin < 6, fig = figure();
+else figure(fig); end
 
-fig = figure(); patch(X(reOrder),Y(reOrder),Z(reOrder),'b');
-grid on;
-
-if nargin == 3
-    alpha(0.3);
-else
-    alpha(opacity);
-end
+hsurf = surf(xx,yy,z);
+set(hsurf,'FaceColor',color,'FaceAlpha',opacity);
+grid on
