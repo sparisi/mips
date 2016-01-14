@@ -150,36 +150,51 @@ classdef BicycleDrive < MDP
             
             isfallen = ( omega < obj.stateLB(3) ) | ( omega > obj.stateUB(3) );
             dist_goal = matrixnorms(bsxfun(@minus,[xf;yf],obj.goal),2);
-            psi_goal = obj.goalangle(xf,xb,yf,yb);
             isgoal = dist_goal < obj.goalradius;
-
+            
             % Compute reward
-            reward = (0.95 - psi_goal.^2) * 0.0001;
+            reward = obj.rewardAngle(nextstate);
             reward(isfallen) = -1;
             reward(isgoal & ~isfallen) = 0.01;
             
             % Check for terminal condition
             absorb = false(1,nstates);
             absorb(isfallen | isgoal) = true;
-
             if obj.realtimeplot, obj.updateplot(nextstate); end
         end
         
-        function myangle = goalangle(obj, xf, xb, yf, yb)
-        % These angles are neither in degrees nor radians, but something
-        % strange invented in order to save CPU-time. The measure is 
-        % arranged the same way as radians, but with a slightly different 
-        % negative factor. Say, the goal is to the east. If the agent rides 
-        % to the east then the angle is 0, to the north the angle is -1, to
-        % the west the angle is -2 or 2, to the south the angle is 1.
-            myangle = (xf-xb) .* (obj.goal(1)-xf) + (yf-yb) .* (obj.goal(2)-yf);
-            scalar = myangle ./ ( obj.l .* sqrt( (obj.goal(1)-xf).^2 + (obj.goal(2)-yf).^2 ) );
+        %% Reward functions
+        function reward = rewardAngleCustom(obj, nextstate)
+        % This reward function is not the one described in the original
+        % paper, but it is the one used in the original implementation (by 
+        % the same authors). See the code linked at the beginning of the 
+        % class for more info.
+            xf        = nextstate(6,:);
+            yf        = nextstate(7,:);
+            xb        = nextstate(8,:);
+            yb        = nextstate(9,:);
+
+            psi_goal = (xf-xb) .* (obj.goal(1)-xf) + (yf-yb) .* (obj.goal(2)-yf);
+            scalar = psi_goal ./ ( obj.l .* sqrt( (obj.goal(1)-xf).^2 + (obj.goal(2)-yf).^2 ) );
             tvaer = (-yf+yb) .* (obj.goal(1)-xf) + (xf-xb) .* (obj.goal(2)-yf);
 
             idx = tvaer <= 0;
-            myangle = zeros(1,length(xf));
-            myangle(idx) = scalar(idx) - 1;
-            myangle(~idx) = abs(scalar(~idx) - 1);
+            psi_goal = zeros(1,length(xf));
+            psi_goal(idx) = scalar(idx) - 1;
+            psi_goal(~idx) = abs(scalar(~idx) - 1);
+
+            reward = (0.95 - psi_goal.^2) * 0.0001;
+        end         
+        
+        function reward = rewardAngle(obj, nextstate)
+        % This is the reward function defined in the original paper.
+            theta     = nextstate(1,:);
+            psi       = nextstate(5,:);
+
+            % (psi+theta) is the angle of the front tyre wrt the y-axis
+            % cart2pol(...) is the angle of the goal wrt the y-axis
+            psi_goal = (psi + theta) - cart2pol(obj.goal(2),-obj.goal(1));
+            reward = (4 - psi_goal.^2) * 0.00004;
         end
         
     end
@@ -190,26 +205,26 @@ classdef BicycleDrive < MDP
         function initplot(obj)
             obj.handleEnv = figure(); hold all
             scatter(0,obj.l/2,'k'); % Init pos
-            plot3dPlane([1e3 1e3 0], [-1e3 -1e3 0], [1e3 -1e3 0], 'k', 0.5, obj.handleEnv); % Ground
-            obj.handleAgent{1} = plotCircle3D([0 obj.l obj.R], [0 0 0], obj.R, 'r', 1); % Front tyre
-            obj.handleAgent{2} = plotCircle3D([0 0 obj.R], [0 0 0], obj.R, 'b', 1); % Back tyre
-            obj.handleAgent{3} = plot([0 0 obj.R], [0 0 obj.R], 'b', 'LineWidth', 3); % Bicycle frame
-            obj.handleAgent{4} = plot(0,obj.l,'w'); % Trace of the front tyre
+            obj.handleAgent{1} = plotCircle3D([0 obj.l obj.R], [1 0 0], obj.R, 'r', 1); % Front tyre
+            obj.handleAgent{2} = plotCircle3D([0 0 obj.R], [1 0 0], obj.R, 'b', 1); % Back tyre
+            obj.handleAgent{3} = plot3([0 0], [0 obj.l], [obj.R obj.R], 'b', 'LineWidth', 3); % Bicycle frame
+            obj.handleAgent{4} = plot(0,obj.l,'k'); % Trace of the front tyre
             box on
-            view(-125,30)
+            xlabel x, ylabel y, zlabel z
+            view(35,75)
             rotate3d on
         end
         
         function updateplot(obj, state)
-            theta     = state(1,:);
-            omega     = state(3,:);
-            psi       = state(5,:);
-            xf        = state(6,:);
-            yf        = state(7,:);
-            xb        = state(8,:);
-            yb        = state(9,:);
+            theta = state(1,:);
+            omega = state(3,:);
+            psi   = state(5,:);
+            xf    = state(6,:);
+            yf    = state(7,:);
+            xb    = state(8,:);
+            yb    = state(9,:);
 
-            x = 0 : 0.01 : 2*pi;
+            x = 0 : 0.1 : 2*pi;
 
             % Plot back tyre
             normal_back = [cos(psi) sin(psi) -sin(omega)];
@@ -244,6 +259,8 @@ classdef BicycleDrive < MDP
             
             axis([xf-2 xf+2 yf-2 yf+2])
 %             view(rad2deg(psi),30) % View from the back of the bicyle
+
+            drawnow limitrate
         end
         
     end

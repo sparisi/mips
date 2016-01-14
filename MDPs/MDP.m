@@ -4,8 +4,8 @@ classdef (Abstract) MDP < handle
     
     properties (GetAccess = 'public', SetAccess = 'protected')
         realtimeplot = 0; % Flag to plot the environment at each timestep
-        handleEnv         % Figure handle for plotting the environment
-        handleAgent       % Handle for plotting the agent
+        handleEnv         % Handle of the figure used for plotting
+        handleAgent       % Handle of plotting elements inside handleEnv
     end
     
     properties (Abstract)
@@ -55,14 +55,13 @@ classdef (Abstract) MDP < handle
         function plotepisode(obj, episode, pausetime)
         % Plots the state of the MDP during an episode.
             if nargin == 2, pausetime = 0; end
-            current_setting = obj.realtimeplot;
-            obj.showplot();
+            try close(obj.handleEnv), catch, end
+            obj.initplot();
             obj.updateplot(episode.s(:,1));
             for i = 1 : size(episode.nexts,2)
                 pause(pausetime)
                 obj.updateplot(episode.nexts(:,i))
             end
-            obj.realtimeplot = current_setting;
         end
     end
     
