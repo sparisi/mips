@@ -106,7 +106,7 @@ classdef BicycleDrive < MDP
             theta(idx) = sign(theta(idx)) * 1.3963;
 
             % Update front tyre position
-            temp = obj.v * obj.dt * 0.5 * rf;
+            temp = obj.v * obj.dt * 0.5 ./ rf;
             idx = temp > 1;
             temp(idx) = sign(psi(idx) + theta(idx)) * 0.5 * pi;
             temp(~idx) = sign(psi(~idx) + theta(~idx)) .* asin(temp(~idx));
@@ -114,7 +114,7 @@ classdef BicycleDrive < MDP
             yf = yf + obj.v * obj.dt .* ( cos(psi + theta + temp) );
 
             % Update back tyre position
-            temp = obj.v * obj.dt * 0.5 * rb;
+            temp = obj.v * obj.dt * 0.5 ./ rb;
             idx = temp > 1;
             temp(idx) = sign(psi(idx)) * 0.5 * pi;
             temp(~idx) = sign(psi(~idx)) .* asin(temp(~idx));
