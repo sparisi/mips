@@ -40,14 +40,12 @@ classdef (Abstract) PolicyDiscrete < Policy
             npolicy = numel(obj);
             if npolicy == 1 % Draw one action for each state
                 prob_list = obj.distribution(States);
-                [idsample, Actions] = find(mnrnd(ones(nstates,1), prob_list'));
-                [~, idx] = sort(idsample);
-                Actions = Actions(idx)';
+                Actions = mymnrnd(prob_list,nstates);
             elseif npolicy == nstates % Draw one action for each pair (policy,state)
                 Actions = zeros(1,nstates);
                 for i = 1 : nstates
                     prob_list = obj(i).distribution(States(:,i));
-                    Actions(i) = find(mnrnd(1, prob_list));
+                    Actions(i) = mymnrnd(prob_list,1);
                 end
             else
                 error('Number of states and policies must be consistent.')
@@ -86,7 +84,7 @@ classdef (Abstract) PolicyDiscrete < Policy
         
         %% Plotting
         function plotDeterministic(obj, xmin, xmax, ymin, ymax, fig)
-        % Plot most probable action for 2D states
+        % Plot the most probable action for 2D states
             assert(xmin < xmax, 'X upper bound cannot be lower than lower bound.')
             assert(ymin < ymax, 'Y upper bound cannot be lower than lower bound.')
 

@@ -147,7 +147,7 @@ classdef Genetic_Solver < handle
                 randIdx = rand(size(theta)) < chance;
                 n_noise = sum(randIdx);
             end
-            wNoise = mvnrnd(zeros(n_noise,1), diag(noise(randIdx)));
+            wNoise = mymvnrnd(zeros(n_noise,1), diag(noise(randIdx)));
             theta(randIdx) = theta(randIdx) + wNoise';
         end
         

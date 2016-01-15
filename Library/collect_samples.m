@@ -43,23 +43,12 @@ simulator = @mdp.simulator;
 initial_state = mdp.initstate(episodes);
 state = initial_state;
 
-persistent ds
-
-% Allocate memory only at the first iteration 
-% (it saves time when maxsteps and episodes are large)
-if isempty(ds)
-    ds.s = nan(nvar_state, maxsteps, episodes);
-    ds.nexts = nan(nvar_state, maxsteps, episodes);
-    ds.a = nan(nvar_action, maxsteps, episodes);
-    ds.r = nan(nvar_reward, maxsteps, episodes);
-    ds.gammar = nan(nvar_reward, maxsteps, episodes);
-else
-    ds.s(:) = nan;
-    ds.nexts(:) = nan;
-    ds.a(:) = nan;
-    ds.r(:) = nan;
-    ds.gammar(:) = nan;
-end
+% Allocate memory
+ds.s = nan(nvar_state, maxsteps, episodes);
+ds.nexts = nan(nvar_state, maxsteps, episodes);
+ds.a = nan(nvar_action, maxsteps, episodes);
+ds.r = nan(nvar_reward, maxsteps, episodes);
+ds.gammar = nan(nvar_reward, maxsteps, episodes);
 
 % Keep track of the states which did not terminate
 ongoing = true(1,episodes);

@@ -26,7 +26,7 @@ classdef GmmConstant < Policy
                 obj.mu = zeros(obj.gmax,n_params);
                 obj.Sigma = zeros(n_params,n_params,obj.gmax);
                 for i = 1 : obj.gmax
-                    obj.mu(i,:) = mvnrnd(mu0,sigma0);
+                    obj.mu(i,:) = mymvnrnd(mu0,sigma0);
                     obj.Sigma(:,:,i) = sigma0;
                 end
                 obj.p = ones(obj.gmax,1) / obj.gmax;
