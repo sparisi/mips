@@ -61,19 +61,15 @@ classdef Gibbs < PolicyDiscrete
             found = (ismember(Actions,obj.action_list));
             assert(min(found) == 1, 'Unknown action.');
 
-            nsamples = size(States,2);
-            lactions = length(obj.action_list);
             phi = obj.basis1(States);
             dphi = size(phi,1);
             prob_list = obj.distribution(States);
-            
-            dlpdt = zeros(obj.dparams,nsamples);
-            for i = 1 : lactions - 1
-                phi_SA = zeros(obj.dparams,nsamples);
-                phi_SA((i-1)*dphi+1:(i-1)*dphi+dphi,:) = phi;
-                dlpdt = dlpdt - bsxfun(@times,phi_SA,prob_list(i,:)) ./ obj.epsilon;
-                idx = Actions == i;
-                dlpdt(:,idx) = dlpdt(:,idx) + phi_SA(:,idx) / obj.epsilon;
+
+            dlpdt = -mtimescolumn(phi, prob_list(1:end-1,:)) / obj.epsilon;
+            for i = 1 : length(obj.action_list) - 1
+                idx1 = (i-1)*dphi + 1 : (i-1)*dphi + dphi;
+                idx2 = Actions == i;
+                dlpdt(idx1,idx2) = dlpdt(idx1,idx2) + phi(:,idx2) / obj.epsilon;
             end
         end
         
