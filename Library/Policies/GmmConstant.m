@@ -1,10 +1,10 @@
 classdef GmmConstant < Policy
 % GMMCONSTANT Gaussian Mixture Model with constant means and covariances.
 % Parameters: means and covariances.
+% Means are stored in rows, as in Matlab's GMDISTRIBUTION.
 %
 % As the number of components is variable (up to GMAX), this class does not
 % implement the properties THETA and DPARAMS.
-% Means are stored in rows, as in Matlab's GMDISTRIBUTION.
     
     properties(GetAccess = 'public', SetAccess = 'private')
         mu    % means
@@ -17,7 +17,7 @@ classdef GmmConstant < Policy
 
         %% Construction
         function obj = GmmConstant(varargin)
-            if nargin == 3 % initialize with a single Gaussian
+            if nargin == 3 % Initialize with a single Gaussian
                 mu0 = varargin{1};
                 sigma0 = varargin{2};
                 obj.gmax = varargin{3};
@@ -30,7 +30,7 @@ classdef GmmConstant < Policy
                     obj.Sigma(:,:,i) = sigma0;
                 end
                 obj.p = ones(obj.gmax,1) / obj.gmax;
-            elseif nargin == 4 % directly init with all components
+            elseif nargin == 4 % Directly init with all components
                 obj.mu = varargin{1};
                 obj.Sigma = varargin{2};
                 obj.gmax = varargin{3};
@@ -45,15 +45,25 @@ classdef GmmConstant < Policy
             obj.daction = size(obj.mu,2);
         end
 
-        %% Distribution functions
+        %% GMM.RANDOM
         function action = drawAction(obj,n)
-            gmm = gmdistribution(obj.mu, obj.Sigma, obj.p);
-            action = gmm.random(n)';
+            components = mymnrnd(obj.p,n); % Select the Gaussians for drawing the samples
+            action = zeros(obj.daction,n);
+            count = 1;
+            for i = 1 : length(obj.p);
+                n = sum(components==i);
+                action(:,count:count+n-1) = mymvnrnd(obj.mu(i,:)',obj.Sigma(:,:,i),n);
+                count = count + n;
+            end
         end
         
-        function probability = evaluate(obj, action)
-            gmm = gmdistribution(obj.mu, obj.Sigma, obj.p);
-            probability = gmm.pdf(action');
+        %% GMM.PDF
+        function probability = evaluate(obj, Actions)
+            probability = zeros(1,size(Actions,2));
+            for i = 1 : length(obj.p)
+                probability = probability + obj.p(i) * ...
+                    exp(loggausspdf(Actions, obj.mu(i,:)', obj.Sigma(:,:,i)));
+            end
         end
 
         %% Entropy
@@ -61,7 +71,7 @@ classdef GmmConstant < Policy
             S = NaN;
         end
 
-        %% WLM
+        %% GMM.FIT
         function obj = weightedMLUpdate(obj, weights, Actions)
             assert(min(weights >= 0), 'Weights cannot be negative.');
             [~, gmm] = emgm(Actions, obj.gmax, weights);
