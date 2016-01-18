@@ -98,6 +98,7 @@ ds.a = permute(ds.a, [1 3 2]);
 ds.nexts = permute(ds.nexts, [1 3 2]);
 ds.gammar = permute(ds.gammar, [1 3 2]);
 ds.r = permute(ds.r, [1 3 2]);
+ds.Q = cumsum(ds.gammar,2,'reverse'); % Because allocated (but not run) steps have value 0
 
 % Convert dataset to struct to allow storage of episodes with different length
 data = struct( ...
@@ -106,17 +107,19 @@ data = struct( ...
     'r', num2cell(ds.r,[1 2]), ...
     'nexts', num2cell(ds.nexts,[1 2]), ...
     'gammar', num2cell(ds.gammar,[1 2]), ...
+    'Q', num2cell(ds.Q,[1 2]), ...
     'length', 1 ...
     );
 data = squeeze(data);
 
-for i = 1 : episodes
+% Remove allocated (but not run) steps
+for i = find(endingstep < max(endingstep)) 
     data(i).s = data(i).s(:,1:endingstep(i));
     data(i).r = data(i).r(:,1:endingstep(i));
     data(i).gammar = data(i).r(:,1:endingstep(i));
     data(i).a = data(i).a(:,1:endingstep(i));
     data(i).nexts = data(i).nexts(:,1:endingstep(i));
-    data(i).Q = cumsum(bsxfun(@times,data(i).r,gamma.^(0:data(i).length-1)),2,'reverse');
+    data(i).Q = data(i).Q(:,1:endingstep(i));
     data(i).length = endingstep(i);
 end
 
