@@ -1,6 +1,6 @@
 function Phi = basis_krbf(n_centers, range, state)
 % BASIS_KRBF Uniformly distributed Kernel Radial Basis Functions. Centers  
-% and bandwidths are automatically computed to guarantee 25% of overlapping  
+% and bandwidths are automatically computed to attain 25% of overlapping  
 % and peaks between 0.95-0.99.
 % Phi = exp( -0.5 * (state - centers)' * B^-1 * (state - centers) ), 
 % where B is a diagonal matrix denoting the bandwiths of the kernels.
