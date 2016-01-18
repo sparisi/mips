@@ -70,7 +70,7 @@ while ( (step < maxsteps) && sum(ongoing) > 0 )
 end
 
 % If we are in the average reward setting, then normalize the return
-if isAveraged && gamma == 1, J = J ./ endingstep; end
+if isAveraged && gamma == 1, J = bsxfun(@times, J, 1 ./ endingstep); end
 
 J = mean(reshape(J,[nvar_reward npolicy episodes]),3);
 

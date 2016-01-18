@@ -44,11 +44,11 @@ initial_state = mdp.initstate(episodes);
 state = initial_state;
 
 % Allocate memory
-ds.s = nan(nvar_state, maxsteps, episodes);
-ds.nexts = nan(nvar_state, maxsteps, episodes);
-ds.a = nan(nvar_action, maxsteps, episodes);
-ds.r = nan(nvar_reward, maxsteps, episodes);
-ds.gammar = nan(nvar_reward, maxsteps, episodes);
+ds.s = nan(nvar_state, episodes, 1);
+ds.nexts = nan(nvar_state, episodes, 1);
+ds.a = nan(nvar_action, episodes, 1);
+ds.r = nan(nvar_reward, episodes, 1);
+ds.gammar = nan(nvar_reward, episodes, 1);
 
 % Keep track of the states which did not terminate
 ongoing = true(1,episodes);
@@ -76,11 +76,11 @@ while ( (step < maxsteps) && sum(ongoing) > 0 )
     totrew(:,ongoing) = totrew(:,ongoing) + (gamma)^(step-1) .* reward;
     
     % Record sample
-    ds.a(:,step,ongoing) = action;
-    ds.r(:,step,ongoing) = reward;
-    ds.gammar(:,step,ongoing) = (gamma)^(step-1) .* reward;
-    ds.s(:,step,ongoing) = running_states;
-    ds.nexts(:,step,ongoing) = nextstate;
+    ds.a(:,ongoing,step) = action;
+    ds.r(:,ongoing,step) = reward;
+    ds.gammar(:,ongoing,step) = (gamma)^(step-1) .* reward;
+    ds.s(:,ongoing,step) = running_states;
+    ds.nexts(:,ongoing,step) = nextstate;
     
     % Continue
     idx = 1:episodes;
@@ -92,15 +92,23 @@ while ( (step < maxsteps) && sum(ongoing) > 0 )
     
 end
 
+% This permutation speeds up the creation of the struct
+ds.s = permute(ds.s, [1 3 2]);
+ds.a = permute(ds.a, [1 3 2]);
+ds.nexts = permute(ds.nexts, [1 3 2]);
+ds.gammar = permute(ds.gammar, [1 3 2]);
+ds.r = permute(ds.r, [1 3 2]);
+
 % Convert dataset to struct to allow storage of episodes with different length
 data = struct( ...
-    's', squeeze(num2cell(ds.s(:,1:step,:),[1 2])), ...
-    'a', squeeze(num2cell(ds.a(:,1:step,:),[1 2])), ...
-    'r', squeeze(num2cell(ds.r(:,1:step,:),[1 2])), ...
-    'nexts', squeeze(num2cell(ds.nexts(:,1:step,:),[1 2])), ...
-    'gammar', squeeze(num2cell(ds.gammar(:,1:step,:),[1 2])), ...
+    's', num2cell(ds.s,[1 2]), ...
+    'a', num2cell(ds.a,[1 2]), ...
+    'r', num2cell(ds.r,[1 2]), ...
+    'nexts', num2cell(ds.nexts,[1 2]), ...
+    'gammar', num2cell(ds.gammar,[1 2]), ...
     'length', 1 ...
     );
+data = squeeze(data);
 
 for i = 1 : episodes
     data(i).s = data(i).s(:,1:endingstep(i));
@@ -113,7 +121,7 @@ for i = 1 : episodes
 end
 
 % If we are in the average reward setting, then normalize the return
-if isAveraged && gamma == 1, totrew = totrew ./ endingstep; end
+if isAveraged && gamma == 1, totrew = bsxfun(@times, totrew, 1./ endingstep); end
 
 J = mean(totrew,2);
 
