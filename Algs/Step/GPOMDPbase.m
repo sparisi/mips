@@ -39,7 +39,6 @@ for i = 1 : totepisodes
     sumdlog = cumsum(dlogpi(:,idx1:idx2),2);
     steps = data(i).length;
     rewgamma = bsxfun(@times,gamma.^(0:steps-1),data(i).r);
-%     keyboard
     grad = grad + squeeze(sum(bsxfun(@times, sumdlog, bsxfun(@plus,permute(rewgamma,[3 2 1]),-b(:,1:steps,:))),2));
 end
     
