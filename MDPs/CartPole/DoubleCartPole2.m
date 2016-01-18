@@ -1,7 +1,14 @@
-classdef DoubleCartPole < MDP
+classdef DoubleCartPole2 < MDP
 % REFERENCE
-% A P Wieland
-% Evolving Controls for Unstable Systems (1991)
+% S Loscalzo, R Wright, L Yu
+% Predictive feature selection for genetic policy search (2014)
+%
+% Differences from the original one:
+% - additional 0 action
+% - the friction 'mu_c' is 0
+% - the timestep 'dt' is smaller
+% - different state bounds
+% - different reward
     
     %% Properties
     properties
@@ -11,8 +18,8 @@ classdef DoubleCartPole < MDP
         masspole = [0.1 0.01]';
         length = [0.5 0.05]'; % Actually distance from the pivot to the poles centre of mass (so full length is the double)
         force = 10.0;
-        dt = 0.02;
-        mu_c = 0.0005; % Coefficient of friction of cart on track
+        dt = 0.01;
+        mu_c = 0.0; % Coefficient of friction of cart on track
         mu_p = 0.000002; % Coefficient of friction of the pole's hinge
         
         % MDP variables
@@ -23,20 +30,20 @@ classdef DoubleCartPole < MDP
         gamma = 0.9;
 
         % Bounds : state = [x xd theta thetad]
-        stateLB = [-2.4, -inf, -deg2rad(15), -deg2rad(15) -inf, -inf]';
-        stateUB = [2.4, inf, deg2rad(15), deg2rad(15), inf, inf]';
+        stateLB = [-2.4, -inf, -deg2rad(36), -deg2rad(36) -inf, -inf]';
+        stateUB = [2.4, inf, deg2rad(36), deg2rad(36), inf, inf]';
         actionLB = 1;
-        actionUB = 2;
-        rewardLB = -1;
-        rewardUB = 0;
+        actionUB = 3;
+        rewardLB = 0;
+        rewardUB = 1;
     end
     
     methods
         
         %% Simulator
         function state = initstate(obj,n)
-            initLB = [-2.4, -1, -deg2rad(15), -deg2rad(15) -1, -1]';
-            initUB = [2.4, 1, deg2rad(15), deg2rad(15), 1, 1]';
+            initLB = [-2.4, -1, -deg2rad(36), -deg2rad(36) -1, -1]';
+            initUB = [2.4, 1, deg2rad(36), deg2rad(36), 1, 1]';
             state = bsxfun(@plus, ...
                 bsxfun(@times, (initUB - initLB), rand(obj.dstate,n)), initLB);
             state(1:2,:) = 0; % the cart is always in the middle, with 0 vel
@@ -44,7 +51,7 @@ classdef DoubleCartPole < MDP
         end
         
         function [nextstate, reward, absorb] = simulator(obj, state, action)
-            forces = [-obj.force obj.force];
+            forces = [-obj.force 0 obj.force];
             F = forces(action);
             
             x = state(1,:);
@@ -78,10 +85,10 @@ classdef DoubleCartPole < MDP
             
             nstates = size(state,2);
             absorb = false(1,nstates);
-            reward = zeros(1,nstates);
+            reward = ones(1,nstates);
             fallen = max(bsxfun(@lt, nextstate, obj.stateLB),[],1) | ...
                 max(bsxfun(@gt, nextstate, obj.stateUB),[],1);
-            reward(fallen) = -1;
+            reward(fallen) = 0;
             absorb(fallen) = true;
             
             if obj.realtimeplot, obj.plotAgent(nextstate); end
