@@ -1,5 +1,5 @@
-function J = evaluate_policies(mdp, episodes, maxsteps, policies, contexts)
-% EVALUATE_SAMPLES Evaluates a set of policies. For each policy, several 
+function J = evaluate_policies2(mdp, episodes, maxsteps, policies, contexts)
+% EVALUATE_POLICIES Evaluates a set of policies. For each policy, several 
 % episodes are simulated.
 % The function is very similar to COLLECT_SAMPLES, but it accepts many
 % policies as input and it does not return the low level dataset.
@@ -16,8 +16,6 @@ function J = evaluate_policies(mdp, episodes, maxsteps, policies, contexts)
 
 npolicy = numel(policies);
 totepisodes = episodes * npolicy;
-if iscolumn(policies), policies = policies'; end
-policies = repmat(policies,1,episodes);
 
 % Get MDP characteristics
 nvar_reward = mdp.dreward;
@@ -32,38 +30,48 @@ step = 0;
 simulator = @mdp.simulator;
 initial_state = mdp.initstate(totepisodes);
 state = initial_state;
+action = zeros(mdp.daction,totepisodes);
 
 % Keep track of the states which did not terminate
 ongoing = true(1,totepisodes);
 
+% Save the last step per episode
+endingstep = maxsteps*ones(1,episodes);
+
 % Run the episodes until maxsteps or all ends
 while ( (step < maxsteps) && sum(ongoing) > 0 )
-    
+
     step = step + 1;
-    running_states = state(:,ongoing);
-        
+    
     % Select action
-    action = policies(ongoing).drawAction(running_states);
+    for i = 1 : npolicy
+        idx = (i-1)*episodes+1 : (i-1)*episodes+episodes;
+        action(:,idx(ongoing(idx))) = policies(i).drawAction(state(:, idx(ongoing(idx))));
+    end
     
     % Simulate one step of all running episodes at the same time
     if nargin < 5
-        [nextstate, reward, endsim] = feval(simulator, running_states, action);
+        [nextstate, reward, endsim] = feval(simulator, state(:,ongoing), action(:,ongoing));
     else
-        [nextstate, reward, endsim] = feval(simulator, running_states, action, contexts(:,ongoing));
+        [nextstate, reward, endsim] = feval(simulator, state(:,ongoing), action(:,ongoing), contexts(:,ongoing));
     end
+    state(:,ongoing) = nextstate;
     
     % Update the total reward
     J(:,ongoing) = J(:,ongoing) + (gamma)^(step-1) .* reward;
     
     % Continue
-    state(:,ongoing) = nextstate;
+    idx = 1:totepisodes;
+    idx = idx(ongoing);
+    idx = idx(endsim);
+    endingstep(idx) = step;
     ongoing(ongoing) = ~endsim;
     
 end
 
-J = mean(reshape(J,[nvar_reward npolicy episodes]),3);
-
 % If we are in the average reward setting, then normalize the return
-if isAveraged && gamma == 1, J = J / step; end
+if isAveraged && gamma == 1, J = J ./ endingstep; end
+
+J = mean(reshape(J,[nvar_reward npolicy episodes]),3);
 
 return

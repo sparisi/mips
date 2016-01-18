@@ -8,4 +8,4 @@ if ~iscolumn(mu), mu = mu'; end
 if nargin == 2, n = 1; end
 
 U = chol(sigma);
-X = U'*randn(length(mu),n) + mu;
+X = bsxfun(@plus, U'*randn(length(mu),n), mu);

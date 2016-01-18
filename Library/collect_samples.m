@@ -113,7 +113,7 @@ for i = 1 : episodes
 end
 
 % If we are in the average reward setting, then normalize the return
-if isAveraged && gamma == 1, totrew = totrew / step; end
+if isAveraged && gamma == 1, totrew = totrew ./ endingstep; end
 
 J = mean(totrew,2);
 

@@ -41,18 +41,10 @@ classdef (Abstract) GaussianLinear < Gaussian
         
         %% MVNRND
         function Actions = drawAction(obj, States)
-            d = numel(obj);
-            n = size(States,2); % draw N samples, one for each state
-            if d == 1
-                phi = obj.basis1(States);
-                mu = obj.A*phi;
-                Actions = obj.U'*randn(obj.daction,n) + mu;
-            else
-                assert(d == n, 'Number of states and policies is not consistent.')
-                assert(isequal(obj.basis), 'All policies must have the same basis functions.')
-                phi = obj(1).basis1(States);
-                Actions = multimvnrnd(cat(3,obj.U),cat(3,obj.A),phi);
-            end
+            % Draw N samples, one for each state
+            phi = obj.basis1(States);
+            mu = obj.A*phi;
+            Actions = obj.U'*randn(obj.daction, size(States,2)) + mu;
         end
         
         %% PLOT PDF

@@ -33,7 +33,7 @@ classdef EGreedy < PolicyDiscrete
             [~, idx] = max(Q,[],1);
             nactions = length(obj.action_list);
             nstates = size(States,2);
-            linearIdx = [0:nstates-1]*nactions + idx;
+            linearIdx = (0:nstates-1)*nactions + idx;
             prob_list = obj.epsilon / nactions * ones(nactions,nstates);
             prob_list(linearIdx) = prob_list(linearIdx) + 1 - obj.epsilon;
             prob_list = bsxfun(@times, prob_list, 1./sum(prob_list)); % Ensure that the sum is 1
@@ -52,7 +52,7 @@ classdef EGreedy < PolicyDiscrete
                 zeros(1,nstates)]; % last action has 0 weights
 
             if nargin == 3
-                idx = ([1:nstates]-1)*dphi+Actions;
+                idx = (0:nstates-1)*dphi+Actions;
                 Q = Q(idx); % linear indexing
             end
         end

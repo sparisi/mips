@@ -30,26 +30,14 @@ classdef (Abstract) PolicyDiscrete < Policy
             prob_list = obj.distribution(States);
             nlist = length(obj.action_list);
             naction = length(Actions);
-            idx = [1 : nlist : naction*nlist] + idx - 1;
+            idx = (1 : nlist : naction*nlist) + idx - 1;
             prob_list = prob_list(:);
             probability = prob_list(idx)';
         end
         
         function Actions = drawAction(obj, States)
-            nstates = size(States,2);
-            npolicy = numel(obj);
-            if npolicy == 1 % Draw one action for each state
-                prob_list = obj.distribution(States);
-                Actions = mymnrnd(prob_list,nstates);
-            elseif npolicy == nstates % Draw one action for each pair (policy,state)
-                Actions = zeros(1,nstates);
-                for i = 1 : nstates
-                    prob_list = obj(i).distribution(States(:,i));
-                    Actions(i) = mymnrnd(prob_list,1);
-                end
-            else
-                error('Number of states and policies must be consistent.')
-            end
+            prob_list = obj.distribution(States);
+            Actions = mymnrnd(prob_list,size(States,2)); % Draw one action for each state
         end
         
         function S = entropy(obj, States)
@@ -70,10 +58,10 @@ classdef (Abstract) PolicyDiscrete < Policy
             assert(isrow(Actions))
             assert(length(Actions) == nstates)
 
-            start_idx = (Actions-1)*dphi+1 + [0:nstates-1]*dphi*nactions; % Column start linear indices
-            all_idx = bsxfun(@plus,start_idx,[0:dphi-1]'); % All linear indices
+            idx_start = (Actions-1)*dphi+1 + (0:nstates-1)*dphi*nactions; % Starting linear indices
+            idx = bsxfun(@plus,idx_start,(0:dphi-1)'); % All linear indices
             phiSA = zeros(dphi*nactions,nstates); % Initialize output array with zeros
-            phiSA(all_idx) = Phi; % Insert values from phi into output array
+            phiSA(idx) = Phi;
             phiSA(end-dphi+1:end,:) = []; % Last action does not have any explicit preference
         end
         
@@ -110,7 +98,7 @@ classdef (Abstract) PolicyDiscrete < Policy
             labels = num2cell(obj.action_list(nonzeroActions));
             labels = cellfun(@num2str,labels,'uni',0);
             lcolorbar(labels);
-            drawnow
+            drawnow limitrate
         end
         
         function plotActions(obj, xmin, xmax, ymin, ymax, fig)
@@ -138,7 +126,7 @@ classdef (Abstract) PolicyDiscrete < Policy
                 xlabel x
                 ylabel y
             end
-            drawnow
+            drawnow limitrate
         end
         
         function plotQ(obj, xmin, xmax, ymin, ymax, fig)
@@ -166,7 +154,7 @@ classdef (Abstract) PolicyDiscrete < Policy
                 xlabel x
                 ylabel y
             end
-            drawnow
+            drawnow limitrate
         end
         
         function plotV(obj, xmin, xmax, ymin, ymax, fig)
@@ -187,7 +175,7 @@ classdef (Abstract) PolicyDiscrete < Policy
             title('V-function')
             xlabel x
             ylabel y
-            drawnow
+            drawnow limitrate
         end
         
     end
