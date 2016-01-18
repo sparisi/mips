@@ -3,20 +3,7 @@ close all
 
 %% ===================================================================== %%
 %  ======================== LOW LEVEL SETTINGS =========================  %
-target = struct();
-
-% Reach a pre-defined joint state
-target.q   = @(t)[3/2*pi; 0];
-target.qd  = @(t)[0; 0];
-target.qdd = @(t)[0; 0];
-
-% % Follow a pre-defined trajectory
-% f1 = 2; f2 = 0.5;
-% target.q   = @(t) wrapin2pi([ sin(2*pi*f1*t)-pi; sin(2*pi*f2*t) ]);
-% target.qd  = @(t) [ 2*pi*f1*cos(2*pi*f1*t); 2*pi*f2*cos(2*pi*f2*t) ];
-% target.qdd = @(t) [ -(2*pi*f1)^2*sin(2*pi*f1*t); -(2*pi*f2)^2*sin(2*pi*f2*t) ];
-
-mdp = DoubleLink(target);
+mdp = DoubleLink;
 robj = 1;
 dreward = mdp.dreward;
 gamma = mdp.gamma;

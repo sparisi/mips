@@ -2,12 +2,15 @@ classdef DoubleLink < MDP
     
     %% Properties
     properties
-        % Environment variables (state = [theta(1) thetad(1) theta(2) thetad(2)])
+        % Environment variables
         lengths = [1 1];
         masses = [1 1];
-        friction = [2.5, 2.5]';
+        friction = [2.5 2.5]';
         g = 9.81;
         dt = 0.002;
+        q_des = [3/2*pi 0]';
+        qd_des  = [0 0]';
+        qdd_des = [0 0]';
         
         % MDP variables
         dstate = 4;
@@ -16,7 +19,7 @@ classdef DoubleLink < MDP
         isAveraged = 0;
         gamma = 1;
 
-        % Bounds
+        % Bounds : state = [theta(1) thetad(1) theta(2) thetad(2)]
         stateLB = [0, -50, 0, -50]';
         stateUB = [2*pi, 50, 2*pi, 50]';
         actionLB = [-20, -20]';
@@ -25,21 +28,10 @@ classdef DoubleLink < MDP
         rewardUB = 0;
     end
     
-    properties
-        target % function handle that defines the desired joint state at each timestep
-        t % interal timestep (during an episode)
-    end
-    
     methods
-        %% Constructor
-        function obj = DoubleLink(target)
-            obj.target = target;
-        end
-        
         %% Simulator
         function state = initstate(obj,n)
             state = repmat([pi 0 0 0]',1,n);
-            obj.t = obj.dt;
             if obj.realtimeplot, obj.showplot; obj.updateplot(state); end
         end
         
@@ -64,14 +56,11 @@ classdef DoubleLink < MDP
             nextstate = [q(1,:); qd(1,:); q(2,:); qd(2,:)];
 
             % Compute reward
-            qdes = obj.target.q(obj.t);
-            qddes = obj.target.qd(obj.t);
-            goalstate = [qdes(1), qddes(1), qdes(2), qddes(2)]';
+            goalstate = [obj.q_des(1), obj.qd_des(1), obj.q_des(2), obj.qd_des(2)]';
             distance = bsxfun(@minus,nextstate,goalstate);
             reward = - matrixnorms(distance,2).^2;
 
             absorb = false(1,size(state,2)); % Infinite horizon
-            obj.t = obj.t + obj.dt;
 
             if obj.realtimeplot, obj.updateplot(nextstate); end
         end
@@ -137,29 +126,36 @@ classdef DoubleLink < MDP
             line(sum(obj.lengths)*[-1.1 1.1], [0 0], 'LineStyle', '--');
             axis(sum(obj.lengths)*[-1.1 1.1 -1.1 1.1]);
 
+            % Agent handle
             lw = 4.0;
             colors = {[0.1 0.1 0.4], [0.4 0.4 0.8]};
             obj.handleAgent{1} = line([0 0], [0, 0], 'linewidth', lw, 'color', colors{1});
             obj.handleAgent{2} = line([0 0], [0, 0], 'linewidth', lw, 'color', colors{2});
             obj.handleAgent{3} = rectangle('Position',[0,0,0,0],'Curvature',[1,1],'FaceColor',colors{1});
             obj.handleAgent{4} = rectangle('Position',[0,0,0,0],'Curvature',[1,1],'FaceColor',colors{2});
-            
+
             % 'Ghost' desired state
-            obj.handleAgent{5} = line([0 0], [0, 0], 'linewidth', lw, 'color', 'r');
-            obj.handleAgent{6} = line([0 0], [0, 0], 'linewidth', lw, 'color', 'r');
-            obj.handleAgent{7} = rectangle('Position',[0,0,0,0],'Curvature',[1,1],'FaceColor','r');
-            obj.handleAgent{8} = rectangle('Position',[0,0,0,0],'Curvature',[1,1],'FaceColor','r');
-            obj.handleAgent{5}.Color(4) = 0.3;
-            obj.handleAgent{6}.Color(4) = 0.3;
-            obj.handleAgent{7}.FaceColor(4) = 0.1;
-            obj.handleAgent{7}.EdgeColor(4) = 0.1;
-            obj.handleAgent{8}.FaceColor(4) = 0.1;
-            obj.handleAgent{8}.EdgeColor(4) = 0.1;
+            r = 0.1;
+            goalstate = [obj.q_des(1), obj.qd_des(1), obj.q_des(2), obj.qd_des(2)]';
+            X = obj.getJointsInTaskSpace(goalstate);
+            xy1 = X(1:2,:);
+            xy2 = X(5:6,:);
+
+            % 'Ghost' desired state
+            h = line([0 xy1(1)], [0, xy1(2)], 'linewidth', lw, 'color', 'r');
+            h.Color(4) = 0.3;
+            h = line([xy1(1) xy2(1)], [xy1(2) xy2(2)], 'linewidth', lw, 'color', 'r');
+            h.Color(4) = 0.3;
+            h = rectangle('Position',[xy1(1)-r,xy1(2)-r,2*r,2*r],'Curvature',[1,1],'FaceColor','r');
+            h.EdgeColor(4) = 0.1;
+            h.FaceColor(4) = 0.1;
+            h = rectangle('Position',[xy2(1)-r,xy2(2)-r,2*r,2*r],'Curvature',[1,1],'FaceColor','r');
+            h.EdgeColor(4) = 0.1;
+            h.FaceColor(4) = 0.1;
         end
         
         function updateplot(obj, state)
             r = 0.1;
-
             X = obj.getJointsInTaskSpace(state);
             xy1 = X(1:2,:);
             xy2 = X(5:6,:);
@@ -171,19 +167,6 @@ classdef DoubleLink < MDP
             obj.handleAgent{3}.Position = [xy1(1)-r,xy1(2)-r,2*r,2*r];
             obj.handleAgent{4}.Position = [xy2(1)-r,xy2(2)-r,2*r,2*r];
 
-            % 'Ghost' desired state
-            qdes = obj.target.q(obj.t);
-            qddes = obj.target.qd(obj.t);
-            goalstate = [qdes(1), qddes(1), qdes(2), qddes(2)]';
-            X = obj.getJointsInTaskSpace(goalstate);
-            xy1 = X(1:2,:);
-            xy2 = X(5:6,:);
-            obj.handleAgent{5}.XData = [0 xy1(1)];
-            obj.handleAgent{5}.YData = [0 xy1(2)];
-            obj.handleAgent{6}.XData = [xy1(1) xy2(1)];
-            obj.handleAgent{6}.YData = [xy1(2) xy2(2)];
-            obj.handleAgent{7}.Position = [xy1(1)-r,xy1(2)-r,2*r,2*r];
-            obj.handleAgent{8}.Position = [xy2(1)-r,xy2(2)-r,2*r,2*r];
             drawnow limitrate
         end
         

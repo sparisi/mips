@@ -5,7 +5,7 @@ classdef CartPole < MDP
     
     %% Properties
     properties
-        % Environment variables (state = [x xd theta thetad])
+        % Environment variables
         g = 9.81;
         masscart = 1.0;
         masspole = 0.1;
@@ -22,7 +22,7 @@ classdef CartPole < MDP
         isAveraged = 0;
         gamma = 0.9;
 
-        % Bounds
+        % Bounds : state = [x xd theta thetad])
         stateLB = [-2.4, -inf, -deg2rad(15), -inf]';
         stateUB = [2.4, inf, deg2rad(15), inf]';
         actionLB = 1;

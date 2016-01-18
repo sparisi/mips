@@ -13,7 +13,7 @@ classdef DoubleCartPole < MDP
     
     %% Properties
     properties
-        % Environment variables (state = [x xd theta thetad])
+        % Environment variables
         g = 9.8;
         masscart = 1.0;
         masspole = [0.1 0.01]';
@@ -30,7 +30,7 @@ classdef DoubleCartPole < MDP
         isAveraged = 0;
         gamma = 1;
 
-        % Bounds
+        % Bounds : state = [x xd theta thetad]
         stateLB = [-2.4, -inf, -deg2rad(36), -deg2rad(36) -inf, -inf]';
         stateUB = [2.4, inf, deg2rad(36), deg2rad(36), inf, inf]';
         actionLB = 1;
