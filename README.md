@@ -45,15 +45,3 @@ This folder contains functions used in the multi-objective framework, e.g., hype
 
 ### Utilities
 Utility functions used for matrix operations, plotting and sampling are stored in this folder.
-
-
-# ReLe Interface
-----------------
-
-For collecting samples and computing gradients and hessians, you can also use *ReLe*, a powerful toolbox in C. 
-You can find it here: https://github.com/AIRLab-POLIMI/ReLe
-
-First, you need to mex the files in `/ReLe/rele_matlab/src/mexinterface` (you can use the wrapper `MEXMakefile`).
-Then add such folder to the Matlab search path.
-Finally just call `collect_samples_rele` instead of `collect_samples`.
-However, please notice that not all the MDPs might be supported.

@@ -1,4 +1,5 @@
-- Removed loop from sampling functions and almost all algorithms. Bsxfun and vectorization is used whenever possible. This allows for much faster computation, especially when few cores are available.
+- Removed loop from sampling functions and almost all algorithms. `bsxfun` and vectorization is used whenever possible. This allows for much faster computation, especially when few cores are available.
+- ReLe is no longer needed as `collect_samples` and step-based approaches are faster.
 - Added several MDPs. MDPs are now better organized in objects.
 - Policies are better organized.
 - Scrips for setting up experiments are separated from the learning ones.
