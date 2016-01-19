@@ -3,8 +3,9 @@ classdef (Abstract) CMDP < MDP
 % set and kept fixed until the end of the episode.
     
     properties (Abstract)
-        dctx      % Size of the context
-        ctx_range % Range of the context
+        dctx  % Size of the context
+        ctxLB % Context bounds
+        ctxUB
     end
     
     methods (Abstract)

@@ -44,7 +44,7 @@ classdef Puddleworld < MDP
                      0         0        obj.step -obj.step]; % action mapping
             
             % Transition function
-            nextstate = state + steps(:,action) + normrnd(0,0.01,size(state));
+            nextstate = state + steps(:,action) + mymvnrnd(0,0.01^2,size(state,2));
             nextstate = bsxfun(@max, bsxfun(@min,nextstate,obj.stateUB), obj.stateLB);
             
             % Distance from the nearest edge of the puddle + Time penalty

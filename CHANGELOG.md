@@ -4,3 +4,4 @@
 - Policies are better organized.
 - Scrips for setting up experiments are separated from the learning ones.
 - Still need to add some stuff and to check for possible bugs.
+- Removed dependencies from the Statistics Toolbox.

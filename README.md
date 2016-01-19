@@ -3,7 +3,7 @@
 
 **Mi**nimal **P**olicy **S**earch is a toolbox for Matlab providing the implementation of some of the most famous policy search algorithms, as well as some recent multi-objective methods and benchmark problems in reinforcement learning.
 
-It requires the *Statistics Toolbox* and the *Optimization Toolbox*.
+It requires the *Optimization Toolbox*.
 
 Some utility functions are imported from File Exchange (original authors are always acknowledged).
 

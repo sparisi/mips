@@ -79,7 +79,7 @@ classdef Dam < MOMDP
                 idx = randi(length(obj.s_init), [1,n]);
                 state = obj.s_init(idx);
             else
-                state = unifrnd(0,160,[1,n]);
+                state = myunifrnd(0,160,n);
             end
             if obj.realtimeplot, obj.showplot; obj.updateplot(state); end
         end
@@ -98,7 +98,7 @@ classdef Dam < MOMDP
             
             % Transition dynamic
             action = bounded_action;
-            dam_inflow = normrnd(obj.DAM_INFLOW_MEAN, obj.DAM_INFLOW_STD, 1, nstates);
+            dam_inflow = mymvnrnd(obj.DAM_INFLOW_MEAN, obj.DAM_INFLOW_STD^2, nstates);
             nextstate = state + dam_inflow - action;
             
             % Cost due to the excess level w.r.t. a flooding threshold (upstream)

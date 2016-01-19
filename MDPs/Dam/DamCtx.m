@@ -8,16 +8,17 @@ classdef DamCtx < CMDP
         GAMMA_H2O = 1000.0;
         G = 9.81;
         
-        % Contextual variables
+        % Contextual variables and bounds
         dctx = 8;
-        ctx_range = [80, 120; % S_MIN_REL
-            20, 80;  % DAM_INFLOW_MEAN
-            1, 2;    % S
-            40, 60;  % H_FLO_U
-            0.1, 1;  % ETA
-            2, 6;    % W_HYD
-            30, 80;  % W_IRR
-            10, 50]; % Q_FLO_D
+        ctxLB = [80 % S_MIN_REL
+            20      % DAM_INFLOW_MEAN
+            1       % S
+            40      % H_FLO_U
+            0.1     % ETA
+            2       % W_HYD
+            30      % W_IRR
+            10];    % Q_FLO_D
+        ctxUB = [120 80 2 60 1 6 80 50]';
 
         % MDP variables
         dstate = 1;
@@ -39,12 +40,11 @@ classdef DamCtx < CMDP
         
         %% Simulator
         function ctx = getcontext(obj, n)
-            ctx = bsxfun(@plus, bsxfun( @times, ... 
-                diff(obj.ctx_range,[],2), rand(obj.dctx,n) ), obj.ctx_range(:,1) );
+            ctx = myunifrnd(obj.ctxLB, obj.ctxUB, n);
         end
         
         function state = initstate(obj, n)
-            state = unifrnd(0,300,[1,n]);
+            state = myunifrnd(0,300,n);
             if obj.realtimeplot, obj.showplot; obj.updateplot(state); end
         end
         
@@ -62,7 +62,7 @@ classdef DamCtx < CMDP
             
             % Transition dynamic
             action = bounded_action;
-            dam_inflow = normrnd(context(2,:), obj.DAM_INFLOW_STD, 1, nstates);
+            dam_inflow = mymvnrnd(context(2,:), obj.DAM_INFLOW_STD^2, nstates);
             nextstate = state + dam_inflow - action;
             
             % Cost due to the excess level w.r.t. a flooding threshold (upstream)
