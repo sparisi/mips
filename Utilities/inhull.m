@@ -116,8 +116,8 @@ switch p
       % Note that bsxfun COULD be used in this line, but I have chosen to
       % not do so to maintain compatibility. This code is still used by
       % users of older releases.
-      %  nullsp = null(bsxfun(@minus,xyz(tess(i,2:end),:),xyz(tess(i,1),:)))';
-      nullsp = null(xyz(tess(i,2:end),:) - repmat(xyz(tess(i,1),:),p-1,1))';
+       nullsp = null(bsxfun(@minus,xyz(tess(i,2:end),:),xyz(tess(i,1),:)))';
+%       nullsp = null(xyz(tess(i,2:end),:) - repmat(xyz(tess(i,1),:),p-1,1))';
       if size(nullsp,1)>1
         degenflag(i) = true;
         nrmls(i,:) = NaN;
@@ -138,8 +138,8 @@ end
 % scale normal vectors to unit length
 nrmllen = sqrt(sum(nrmls.^2,2));
 % again, bsxfun COULD be employed here...
-%  nrmls = bsxfun(@times,nrmls,1./nrmllen);
-nrmls = nrmls.*repmat(1./nrmllen,1,p);
+ nrmls = bsxfun(@times,nrmls,1./nrmllen);
+% nrmls = nrmls.*repmat(1./nrmllen,1,p);
 
 % center point in the hull
 center = mean(xyz,1);
@@ -149,8 +149,8 @@ a = xyz(tess(~degenflag,1),:);
 
 % ensure the normals are pointing inwards
 % this line too could employ bsxfun...
-%  dp = sum(bsxfun(@minus,center,a).*nrmls,2);
-dp = sum((repmat(center,nt,1) - a).*nrmls,2);
+ dp = sum(bsxfun(@minus,center,a).*nrmls,2);
+% dp = sum((repmat(center,nt,1) - a).*nrmls,2);
 k = dp<0;
 nrmls(k,:) = -nrmls(k,:);
 
