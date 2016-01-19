@@ -50,8 +50,8 @@ classdef GaussianLinearFixedvar < GaussianLinear
         %% WML
         function obj = weightedMLUpdate(obj, weights, Action, Phi)
             assert(min(weights)>=0, 'Weights cannot be negative.')
-            D = diag(weights);
-            A = (Phi * D * Phi' + 1e-8 * eye(size(Phi,1))) \ Phi * D * Action';
+            PhiW = bsxfun(@times,Phi,weights);
+            A = (PhiW * Phi' + 1e-8 * eye(size(Phi,1))) \ PhiW * Action';
             A = A';
             obj = obj.update(A(:));
         end
