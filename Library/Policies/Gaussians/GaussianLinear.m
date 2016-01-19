@@ -19,7 +19,7 @@ classdef (Abstract) GaussianLinear < Gaussian
         %% Derivative of the logarithm of the policy
         function logprob = logpdf(obj, Actions, States)
             ns = size(States,2);
-            na = size(Actions,2);
+            [d,na] = size(Actions);
             assert(ns == na ... % logprob(i) = prob of drawing Actions(i) in States(i)
                 || na == 1 ... % logprob(i) = prob of drawing a single action in States(i)
                 || ns == 1, ... % logprob(i) = prob of drawing Actions(i) in a single state
@@ -27,7 +27,6 @@ classdef (Abstract) GaussianLinear < Gaussian
             phi = obj.basis1(States);
             mu = obj.A*phi;
             Actions = bsxfun(@minus, Actions, mu);
-            d = size(Actions,1);
             Q = obj.U' \ Actions;
             q = dot(Q,Q,1); % quadratic term (M distance)
             c = d * log(2*pi) + 2 * sum(log(diag(obj.U))); % normalization constant
@@ -35,8 +34,8 @@ classdef (Abstract) GaussianLinear < Gaussian
         end
         
         %% MVNPDF
-        function probability = evaluate(obj, varargin)
-            probability = exp(obj.logpdf(varargin{:}));
+        function probability = evaluate(obj, Actions, States)
+            probability = exp(obj.logpdf(Actions,States));
         end
         
         %% MVNRND

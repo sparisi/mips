@@ -1,4 +1,4 @@
-function J = evaluate_policies2(mdp, episodes, maxsteps, policies, contexts)
+function J = evaluate_policies(mdp, episodes, maxsteps, policies, contexts)
 % EVALUATE_POLICIES Evaluates a set of policies. For each policy, several 
 % episodes are simulated.
 % The function is very similar to COLLECT_SAMPLES, but it accepts many
