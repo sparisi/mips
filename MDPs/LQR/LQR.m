@@ -72,7 +72,7 @@ classdef LQR < MOMDP
                     obj.utopia = -283*ones(1,dim);
                     obj.antiutopia = -436*ones(1,dim);
                 otherwise
-                    warning('Multiobjective framework not available for this number of objective.')
+                    warning('Multiobjective framework not available for the desired number of objective.')
             end
         end
         
@@ -86,8 +86,10 @@ classdef LQR < MOMDP
             absorb = false(1,nstate);
             nextstate = obj.A*state + obj.B*action;
             reward = zeros(obj.dreward,nstate);
+            
             for i = 1 : obj.dreward
-                reward(i,:) = -diag((state'*obj.Q{i}*state + action'*obj.R{i}*action));
+                reward(i,:) = -sum(bsxfun(@times, state'*obj.Q{i}, state'), 2)' ...
+                    -sum(bsxfun(@times, action'*obj.R{i}, action'), 2)';
             end
         end
         
