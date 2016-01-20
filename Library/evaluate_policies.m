@@ -72,6 +72,6 @@ end
 % If we are in the average reward setting, then normalize the return
 if isAveraged && gamma == 1, J = bsxfun(@times, J, 1 ./ endingstep); end
 
-J = mean(reshape(J,[nvar_reward npolicy episodes]),3);
+J = squeeze(mean(reshape(J,[nvar_reward episodes npolicy]),2));
 
 return

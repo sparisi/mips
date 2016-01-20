@@ -8,6 +8,9 @@ classdef (Abstract) MOMDP < MDP
     end
     
     methods
+        % NB! Frontiers are returned / passed as [N x R] matrices, where N
+        % is the number of points and R is the number of objectives.
+        
         [front, weights] = truefront(obj);
         % Returns the true Pareto frontier (or a reference one) and a set of
         % weights if the frontier is obtained by weighted sum.
