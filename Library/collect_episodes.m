@@ -21,8 +21,7 @@ function [J, Theta, Context] = collect_episodes(mdp, episodes, steps, pol_high, 
 
 pol_low = repmat(pol_low,1,episodes);
 
-% In contextual MDPs, the high level policy draws the parameters depending on the context
-if isprop(pol_high,'basis') 
+if ismember('CMDP',superclasses(mdp)) % Contextual MDP
     Context = mdp.getcontext(episodes);
     Theta = pol_high.drawAction(Context);
     for i = 1 : episodes

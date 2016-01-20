@@ -6,7 +6,7 @@
 % Reinforcement Learning by Reward-weighted Regression for Operational 
 % Space Control (2007)
 
-N_MAX = 10000;
+N_MAX = 100000;
 Phi = [];
 R = [];
 Action = [];
@@ -29,9 +29,9 @@ while true
     Action = Action(:, 1:min(N_MAX,end));
 
     weights = (R(robj,:) - min(R(robj,:),[],2)) / (max(R(robj,:),[],2) - min(R(robj,:),[],2)); % simple normalization in [0,1]
-%     beta = 0.1; weights = exp(beta*R(robj,:));
+%     beta = 10; weights = exp(beta*R(robj,:));
     
-    [~, J] = collect_samples(mdp, episodes_eval, steps_eval, policy.makeDeterministic);
+    J = evaluate_policies(mdp, episodes_eval, steps_eval, policy.makeDeterministic);
     fprintf('%d ) Entropy: %.2f, J: %.4f\n', iter, S, J(robj))
     
     policy = policy.weightedMLUpdate(weights, Action, Phi);

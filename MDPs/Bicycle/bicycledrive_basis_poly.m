@@ -8,11 +8,11 @@ if nargin == 0
     return
 end
 
-theta       = state(1,:);
-theta_dot   = state(1,:);
-omega       = state(3,:);
-omega_dot   = state(4,:);
-psi         = state(5,:);
+theta     = state(1,:);
+theta_dot = state(1,:);
+omega     = state(3,:);
+omega_dot = state(4,:);
+psi       = state(5,:);
 
 idx = psi > 0;
 psi_hat = (pi - psi) .* ones(1,size(state,2));

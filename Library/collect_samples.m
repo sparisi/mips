@@ -13,19 +13,20 @@ function [data, J] = collect_samples(mdp, episodes, maxsteps, policy, contexts)
 %
 %    OUTPUT
 %     - data     : struct with the following fields (one per episode)
-%                   * s       : state
-%                   * a       : action
-%                   * nexts   : next state
-%                   * r       : immediate reward
-%                   * gammar  : discounted immediate reward, gamma^(t-1)*r
-%                   * Q       : approximation of the Q function, that is
-%                               Q(s_t,a_t) = sum_(h=t)^T gamma^(h-1)*r(s_t,a_t)
-%                   * length  : length of the episode
+%                   * s      : state
+%                   * a      : action
+%                   * nexts  : next state
+%                   * r      : immediate reward
+%                   * gammar : discounted immediate reward, gamma^(t-1)*r
+%                   * Q      : approximation of the Q function, that is
+%                              Q(s_t,a_t) = sum_(h=t)^T gamma^(h-1)*r(s_t,a_t)
+%                   * length : length of the episode
 %     - J        : returns averaged over all the episodes
 
 assert(numel(policy) == 1, ...
-    ['This function supports only one policy as input.' ...
-    'For collecting samples with multiple policies, see COLLECT_EPISODES.'])
+    ['This function supports only one policy as input. ' ...
+    'For collecting samples with multiple policies, see COLLECT_EPISODES. ' ...
+    'For evaluating multiple policies, see EVALUATE_POLICIES'])
 
 % Get MDP characteristics
 nvar_state = mdp.dstate;

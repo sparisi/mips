@@ -8,10 +8,10 @@ if nargin == 0
     return
 end
 
-theta       = state(1,:);
-theta_dot   = state(2,:);
-omega       = state(3,:);
-omega_dot   = state(4,:);
+theta     = state(1,:);
+theta_dot = state(2,:);
+omega     = state(3,:);
+omega_dot = state(4,:);
 
 phi = [omega
     omega_dot
