@@ -1,4 +1,4 @@
-# Description
+ue# Description
 -------------
 
 **Mi**nimal **P**olicy **S**earch is a toolbox for Matlab providing the implementation of some of the most famous policy search algorithms, as well as some recent multi-objective methods and benchmark problems in reinforcement learning.
@@ -43,7 +43,7 @@ There are also some extension, that are *Contextual MDPs* (`CMDP.m`) and *Multi-
 ### MO_Library
 This folder contains functions used in the multi-objective framework, e.g., hypervolume estimators and Pareto-optimality filters.
 
-> **IMPORTANT!** All frontiers is stored in **ROWS**, i.e., they are matrices `N x R`, where `N` is the number of points and `R` is the number of objectives.
+> **IMPORTANT!** All frontiers are stored in **ROWS**, i.e., they are matrices `N x R`, where `N` is the number of points and `R` is the number of objectives.
 
 ### Utilities
 Utility functions used for matrix operations, plotting and sampling are stored in this folder.
