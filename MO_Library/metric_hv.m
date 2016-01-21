@@ -15,7 +15,7 @@ function S = metric_hv(J, HVF)
 front = pareto(uniqueJ);
 hyperv_ref = HVF(front);
 
-idx2 = find(all(ismember(uniqueJ,front),2)); % dominated solutions metric value is 0
+idx2 = all(ismember(uniqueJ,front),2); % dominated solutions metric value is 0
 hvUnique = zeros(size(uniqueJ,1),1);
 hvContrib = zeros(size(front,1),1);
 parfor i = 1 : size(front,1)
@@ -25,3 +25,5 @@ parfor i = 1 : size(front,1)
 end
 hvUnique(idx2) = hvContrib;
 S = hvUnique(idx); % map back to duplicates
+
+S = max(0,S); % the contribution estimation might be negative using a Monte Carlo approx of the hypervolume
