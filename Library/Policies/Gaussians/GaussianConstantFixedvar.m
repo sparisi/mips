@@ -55,7 +55,7 @@ classdef GaussianConstantFixedvar < GaussianConstant
         end
         
         function obj = randomize(obj)
-            warning('This policy should not be randomized!')
+            warning('This policy cannot be randomized!')
         end
         
     end

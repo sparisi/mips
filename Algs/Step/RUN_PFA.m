@@ -21,7 +21,7 @@ iter = 1;
 verboseOut = false;
 
 %% Learn the last objective
-while iter * episodes_learn < 1e6
+while true
     [ds, J] = collect_samples(mdp, episodes_learn, steps_learn, policy);
     S = policy.entropy(horzcat(ds.s));
     [policy, gnorm] = solver.optimization_step(ds, policy, dreward);
@@ -38,13 +38,13 @@ inter_J = [];
 
 
 %% For all the remaining objectives
-for obj = -[-(dreward-1) : -1]
+for obj = linspace(dreward-1, 1, dreward-1)
     % Filter suboptimal policies
     all_policies = [front_pol, inter_pol]; 
     all_J = [front_J, inter_J];
     [front_J, front_pol] = pareto(all_J', all_policies);
     front_J = front_J';
-
+    
     % Keep intermediate solutions
     inter_pol = [];
     inter_J = [];
@@ -61,15 +61,19 @@ for obj = -[-(dreward-1) : -1]
             [ds, current_J] = collect_samples(mdp, episodes_learn, steps_learn, current_pol);
             S = current_pol.entropy(horzcat(ds.s));
             [current_pol, gnorm] = solver.optimization_step(ds, current_pol, obj);
-            iter_opt = iter_opt + 1;
-            iter = iter + 1;
-    
+
             if verboseOut, fprintf('Policy %d/%d, Obj %d) Entropy: %.2f \tNorm: %.2e \tJ: %s *** Optimization\n', ...
                     i, num_policy, obj, S, gnorm, num2str(current_J','%.4f, ')); end
 
             if gnorm < tolerance_step || iter_opt > maxIter || S < minS, break, end
-            inter_pol = [inter_pol, current_pol]; % save intermediate solution
+            inter_pol = [inter_pol, current_pol]; % Save intermediate solution
+            inter_J = [inter_J, current_J];
             
+            iter_opt = iter_opt + 1;
+            iter = iter + 1;
+            
+            if iter * episodes_learn > 1e6, break; end % Budget limit
+
             iter_corr = 1; % Iter counter for the correction step
             while true % Correction step
                 [ds, current_J] = collect_samples(mdp, episodes_learn, steps_learn, current_pol);

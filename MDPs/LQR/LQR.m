@@ -115,7 +115,7 @@ classdef LQR < MOMDP
                 plot3(front(:,1),front(:,2),front(:,3),'o')
                 box on
             else
-                warning('Can plot only 2 and 3 dimensions.')
+                warning('Can plot only 2- and 3- dimensional frontiers.')
                 return
             end
             

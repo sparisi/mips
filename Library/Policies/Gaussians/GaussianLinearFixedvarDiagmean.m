@@ -51,7 +51,7 @@ classdef GaussianLinearFixedvarDiagmean < GaussianLinear
         end
         
         function obj = randomize(obj,varargin)
-            warning('This policy should not be randomized!')
+            warning('This policy cannot be randomized!')
         end
         
         %% ============================================================= %%
