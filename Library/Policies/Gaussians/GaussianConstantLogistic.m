@@ -53,7 +53,7 @@ classdef GaussianConstantLogistic < GaussianConstant
             Sigma = diag(logv);
             obj.mu = mu;
             obj.Sigma = Sigma;
-            obj.U = diag(sqrt(diag(Sigma)));
+            obj.U = diag(sqrt(logv));
         end
         
         %% Change stochasticity

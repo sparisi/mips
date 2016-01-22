@@ -57,7 +57,7 @@ classdef GaussianLinearLogistic < GaussianLinear
             A = vec2mat(obj.theta(1:end-obj.daction),obj.daction);
             obj.A = A;
             obj.Sigma = Sigma;
-            obj.U = diag(sqrt(diag(Sigma)));
+            obj.U = diag(sqrt(logv));
         end
         
         %% Change stochasticity
