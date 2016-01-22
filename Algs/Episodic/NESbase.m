@@ -8,24 +8,21 @@ function [nat_grad, stepsize] = NESbase(pol_high, J, Theta, lrate)
 % D Wierstra, T Schaul, T Glasmachers, Y Sun, J Peters, J Schmidhuber 
 % Natural Evolution Strategy (2014)
 
-[n_objectives, n_episodes] = size(J);
 dlogPidtheta = pol_high.dlogPidtheta(Theta);
-grad = zeros(pol_high.dparams, n_objectives);
+J = permute(J,[3 2 1]);
 
-for i = 1 : n_objectives
-    den = sum(dlogPidtheta.^2,2);
-    num = sum(bsxfun(@times,dlogPidtheta.^2,J(i,:)),2);
-    b = num ./ den;
-    b(isnan(b)) = 0;
-
-    grad(:,i) = mean(dlogPidtheta .* bsxfun(@minus,J(i,:),b),2);
-end
+den = sum(dlogPidtheta.^2,2);
+num = sum( bsxfun(@times, dlogPidtheta.^2, J), 2);
+b = bsxfun(@times, num, 1./den);
+b(isnan(b)) = 0;
+diff = bsxfun(@minus,J,b);
+grad = permute( mean(bsxfun(@times, dlogPidtheta, diff), 2), [1 3 2]);
 
 % If we can compute the FIM in closed form, we use it
 if ismethod(pol_high,'fisher')
     F = pol_high.fisher;
 else
-    F = dlogPidtheta * dlogPidtheta' / n_episodes;
+    F = dlogPidtheta * dlogPidtheta' / size(J,2);
 end
 
 % If we can compute the FIM inverse in closed form, we use it
