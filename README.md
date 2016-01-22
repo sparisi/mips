@@ -41,6 +41,8 @@ Policies are modeled as objects. Their most important method is `drawAction`, bu
 Each MDP is modeled as an object (`MDP.m`) and requires some properties (dimension of state and action spaces, bounds, etc...) and methods (for simulating and plotting).
 There are also some extension, that are *Contextual MDPs* (`CMDP.m`) and *Multi-objective MDPs* (`MOMDP.m`).
 
+> **IMPORTANT!** To allow parallel execution of multiple episodes, `simulator` functions need to support vectorized operations, i.e., they need to deal with states and actions represented as `S x N` and `A x N` matrices, repsectively.
+
 ### MO_Library
 This folder contains functions used in the multi-objective framework, e.g., hypervolume estimators and Pareto-optimality filters.
 
