@@ -1,13 +1,16 @@
 classdef DoubleLink < MDP
-    
+% REFERENCE
+% T Yoshikawa
+% Foundations of Robotics: Analysis and Control (1990)
+
     %% Properties
     properties
         % Environment variables
         lengths = [1 1];
         masses = [1 1];
-        friction = [2.5 2.5]';
+        friction_coeff = [2.5 2.5]'; % viscous friction coefficients
         g = 9.81;
-        dt = 0.002;
+        dt = 0.01;
         q_des = [3/2*pi 0]';
         qd_des  = [0 0]';
         qdd_des = [0 0]';
@@ -20,10 +23,10 @@ classdef DoubleLink < MDP
         gamma = 1;
 
         % Bounds : state = [theta(1) thetad(1) theta(2) thetad(2)]
-        stateLB = [0, -50, 0, -50]';
-        stateUB = [2*pi, 50, 2*pi, 50]';
-        actionLB = [-20, -20]';
-        actionUB = [20, 20]';
+        stateLB = [-pi, -50, -pi, -50]';
+        stateUB = [pi, 50, pi, 50]';
+        actionLB = [-10, -10]';
+        actionUB = [10, 10]';
         rewardLB = -inf;
         rewardUB = 0;
     end
@@ -38,27 +41,27 @@ classdef DoubleLink < MDP
         function [nextstate, reward, absorb] = simulator(obj, state, action)
             % Check action
             real_action = bsxfun(@max, bsxfun(@min,action,obj.actionUB), obj.actionLB);
-            penalty_action = matrixnorms(real_action-action,2);
+%             penalty_action = matrixnorms(real_action-action,2);
             action = real_action;
 
             % State transition
-            [gravity, coriolis, invM] = obj.getDynamicsMatrices(state);
-            qdd = mtimes32(invM, action - coriolis - gravity);
+            [gravity, coriolis, invM, friction] = obj.getDynamicsMatrices(state);
+            qdd = mtimes32(invM, action - coriolis - gravity - friction);
             qd = state(2:2:end,:) + obj.dt * qdd;
             q = state(1:2:end,:) + obj.dt * qd;
-            q = wrapin2pi(q);
 
             % Check velocity 
-            real_vel = bsxfun(@max, bsxfun(@min,qd,obj.stateUB(2:2:end)), obj.stateLB(2:2:end));
-            penalty_vel = matrixnorms(real_vel-qd,2);
-            qd = real_vel;
+%             real_vel = bsxfun(@max, bsxfun(@min,qd,obj.stateUB(2:2:end)), obj.stateLB(2:2:end));
+%             penalty_vel = matrixnorms(real_vel-qd,2);
+%             qd = real_vel;
             
             nextstate = [q(1,:); qd(1,:); q(2,:); qd(2,:)];
 
             % Compute reward
             goalstate = [obj.q_des(1), obj.qd_des(1), obj.q_des(2), obj.qd_des(2)]';
+%             distance = bsxfun(@minus,q,obj.q_des);
             distance = bsxfun(@minus,nextstate,goalstate);
-            reward = - matrixnorms(distance,2).^2;
+            reward = -matrixnorms(distance,2).^2;
 
             absorb = false(1,size(state,2)); % Infinite horizon
 
@@ -66,37 +69,42 @@ classdef DoubleLink < MDP
         end
         
         %% Dynamics
-        function [gravity, coriolis, invM] = getDynamicsMatrices(obj, state)
-            inertias = obj.masses .* (obj.lengths.^2 + 0.0001) ./ 12.0;
+        function [gravity, coriolis, invM, friction] = getDynamicsMatrices(obj, state)
+            inertias = obj.masses .* (obj.lengths.^2 + 0.00001) ./ 3.0;
             m1 = obj.masses(1);
             m2 = obj.masses(2);
-            l1 = obj.masses(1);
-            l2 = obj.masses(2);
+            l1 = obj.lengths(1);
+            l2 = obj.lengths(2);
             lg1 = l1 / 2;
             lg2 = l2 / 2;
-            q1 = state(1,:) + pi/2;
+            q1 = state(1,:);
             q2 = state(3,:);
             q1d = state(2,:);
             q2d = state(4,:);
-            s1 = sin(q1);
+%             s1 = sin(q1);
             c1 = cos(q1);
             s2 = sin(q2);
             c2 = cos(q2);
-            s12 = sin(q1 + q2);
+%             s12 = sin(q1 + q2);
             c12 = cos(q1 + q2);
+            
             M11 = m1 * lg1^2 + inertias(1) + m2 * (l1^2 + lg2^2 + 2 * l1 * lg2 * c2) + inertias(2);
-            M12 = m2 * (lg2^2 +  l1 * lg2 * c2) + inertias(2);
-            M21 = m2 * (lg2^2 +  l1 * lg2 * c2) + inertias(2);
+            M12 = m2 * (lg2^2 + l1 * lg2 * c2) + inertias(2);
+            M21 = M12;
             M22 = repmat(m2 * lg2^2 + inertias(2), 1, size(state,2));
             invdetM = 1 ./ (M11 .* M22 - M12 .* M21);
-            invM(1,1,:) = bsxfun(@times, M22, invdetM);
-            invM(1,2,:) = bsxfun(@times, -M21, invdetM);
-            invM(2,1,:) = bsxfun(@times, M11, invdetM);
-            invM(2,2,:) = bsxfun(@times, -M12, invdetM);
-            gravity = [m1 * obj.g * lg1 * c1 + m2 * obj.g * (l1 * c1 + lg2 * c12);
+            invM(1,1,:) = M22;
+            invM(1,2,:) = -M21;
+            invM(2,1,:) = -M12;
+            invM(2,2,:) = M11;
+            invM = bsxfun(@times, invM, permute(invdetM, [3 1 2]));
+
+            gravity = [m1 * obj.g * lg1 * c1 + m2 * obj.g * (l1 * c1 + lg2 * c12)
                 m2 * obj.g * lg2 * c12];
-            coriolis = [2 * m2 * l1 * lg2 * (q1d .* q2d .* s2 + q1d.^2 .* s2) + obj.friction(1) * q1d;
-                2 * m2 * l1 * lg2 * (q1d.^2 .* s2) + obj.friction(2) .* q2d];
+            coriolis = [-m2 * l1 * lg2 * s2 .* (2 .* q1d .* q2d + q2d.^2)
+                m2 * l1 * lg2 * s2 .* q1d.^2];
+            friction = [obj.friction_coeff(1) * q1d
+                obj.friction_coeff(2) * q2d];
         end
 
         %% Kinematics
