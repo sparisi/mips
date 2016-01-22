@@ -1,4 +1,4 @@
-ue# Description
+# Description
 -------------
 
 **Mi**nimal **P**olicy **S**earch is a toolbox for Matlab providing the implementation of some of the most famous policy search algorithms, as well as some recent multi-objective methods and benchmark problems in reinforcement learning.
@@ -28,9 +28,10 @@ In this setting, it is important to set up the variable `makeDet`: if `true`, th
 ### Library
 The folder contains some policies, generic basis functions, and functions for sampling and evaluation. The most important functions are
 
-- `collect_samples`, which stores low level tuples `(s,a,r,s')` into a struct,
-- `collect_episodes`, which collects high level data, i.e. pairs `(return,policy)`,
-- `evaluate_policies`, which evaluates low level policies on several episodes.
+- `collect_samples`: stores low level tuples `(s,a,r,s')` into a struct,
+- `collect_episodes`: collects high level data, i.e. pairs `(return,policy)`,
+- `evaluate_policies`: evaluates low level policies on several episodes,
+- `evaluate_policies_high`: evaluates high level policies on several episodes.
 
 Policies are modeled as objects. Their most important method is `drawAction`, but depending on the class some additional properties might be mandatory.
 

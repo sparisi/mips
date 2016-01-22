@@ -7,11 +7,11 @@ function C = mtimes32(A,B)
 % >> end
 %
 %    INPUT
-%     - A : [D x D x N] matrix
-%     - B : [D x N] matrix
+%     - A : [D1 x D2 x N] matrix
+%     - B : [D2 x N] matrix
 %
 %    OUTPUT
-%     - C : [D x N] matrix
+%     - C : [D1 x N] matrix
 
 C = bsxfun(@times,A,reshape(B,[1 size(B)]));
 C = permute(sum(C,2),[1 3 2]);

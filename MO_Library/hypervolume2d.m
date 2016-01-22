@@ -18,6 +18,8 @@ function hv = hypervolume2d(f, antiutopia, utopia)
 %    OUTPUT
 %     - hv         : hypervolume
 
+f = pareto(f); % Be sure that the front does not have dominated solutions
+
 if nargin == 3
     f = normalize_points(f,antiutopia,utopia);
     r = zeros(1, size(f,2));
@@ -26,8 +28,8 @@ else
 end
 
 % If a solution lays below the reference point, ignore it
-isBelow = sum( bsxfun(@gt, r, f), 2) >= 1;
-f(isBelow, :) = [];
+isBelow = sum(bsxfun(@gt, r, f), 2) >= 1;
+f(isBelow,:) = [];
 
 if isempty(f)
     hv = 0;
@@ -35,13 +37,6 @@ if isempty(f)
 end
 
 f = sortrows(f,1);
-b = f(1,1) - r(1);
-h = f(1,2) - r(2);
-hv = b*h;
-for i = 2 : size(f,1)
-    b = f(i,1) - f(i-1,1);
-    h = f(i,2) - r(2);
-    hv = hv + b*h;
-end
-
-return
+b = diff([r(1); f(:,1)]);
+h = f(:,2) - r(2);
+hv = sum(b.*h);

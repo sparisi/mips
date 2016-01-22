@@ -1,4 +1,4 @@
-function loss = eval_loss(front, domain)
+function loss = eval_loss(front, mdp)
 % EVAL_LOSS Evaluates the loss of an approximate frontier wrt a reference 
 % one, using a weigthed scalarization of the objectives.
 %
@@ -8,19 +8,22 @@ function loss = eval_loss(front, domain)
 % Tree-based Fitted Q-Iteration for Multi-Objective Markov Decision 
 % Problems (2012)
 
-[reference_front, weights] = feval([domain '_moref'],0);
+[reference_front, weights] = mdp.truefront;
+diff_max = (max(reference_front) - min(reference_front));
 
-diff_J = (max(reference_front) - min(reference_front));
 
 loss = 0;
-
-parfor i = 1 : size(weights,1)
+for i = 1 : size(weights,1)
     w = weights(i,:)';
     front_w = front * w;
     reference_front_w = reference_front * w;
-    loss = loss + (max(reference_front_w) - max(front_w)) / (diff_J * w);
+    loss = loss + (max(reference_front_w) - max(front_w)) / (diff_max * w);
 end
-
 loss = loss / size(weights,1);
 
-end
+
+% fw = front*weights';
+% rw = reference_front*weights';
+% loss = sum( ...
+%     ( max(rw,[],1) - max(fw,[],1) ) ./ ( diff_max * weights') ...
+%     ) / size(weights,1);

@@ -89,10 +89,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         }
         
         if (dominatingIdx != -1 && dominatingIdx != -2) // P is dominated by only one solution F(j,:)
-            contribution[dominatingIdx] += 1; // therefore F(j,:) contributes to the hypervolume growth
-    }
-    
-    for (j = 0; j < NF; j++) { // finally normalize the Monte Carlo estimate
-        contribution[j] /= N;
+            contribution[dominatingIdx] += (float) 1.0 / N; // therefore F(j,:) contributes to the hypervolume growth (divide by N to normalize the Monte Carlo estimate)
     }
 }
