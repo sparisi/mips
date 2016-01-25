@@ -45,22 +45,6 @@ classdef (Abstract) GaussianConstant < Gaussian
             legend show
         end
 
-        %% KL
-        function d = kl(p, q, varargin)
-        % Kullback–Leibler divergence divergence KL(P||Q) from distribution 
-        % P to distribution Q
-        %
-        % http://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence
-            assert(ismember('GaussianConstant',superclasses(q)) == 1, 'Both distributions must be Gaussian.')
-            k = p.daction;
-            assert(k == q.daction, 'The Gaussians must have the same dimension.')
-            s0 = p.Sigma;
-            s1 = q.Sigma;
-            m0 = p.mu;
-            m1 = q.mu;
-            d = 0.5 * (trace(s1 \ s0) + (m1 - m0)' / s1 * (m1 - m0) - k + log(det(s1) / det(s0)));
-        end
-        
     end
 
 end

@@ -66,7 +66,7 @@ classdef GmmConstant < Policy
             end
         end
 
-        %% Entropy
+        %% ENTROPY
         function S = entropy(obj, Actions)
             prob_list = obj.evaluate(Actions);
             idx = isinf(prob_list) | isnan(prob_list) | prob_list == 0;
@@ -74,22 +74,6 @@ classdef GmmConstant < Policy
             S = -mean(log(prob_list));
         end
 
-        %% KL
-        function div = kl(p, q, varargin)
-            % Approximates the Kullback-Leibler divergence KL(P||Q) from
-            % distribution P to distribution Q using samples drawn from P.
-            %
-            % http://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence
-            pdf_p = p.evaluate(varargin{:});
-            pdf_q = q.evaluate(varargin{:});
-            
-            index = pdf_q > 0;
-            pdf_q = pdf_q(index);
-            pdf_p = pdf_p(index);
-            
-            div = mean(log(pdf_p ./ pdf_q));
-        end
-        
         %% GMM.FIT
         function obj = weightedMLUpdate(obj, weights, Actions)
             assert(min(weights >= 0), 'Weights cannot be negative.');
