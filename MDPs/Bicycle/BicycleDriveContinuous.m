@@ -4,7 +4,10 @@ classdef BicycleDriveContinuous < MDP
 % Learning to Drive a Bicycle using Reinforcement Learning and Shaping
 % (1998)
 %
-% Original C code: http://www.ailab.si/dorian/MLControl/BikeCCode.htm
+% D Ernst, P Geurts, L Wehenkel
+% Tree-Based Batch Mode Reinforcement Learning (2005)
+%
+% Original Randlov code: http://www.ailab.si/dorian/MLControl/BikeCCode.htm
     
     %% Properties
     properties
@@ -13,7 +16,7 @@ classdef BicycleDriveContinuous < MDP
         daction = 2;
         dreward = 1;
         isAveraged = 0;
-        gamma = 0.995;
+        gamma = 0.98; % 0.98 Ernst, 0.99 Randlov
 
         % Bounds : state = (theta, theta_dot, omega, omega_dot, psi, xf, yf, xb, yb)
         stateLB = [-1.3963 -inf -pi/15 -inf -pi -inf -inf -inf]';
@@ -58,6 +61,10 @@ classdef BicycleDriveContinuous < MDP
         
         function [nextstate, reward, absorb] = simulator(obj, state, action)
             % Parse input
+            real_action = bsxfun(@max, bsxfun(@min,action,obj.actionUB), obj.actionLB);
+%             penalty_action = matrixnorms(real_action-action,2);
+            action = real_action;
+            
             T = action(1,:); % torque
             d = action(2,:); % displacement
             
@@ -100,6 +107,7 @@ classdef BicycleDriveContinuous < MDP
             omega     = omega     + omega_dot   * obj.dt;
             theta_dot = theta_dot + theta_d_dot * obj.dt;
             theta     = theta     + theta_dot   * obj.dt;
+            theta = wrapinpi(theta);
             idx = abs(theta) > 1.3963; % handlebars cannot turn more than 80 degrees
             theta(idx) = sign(theta(idx)) * 1.3963;
 
@@ -151,7 +159,8 @@ classdef BicycleDriveContinuous < MDP
             isgoal = dist_goal < obj.goalradius;
 
             % Compute reward
-            reward = obj.rewardAngle(nextstate);
+%             reward = obj.rewardRandlov(nextstate);
+            reward = obj.rewardErnst(state,nextstate);
             reward(isfallen) = -1;
             reward(isgoal & ~isfallen) = 0.01;
             
@@ -163,11 +172,9 @@ classdef BicycleDriveContinuous < MDP
         end
         
         %% Reward functions
-        function reward = rewardAngleCustom(obj, nextstate)
-        % This reward function is not the one described in the original
-        % paper, but it is the one used in the original implementation (by 
-        % the same authors). See the code linked at the beginning of the 
-        % class for more info.
+        function reward = rewardRandlovCustom(obj, nextstate)
+        % Reward function used in the original implementation. See the code 
+        % linked at the beginning of the class for more info.
             xf        = nextstate(6,:);
             yf        = nextstate(7,:);
             xb        = nextstate(8,:);
@@ -185,16 +192,47 @@ classdef BicycleDriveContinuous < MDP
             reward = (0.95 - psi_goal.^2) * 0.0001;
         end         
         
-        function reward = rewardAngle(obj, nextstate)
-        % This is the reward function defined in the original paper.
-            theta     = nextstate(1,:);
-            psi       = nextstate(5,:);
+        function reward = rewardRandlov(obj, nextstate)
+        % Reward function defined in the original paper.
+            xf = nextstate(6,:);
+            yf = nextstate(7,:);
+            
+            psi_goal = zeros(1,size(nextstate,2));
+            delta_y = obj.goal(2) - yf;
+            idx = (xf == obj.goal(1)) & (delta_y < 0.0);
+            psi_goal(idx) = pi;
+            idx = ~idx & delta_y > 0.0;
+            psi_goal(idx) = atan((xf(idx) - obj.goal(1)) ./ delta_y(idx));
+            psi_goal(~idx) = sign(xf(~idx) - obj.goal(1)) * 0.5 * pi - atan(delta_y(~idx) ./ (xf(~idx) - obj.goal(1)));
 
-            % (psi+theta) is the angle of the front tyre wrt the y-axis
-            % cart2pol(...) is the angle of the goal wrt the y-axis
-            psi_goal = (psi + theta) - cart2pol(obj.goal(2),-obj.goal(1));
             reward = (4 - psi_goal.^2) * 0.00004;
-        end        
+        end
+        
+        function reward = rewardErnst(obj, state, nextstate)
+        % Reward function defined in "Tree-Based Batch Mode Reinforcement 
+        % Learning (2005)" by Ernst et al.
+            xf1 = state(6,:);
+            yf1 = state(7,:);
+            xf2 = nextstate(6,:);
+            yf2 = nextstate(7,:);
+            
+            psi_goal1 = zeros(1,size(nextstate,2));
+            psi_goal2 = zeros(1,size(nextstate,2));
+            delta_y1 = obj.goal(2) - yf1;
+            delta_y2 = obj.goal(2) - yf2;
+            idx1 = (xf1 == obj.goal(1)) & (delta_y1 < 0.0);
+            idx2 = (xf2 == obj.goal(1)) & (delta_y2 < 0.0);
+            psi_goal1(idx1) = pi;
+            psi_goal2(idx2) = pi;
+            idx1 = ~idx1 & delta_y1 > 0.0;
+            idx2 = ~idx2 & delta_y2 > 0.0;
+            psi_goal1(idx1) = atan((xf1(idx1) - obj.goal(1)) ./ delta_y1(idx1));
+            psi_goal2(idx2) = atan((xf2(idx2) - obj.goal(1)) ./ delta_y2(idx2));
+            psi_goal1(~idx1) = sign(xf1(~idx1) - obj.goal(1)) * 0.5 * pi - atan(delta_y1(~idx1) ./ (xf1(~idx1) - obj.goal(1)));
+            psi_goal2(~idx2) = sign(xf2(~idx2) - obj.goal(1)) * 0.5 * pi - atan(delta_y2(~idx2) ./ (xf2(~idx2) - obj.goal(1)));
+
+            reward = 0.1 * (psi_goal1 - psi_goal2);
+        end
         
     end
     
@@ -211,7 +249,7 @@ classdef BicycleDriveContinuous < MDP
             box on
             xlabel x, ylabel y, zlabel z
             view(35,75)
-            rotate3d on
+%             rotate3d on
         end
         
         function updateplot(obj, state)
