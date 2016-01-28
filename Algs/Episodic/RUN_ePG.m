@@ -1,4 +1,4 @@
-N = 50;
+N = 100;
 N_MAX = N * 10;
 if makeDet, policy = policy.makeDeterministic; end
 
@@ -29,7 +29,7 @@ while true
     avgRew = mean(J_iter(robj,:));
     J_history(:,iter) = J_iter(:,robj);
     fprintf( '%d) Avg Reward: %.4f, \tNorm: %.2f, \tEntropy: %.3f\n', ...
-        iter, avgRew, norm(grad(:,robj)), policy_high.entropy );
+        iter, avgRew, norm(grad(:,robj)), policy_high.entropy(Theta_iter) );
 
     policy_high = policy_high.update(policy_high.theta + grad(:,robj)*stepsize(robj));
 

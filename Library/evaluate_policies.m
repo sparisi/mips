@@ -46,9 +46,12 @@ while ( (step < maxsteps) && sum(ongoing) > 0 )
     % Select action
     for i = 1 : npolicy
         idx = (i-1)*episodes+1 : (i-1)*episodes+episodes;
-        action(:,idx(ongoing(idx))) = policies(i).drawAction(state(:, idx(ongoing(idx))));
+        doStates = state(:, idx(ongoing(idx)));
+        if ~isempty(doStates)
+            action(:,idx(ongoing(idx))) = policies(i).drawAction(state(:, idx(ongoing(idx))));
+        end
     end
-    
+
     % Simulate one step of all running episodes at the same time
     if nargin < 5
         [nextstate, reward, endsim] = feval(simulator, state(:,ongoing), action(:,ongoing));

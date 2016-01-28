@@ -28,7 +28,7 @@ while true
     avgRew = mean(J_iter(robj,:));
     J_history(:,iter) = J_iter(robj,:);
     fprintf( '%d) Avg Reward: %.4f, \tKL Div: %.2f, \tEntropy: %.3f\n', ...
-        iter, avgRew, divKL, policy_high.entropy );
+        iter, avgRew, divKL, policy_high.entropy(Theta_iter) );
     
     policy_high = policy_high.weightedMLUpdate(weights, Theta);
     
