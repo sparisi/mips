@@ -50,3 +50,40 @@ This folder contains functions used in the multi-objective framework, e.g., hype
 
 ### Utilities
 Utility functions used for matrix operations, plotting and sampling are stored in this folder.
+
+
+# Visualization
+---------------
+
+Here is a list with examples of all ways of visualizing a particular data / animation. Please note that not all MDPs support an animation.
+
+### Real time data plotting
+During the learning, it is possible to plot in real time a desired data (e.g., the return `J`) by using `updateplot`. 
+
+`updateplot('Return',iter,J,1)`
+
+### Mean and std of data from multiple trials
+If you are interested on evaluating an algorithm on several trials you can use the function `shadedErrorBar`. For a complete example, please refer to `trialsplot.m`.
+
+### Real time animation
+Launch `mdp.showplot` to initialize the plotting and an animation of the agent-environment interaction will be shown during the learning. To stop plotting use `mdp.closeplot`.
+
+> **IMPORTANT!** This is possible only if you are learning using one episode per iteration.
+
+### Offline animation
+
+- For step-based algorithms, you can directly use the built-in plotting function of the MDPs.
+As `collect_samples` returns a low-level dataset of the episodes, you just have to call `mdp.plotepisode`
+
+`data = collect_samples(mdp,policy,episodes,steps,policy);
+mdp.plotepisode(data(1),0.001)`
+
+- For episode-based algorithms, the low-level dataset is not returned. In this case, you can call `show_simulation`, which executes only one episode and shows an animation. This approach can be used also in step-based algorithms.
+
+`show_policy(mdp,policy,0.001,1)` or `show_policy(mdp,policy.update(policy_high.drawAction(1)),0.001,1)`
+
+### MOMDPs Pareto frontier
+
+To plot a set of points as a Pareto frontier of a MOMDP, use `mdp.plotfront`. Each MOMDP has its only plotting style for better clarity. Please note that the points have to be passed as rows and that the function does not filter dominated points.
+
+`mdp.plotfront([0.5 0.5; 1 0; 0 1])`
