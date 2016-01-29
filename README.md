@@ -8,7 +8,7 @@ It requires the *Optimization Toolbox*.
 Some utility functions are imported from File Exchange (original authors are always acknowledged).
 
 
-# Code Structure
+# Code structure
 ----------------
 
 Launch `INSTALL` to add the path of all folders.
@@ -80,7 +80,7 @@ mdp.plotepisode(data(1),0.001)`
 
 - For episode-based algorithms, the low-level dataset is not returned. In this case, you can call `show_simulation`, which executes only one episode and shows an animation. This approach can be used also in step-based algorithms.
 
-`show_policy(mdp,policy,0.001,1)` or `show_policy(mdp,policy.update(policy_high.drawAction(1)),0.001,1)`
+`show_policy(mdp,policy,0.001,100)` or `show_policy(mdp,policy.update(policy_high.drawAction(1)),0.001,100)`
 
 ### MOMDPs Pareto frontier
 
