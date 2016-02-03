@@ -19,8 +19,8 @@ classdef BicycleDriveContinuous < MDP
         gamma = 0.98; % 0.98 Ernst, 0.99 Randlov
 
         % Bounds : state = (theta, theta_dot, omega, omega_dot, psi, xf, yf, xb, yb)
-        stateLB = [-1.3963 -inf -pi/15 -inf -pi -inf -inf -inf]';
-        stateUB = [1.3963 inf pi/15 inf pi inf inf inf]';
+        stateLB = [-1.3963 -inf -pi/15 -inf -pi -inf -inf -inf -inf]';
+        stateUB = [1.3963 inf pi/15 inf pi inf inf inf inf]';
         actionLB = [-2 -0.02]';
         actionUB = [2 0.02]';
         rewardLB = -inf;
@@ -107,7 +107,7 @@ classdef BicycleDriveContinuous < MDP
             omega     = omega     + omega_dot   * obj.dt;
             theta_dot = theta_dot + theta_d_dot * obj.dt;
             theta     = theta     + theta_dot   * obj.dt;
-            theta = wrapinpi(theta);
+%             theta = wrapinpi(theta);
             idx = abs(theta) > 1.3963; % handlebars cannot turn more than 80 degrees
             theta(idx) = sign(theta(idx)) * 1.3963;
 
@@ -196,14 +196,12 @@ classdef BicycleDriveContinuous < MDP
         % Reward function defined in the original paper.
             xf = nextstate(6,:);
             yf = nextstate(7,:);
-            
-            psi_goal = zeros(1,size(nextstate,2));
-            delta_y = obj.goal(2) - yf;
-            idx = (xf == obj.goal(1)) & (delta_y < 0.0);
-            psi_goal(idx) = pi;
-            idx = ~idx & delta_y > 0.0;
-            psi_goal(idx) = atan((xf(idx) - obj.goal(1)) ./ delta_y(idx));
-            psi_goal(~idx) = sign(xf(~idx) - obj.goal(1)) * 0.5 * pi - atan(delta_y(~idx) ./ (xf(~idx) - obj.goal(1)));
+            xb = nextstate(8,:);
+            yb = nextstate(9,:);
+
+            v1 = [xf-xb; yf-yb];
+            v2 = [obj.goal(1)-xb; obj.goal(2)-yb];
+            psi_goal = acos(dot(v1,v2)./(matrixnorms(v1,2).*matrixnorms(v2,2)));
 
             reward = (4 - psi_goal.^2) * 0.00004;
         end
@@ -213,25 +211,21 @@ classdef BicycleDriveContinuous < MDP
         % Learning (2005)" by Ernst et al.
             xf1 = state(6,:);
             yf1 = state(7,:);
+            xb1 = state(8,:);
+            yb1 = state(9,:);
             xf2 = nextstate(6,:);
             yf2 = nextstate(7,:);
-            
-            psi_goal1 = zeros(1,size(nextstate,2));
-            psi_goal2 = zeros(1,size(nextstate,2));
-            delta_y1 = obj.goal(2) - yf1;
-            delta_y2 = obj.goal(2) - yf2;
-            idx1 = (xf1 == obj.goal(1)) & (delta_y1 < 0.0);
-            idx2 = (xf2 == obj.goal(1)) & (delta_y2 < 0.0);
-            psi_goal1(idx1) = pi;
-            psi_goal2(idx2) = pi;
-            idx1 = ~idx1 & delta_y1 > 0.0;
-            idx2 = ~idx2 & delta_y2 > 0.0;
-            psi_goal1(idx1) = atan((xf1(idx1) - obj.goal(1)) ./ delta_y1(idx1));
-            psi_goal2(idx2) = atan((xf2(idx2) - obj.goal(1)) ./ delta_y2(idx2));
-            psi_goal1(~idx1) = sign(xf1(~idx1) - obj.goal(1)) * 0.5 * pi - atan(delta_y1(~idx1) ./ (xf1(~idx1) - obj.goal(1)));
-            psi_goal2(~idx2) = sign(xf2(~idx2) - obj.goal(1)) * 0.5 * pi - atan(delta_y2(~idx2) ./ (xf2(~idx2) - obj.goal(1)));
+            xb2 = nextstate(8,:);
+            yb2 = nextstate(9,:);
 
-            reward = 0.1 * (psi_goal1 - psi_goal2);
+            v1 = [xf1-xb1; yf1-yb1];
+            v2 = [obj.goal(1)-xb1; obj.goal(2)-yb1];
+            psi_goal1 = acos(dot(v1,v2)./(matrixnorms(v1,2).*matrixnorms(v2,2)));
+            v1 = [xf2-xb2; yf2-yb2];
+            v2 = [obj.goal(1)-xb2; obj.goal(2)-yb2];
+            psi_goal2 = acos(dot(v1,v2)./(matrixnorms(v1,2).*matrixnorms(v2,2)));
+
+            reward = - 0.1 * (psi_goal1 - psi_goal2);
         end
         
     end

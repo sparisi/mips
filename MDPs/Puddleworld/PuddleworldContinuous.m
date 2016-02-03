@@ -43,7 +43,7 @@ classdef PuddleworldContinuous < MDP
             action = bsxfun(@max, bsxfun(@min,action,obj.actionUB), obj.actionLB);
 
             % Transition function
-            nextstate = state + action + mymvnrnd(0,0.01^2,size(state,2));
+            nextstate = state + steps(:,action) + mymvnrnd([0;0],0.01^2*eye(2),size(state,2));
             nextstate = bsxfun(@max, bsxfun(@min,nextstate,obj.stateUB), obj.stateLB);
             
             goaldistance = matrixnorms(bsxfun(@minus,nextstate,obj.goal),2);
