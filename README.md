@@ -80,10 +80,10 @@ mdp.plotepisode(data(1),0.001)`
 
 - For episode-based algorithms, the low-level dataset is not returned. In this case, you can call `show_simulation`, which executes only one episode and shows an animation. This approach can be used also in step-based algorithms.
 
-`show_policy(mdp,policy,0.001,100)` or `show_policy(mdp,policy.update(policy_high.drawAction(1)),0.001,100)`
+`show_simulation(mdp,policy,0.001,100)` or `show_simulation(mdp,policy.update(policy_high.drawAction(1)),0.001,100)`
 
 ### MOMDPs Pareto frontier
 
-To plot a set of points as a Pareto frontier of a MOMDP, use `mdp.plotfront`. Each MOMDP has its only plotting style for better clarity. Please note that the points have to be passed as rows and that the function does not filter dominated points.
+To plot a set of points as a Pareto frontier of a MOMDP, use `mdp.plotfront`. Each MOMDP has its own plotting style for better clarity. Please note that the points have to be passed as rows and that the function does not filter dominated points.
 
 `mdp.plotfront([0.5 0.5; 1 0; 0 1])`
