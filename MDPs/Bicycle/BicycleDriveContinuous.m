@@ -175,10 +175,10 @@ classdef BicycleDriveContinuous < MDP
         function reward = rewardRandlovCustom(obj, nextstate)
         % Reward function used in the original implementation. See the code 
         % linked at the beginning of the class for more info.
-            xf        = nextstate(6,:);
-            yf        = nextstate(7,:);
-            xb        = nextstate(8,:);
-            yb        = nextstate(9,:);
+            xf = nextstate(6,:);
+            yf = nextstate(7,:);
+            xb = nextstate(8,:);
+            yb = nextstate(9,:);
 
             psi_goal = (xf-xb) .* (obj.goal(1)-xf) + (yf-yb) .* (obj.goal(2)-yf);
             scalar = psi_goal ./ ( obj.l .* sqrt( (obj.goal(1)-xf).^2 + (obj.goal(2)-yf).^2 ) );
@@ -225,7 +225,7 @@ classdef BicycleDriveContinuous < MDP
             v2 = [obj.goal(1)-xb2; obj.goal(2)-yb2];
             psi_goal2 = acos(dot(v1,v2)./(matrixnorms(v1,2).*matrixnorms(v2,2)));
 
-            reward = - 0.1 * (psi_goal1 - psi_goal2);
+            reward = - 0.1 * (abs(psi_goal1) - abs(psi_goal2));
         end
         
     end

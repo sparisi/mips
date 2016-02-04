@@ -4,6 +4,7 @@ classdef PuddleworldContinuous < MDP
     properties
         % Environment variables
         goal = [1 1]';
+        step = 0.05;
         p1 = [0.1 0.75; % Centers of the first puddle
             0.45 0.75];
         p2 = [0.45 0.4; % Centers of the second puddle
@@ -43,16 +44,15 @@ classdef PuddleworldContinuous < MDP
             action = bsxfun(@max, bsxfun(@min,action,obj.actionUB), obj.actionLB);
 
             % Transition function
-            nextstate = state + steps(:,action) + mymvnrnd([0;0],0.01^2*eye(2),size(state,2));
+            nextstate = state + action + mymvnrnd([0;0],0.01^2*eye(2),size(state,2));
             nextstate = bsxfun(@max, bsxfun(@min,nextstate,obj.stateUB), obj.stateLB);
             
-            goaldistance = matrixnorms(bsxfun(@minus,nextstate,obj.goal),2);
-
             % Distance from the nearest edge of the puddle + Time penalty
             reward = obj.puddlepenalty(nextstate) - 1;
             
             % Terminal condition
-            absorb = goaldistance <= 0.05;
+            goaldistance = matrixnorms(bsxfun(@minus,nextstate,obj.goal),2);
+            absorb = goaldistance <= obj.step;
             
             if obj.realtimeplot, obj.updateplot(nextstate), end
         end
