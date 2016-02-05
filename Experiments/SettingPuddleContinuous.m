@@ -13,8 +13,8 @@ bfs = @puddle_basis_rbf;
 
 A0 = zeros(daction,bfs()+1);
 Sigma0 = eye(daction);
-policy = GaussianLinearDiag2(bfs, daction, A0, Sigma0);
-% policy = GaussianLinearChol2(bfs, daction, A0, Sigma0);
+policy = GaussianLinearDiag(bfs, daction, A0, Sigma0);
+% policy = GaussianLinearChol(bfs, daction, A0, Sigma0);
 
 
 %% ===================================================================== %%

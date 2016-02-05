@@ -51,8 +51,7 @@ classdef Puddleworld < MDP
             reward = obj.puddlepenalty(nextstate) - 1;
             
             % Terminal condition
-            goaldistance = matrixnorms(bsxfun(@minus,nextstate,obj.goal),2);
-            absorb = goaldistance <= obj.step;
+            absorb = sum(nextstate,1) >= 1.9;
             
             if obj.realtimeplot, obj.updateplot(nextstate), end
         end
@@ -106,8 +105,8 @@ classdef Puddleworld < MDP
             patch([0.35 0.55 0.55 0.35], [0.4 0.4 0.8 0.8], grey, 'EdgeAlpha', 0)
             
             % Triangle
-            x = [0.95, 1.0, 1.0];
-            y = [1.0, 0.95, 1.0];
+            x = [0.9, 1.0, 1.0];
+            y = [1.0, 0.9, 1.0];
             fill(x, y, 'r')
             
             axis([0 1 0 1])
@@ -115,7 +114,7 @@ classdef Puddleworld < MDP
             axis square
 
             % Agent
-            obj.handleAgent = plot(0,0,'ro','MarkerSize',8,'MarkerFaceColor','r');
+            obj.handleAgent = plot(0.1,0.2,'ko','MarkerSize',12,'MarkerFaceColor','b');
         end
         
         function updateplot(obj, state)

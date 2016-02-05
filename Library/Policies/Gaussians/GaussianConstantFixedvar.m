@@ -54,7 +54,7 @@ classdef GaussianConstantFixedvar < GaussianConstant
             obj.U = chol(obj.Sigma);
         end
         
-        function obj = randomize(obj)
+        function obj = randomize(obj, varargin)
             warning('This policy cannot be randomized!')
         end
         

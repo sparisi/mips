@@ -62,7 +62,7 @@ classdef GaussianConstantLogistic < GaussianConstant
             obj = obj.update(obj.theta);
         end
         
-        function obj = randomize(obj)
+        function obj = randomize(obj, varargin)
             warning('Not implemented for this policy!')
         end
         

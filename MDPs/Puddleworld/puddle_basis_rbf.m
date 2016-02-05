@@ -1,6 +1,6 @@
 function phi = puddle_basis_rbf(state)
 
-n_centers = 4;
+n_centers = 7;
 range = [0 1; 0 1];
 
 % If no arguments just return the number of basis functions

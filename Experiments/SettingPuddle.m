@@ -12,7 +12,7 @@ nactions = mdp.actionUB;
 bfs = @puddle_basis_rbf;
 
 policy = Gibbs(bfs, zeros((bfs()+1)*(nactions-1),1), mdp.actionLB:mdp.actionUB);
-policy = EGreedy(bfs, zeros((bfs()+1)*(nactions-1),1), mdp.actionLB:mdp.actionUB, 1);
+% policy = EGreedy(bfs, zeros((bfs()+1)*(nactions-1),1), mdp.actionLB:mdp.actionUB, 1);
 
 
 %% ===================================================================== %%
@@ -31,5 +31,5 @@ policy_high = GaussianConstantChol(n_params, mu0, Sigma0high);
 %  ======================== LEARNING SETTINGS ==========================  %
 episodes_eval = 500;
 steps_eval = 100;
-episodes_learn = 50;
+episodes_learn = 150;
 steps_learn = 100;

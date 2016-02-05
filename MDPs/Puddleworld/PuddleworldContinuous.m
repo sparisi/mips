@@ -35,13 +35,13 @@ classdef PuddleworldContinuous < MDP
         
         %% Simulator
         function state = initstate(obj, n)
-            state = rand(2,n);
+            state = multigrid(ceil(sqrt(n)),[0,1]',[0,1]');
             if obj.realtimeplot, obj.showplot; obj.updateplot(state); end
         end
         
         function [nextstate, reward, absorb] = simulator(obj, state, action)
             % Bound the action
-            action = bsxfun(@max, bsxfun(@min,action,obj.actionUB), obj.actionLB);
+            action = bsxfun(@times,action,1./matrixnorms(action,2)) * obj.step;
 
             % Transition function
             nextstate = state + action + mymvnrnd([0;0],0.01^2*eye(2),size(state,2));
@@ -51,8 +51,7 @@ classdef PuddleworldContinuous < MDP
             reward = obj.puddlepenalty(nextstate) - 1;
             
             % Terminal condition
-            goaldistance = matrixnorms(bsxfun(@minus,nextstate,obj.goal),2);
-            absorb = goaldistance <= obj.step;
+            absorb = sum(nextstate,1) >= 1.9;
             
             if obj.realtimeplot, obj.updateplot(nextstate), end
         end
@@ -130,16 +129,16 @@ classdef PuddleworldContinuous < MDP
             patch([0.6 0.8 0.8 0.6], [0.75 0.75 0.8 0.8], grey, 'EdgeAlpha', 0)
             
             % Triangle
-            x = [0.95, 1.0, 1.0];
-            y = [1.0, 0.95, 1.0];
-            fill(x, y, 'r')
+            x = [0.9, 1.0, 1.0];
+            y = [1.0, 0.9, 1.0];
+            fill(x, y, 'g')
             
             axis([0 1 0 1])
             box on
             axis square
 
             % Agent
-            obj.handleAgent = plot(0,0,'ro','MarkerSize',8,'MarkerFaceColor','r');
+            obj.handleAgent = plot(0.1,0.2,'ko','MarkerSize',12,'MarkerFaceColor','b');
         end
         
         function updateplot(obj, state)

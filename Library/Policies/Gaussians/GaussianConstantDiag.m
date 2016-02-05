@@ -108,7 +108,7 @@ classdef GaussianConstantDiag < GaussianConstant
             obj = obj.update(obj.theta);
         end
         
-        function obj = randomize(obj)
+        function obj = randomize(obj, factor)
             obj.theta(end-obj.daction+1:end) = ... 
                 obj.theta(end-obj.daction+1:end) * factor;
             obj = obj.update(obj.theta);
