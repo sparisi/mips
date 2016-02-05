@@ -63,7 +63,7 @@ During the learning, it is possible to plot in real time a desired data (e.g., t
 `updateplot('Return',iter,J,1)`
 
 ### Mean and std of data from multiple trials
-If you are interested on evaluating an algorithm on several trials you can use the function `shadedErrorBar`. For a complete example, please refer to `trialsplot.m`.
+If you are interested on evaluating an algorithm on several trials you can use the function `shadedErrorBar`. For a complete example, please refer to `myplot.m`.
 
 ### Real time animation
 Launch `mdp.showplot` to initialize the plotting and an animation of the agent-environment interaction will be shown during the learning. To stop plotting use `mdp.closeplot`.
