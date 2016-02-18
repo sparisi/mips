@@ -99,7 +99,7 @@ classdef Dam < MOMDP
             % Transition dynamic
             action = bounded_action;
             dam_inflow = mymvnrnd(obj.DAM_INFLOW_MEAN, obj.DAM_INFLOW_STD^2, nstates);
-            nextstate = state + dam_inflow - action;
+            nextstate = max(state + dam_inflow - action, 0); % There is a very small chance that dam_inflow < 0
             
             % Cost due to the excess level w.r.t. a flooding threshold (upstream)
             reward(1,:) = -max(nextstate/obj.S - obj.H_FLO_U, 0) + penalty;

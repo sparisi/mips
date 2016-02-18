@@ -13,7 +13,7 @@ bfs = @mc_basis_rbf;
 bfs = @(varargin)basis_poly(1,mdp.dstate,0,varargin{:});
 
 A0 = zeros(daction,bfs()+1);
-Sigma0 = 10;
+Sigma0 = 16;
 % policy = GaussianLinearDiag(bfs, daction, A0, Sigma0);
 policy = GaussianLinearChol(bfs, daction, A0, Sigma0);
 

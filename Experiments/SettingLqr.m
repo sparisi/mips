@@ -39,5 +39,5 @@ policy_high = GaussianConstantDiag(n_params, mu0, Sigma0high);
 %  ======================== LEARNING SETTINGS ==========================  %
 episodes_eval = 150;
 steps_eval = 50;
-episodes_learn = 150;
+episodes_learn = 50;
 steps_learn = 50;

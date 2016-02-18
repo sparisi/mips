@@ -3,7 +3,7 @@ function K = kernel(X, Y, type, param)
 %
 %    INPUT
 %     - X     : [N x D] matrix (N samples, D dimension)
-%     - Y     : [M x D] matrix (N samples, D dimension)
+%     - Y     : [M x D] matrix (M samples, D dimension)
 %     - type  : kernel name
 %     - param : kernel parameters
 %

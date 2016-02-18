@@ -12,7 +12,7 @@ daction = mdp.daction;
 bfs = @bicycledrive_basis_poly;
 
 A0 = zeros(daction,bfs()+1);
-Sigma0 = [2 0; 0 0.02];
+Sigma0 = [4 0; 0 0.04];
 policy = GaussianLinearDiag(bfs, daction, A0, Sigma0);
 % policy = GaussianLinearChol(bfs, daction, A0, Sigma0);
 
