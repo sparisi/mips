@@ -3,10 +3,10 @@ classdef DoubleCartPole2 < MDP
 % S Loscalzo, R Wright, L Yu
 % Predictive feature selection for genetic policy search (2014)
 %
-% Differences from the original one:
+% Differences from the original cart-pole:
 % - additional 0 action
-% - the friction 'mu_c' is 0
-% - the timestep 'dt' is smaller
+% - friction 'mu_c' is 0
+% - timestep 'dt' is smaller
 % - different state bounds
 % - different reward
     

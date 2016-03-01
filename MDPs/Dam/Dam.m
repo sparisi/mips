@@ -110,7 +110,7 @@ classdef Dam < MOMDP
             q = max(action - obj.Q_MEF, 0);
             p_hyd = obj.ETA .* obj.G .* obj.GAMMA_H2O .* nextstate ./ obj.S .* q ./ (3.6e6);
             
-            % Deficit in the hydroelectric supply w.r.t the hydroelectric demand
+            % Deficit in the hydroelectric supply w.r.t. the hydroelectric demand
             reward(3,:) = -max(obj.W_HYD - p_hyd, 0) + penalty;
             
             % Cost due to the excess level w.r.t. a flooding threshold (downstream)

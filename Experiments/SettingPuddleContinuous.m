@@ -9,7 +9,7 @@ dreward = mdp.dreward;
 gamma = mdp.gamma;
 daction = mdp.daction;
 
-bfs = @puddle_basis_rbf;
+bfs = @(varargin)basis_krbf(10,[0 1; 0 1],varargin{:});
 
 A0 = zeros(daction,bfs()+1);
 Sigma0 = eye(daction);

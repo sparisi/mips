@@ -74,10 +74,11 @@ classdef DamCtx < CMDP
             q = max(action - obj.Q_MEF, 0);
             p_hyd = context(5,:) .* obj.G .* obj.GAMMA_H2O .* nextstate ./ context(3,:) .* q ./ (3.6e6);
             
-            % Deficit in the hydroelectric supply w.r.t the hydroelectric demand
+            % Deficit in the hydroelectric supply w.r.t. the hydroelectric demand
             reward(3,:) = -max(context(6,:) - p_hyd, 0);
             
-            reward = sum(reward,1) + penalty;
+%             reward = sum(reward,1) + penalty;
+            reward = reward(1,:) + reward(3,:) + penalty;
             absorb = false(1,nstates);
 
             if obj.realtimeplot, obj.updateplot(nextstate); end

@@ -9,7 +9,7 @@ dreward = mdp.dreward;
 gamma = mdp.gamma;
 nactions = mdp.actionUB;
 
-bfs = @puddle_basis_rbf;
+bfs = @(varargin)basis_krbf(4,[0 1; 0 1],varargin{:});
 
 policy = Gibbs(bfs, zeros((bfs()+1)*(nactions-1),1), mdp.actionLB:mdp.actionUB);
 

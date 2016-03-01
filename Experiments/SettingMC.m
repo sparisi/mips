@@ -9,7 +9,7 @@ dreward = mdp.dreward;
 gamma = mdp.gamma;
 nactions = mdp.actionUB;
 
-bfs = @mc_basis_rbf;
+bfs = @(varargin)basis_krbf(4,[-1 1;-3 3],varargin{:});
 
 policy = Gibbs(bfs, zeros((bfs()+1)*(nactions-1),1), mdp.actionLB:mdp.actionUB);
 

@@ -1,6 +1,6 @@
 function phi = damctx_basis_rbf(state)
     
-n_centers = 6;
+n_centers = 8;
 range = [-20 320];
 width = 60;
 if nargin == 0
