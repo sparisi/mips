@@ -1,9 +1,9 @@
 function Phi = basis_krbf(n_centers, range, state)
-% BASIS_KRBF Uniformly distributed Kernel Radial Basis Functions. Centers  
-% and bandwidths are automatically computed to attain 25% of overlapping  
-% and peaks between 0.95-0.99.
+% BASIS_KRBF Kernel Radial Basis Functions. 
 % Phi = exp( -0.5 * (state - centers)' * B^-1 * (state - centers) ), 
 % where B is a diagonal matrix denoting the bandwiths of the kernels.
+% Centers are uniformly placed in RANGE and bandwidths are automatically 
+% computed. See the code for more details.
 %
 %    INPUT
 %     - n_centers : number of centers (the same for all dimensions)
@@ -16,21 +16,13 @@ function Phi = basis_krbf(n_centers, range, state)
 %     - Phi       : if a state is provided as input, the function 
 %                   returns the feature vectors representing it; 
 %                   otherwise it returns the number of features
-%
-% =========================================================================
-% EXAMPLE
-% basis_krbf(2, [0,1; 0,1], [0.2, 0.1]')
-%     0.7118
-%     0.0508
-%     0.0211
-%     0.0015
 
 persistent centers bands
 
 % Compute bandwidths and centers only once
 if isempty(centers)
     dim_state = size(range,1);
-    bands = diff(range,[],2).^2 / n_centers^3;
+    bands = diff(range,[],2).^2 / (2 * n_centers^2); % change the denominator for wider/narrower bandwidth
     m = diff(range,[],2) / n_centers;
     
     c = cell(dim_state, 1);
