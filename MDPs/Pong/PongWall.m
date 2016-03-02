@@ -20,8 +20,8 @@ classdef PongWall < MDP
         GOAL_SIZE = PongWall.PLOT_H;
         GOAL_TOP = (PongWall.PLOT_H + PongWall.GOAL_SIZE) / 2;
         GOAL_BOT = (PongWall.PLOT_H - PongWall.GOAL_SIZE) / 2;
-        PADDLE_H = 18;
-        PADDLE_W = 3;
+        PADDLE_H = 14;
+        PADDLE_W = 2;
         PADDLE_X = 10;
         
         FIGURE_COLOR = [0, 0, 0];
@@ -72,7 +72,7 @@ classdef PongWall < MDP
     methods
 
         function state = initstate(obj, n)
-            % Random init ball velocity
+            % Random init ball direction
             ballVector = [1-(2*rand(1,n)); 1-(2*rand(1,n))];
             ballVector(1,:) = ballVector(1,:) .* ((rand(1,n) / obj.B_FACTOR) + 1);
             ballVector = bsxfun(@times, ballVector, 1 ./ (sqrt(ballVector(1,:).^2 + ballVector(2,:).^2)));
@@ -112,9 +112,9 @@ classdef PongWall < MDP
             % Move ball
             newX = ballX + (ballSpeed .* ballVector(1,:));
             newY = ballY + (ballSpeed .* ballVector(2,:));
-            tmpV = nan(2,n);
 
             % Check bounce
+            tmpV = nan(2,n);
             idx = newX > (obj.PLOT_W - obj.BALL_RADIUS); % Hit right wall
             tmpV(:,idx) = [-1 * abs(ballVector(1,idx)); ballVector(2,idx)];
             idx = newY > (obj.PLOT_H - obj.BALL_RADIUS); % Hit top wall
