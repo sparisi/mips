@@ -25,15 +25,20 @@ classdef PongWall < MDP
         PADDLE_X = 10;
         
         FIGURE_COLOR = [0, 0, 0];
-        AXIS_COLOR = [.15, .15, .15];
+%         AXIS_COLOR = [.15, .15, .15];
+        AXIS_COLOR = [0 0 0];
         CENTER_RADIUS = 15;
         BALL_MARKER_SIZE = 10;
-        BALL_COLOR = [.1, .7, .1];
-        BALL_OUTLINE = [.7, 1, .7];
+%         BALL_COLOR = [.1, .7, .1];
+%         BALL_OUTLINE = [.7, 1, .7];
+        BALL_COLOR = [1 1 1];
+        BALL_OUTLINE = [1 1 1];
         BALL_SHAPE = 'o';
         PADDLE_LINE_WIDTH = 2;
-        WALL_COLOR = [.3, .3, .8];
-        PADDLE_COLOR = [1, .5, 0];
+%         WALL_COLOR = [.3, .3, .8];
+%         PADDLE_COLOR = [1, .5, 0];
+        PADDLE_COLOR = [1 1 1];
+        WALL_COLOR = [1 1 1];
         CENTERLINE_COLOR = PongWall.PADDLE_COLOR .* .8;
     end
         
@@ -163,6 +168,7 @@ classdef PongWall < MDP
             set(gca, 'color', obj.AXIS_COLOR, 'YTick', [], 'XTick', []);
             set(obj.handleEnv, 'color', obj.FIGURE_COLOR);
             hold on
+            
             topWallXs = [0 0 obj.PLOT_W obj.PLOT_W];
             topWallYs = [obj.GOAL_TOP obj.PLOT_H obj.PLOT_H obj.GOAL_TOP];
             bottomWallXs = [0 0 obj.PLOT_W obj.PLOT_W];
@@ -173,21 +179,21 @@ classdef PongWall < MDP
                 'LineWidth', obj.WALL_WIDTH, 'Color', obj.WALL_COLOR);
             plot([obj.PLOT_W, obj.PLOT_W], [0, obj.PLOT_H], ...
                 'LineWidth', obj.WALL_WIDTH, 'Color', obj.WALL_COLOR);
-            thetas = linspace(0, (2*pi), 100);
-            circleXs = (obj.CENTER_RADIUS .* cos(thetas)) + (obj.PLOT_W / 2);
-            circleYs = (obj.CENTER_RADIUS .* sin(thetas))+ (obj.PLOT_H / 2);
+
             centerline = plot([obj.PLOT_W/2, obj.PLOT_W/2], [obj.PLOT_H, 0], '--');
             set(centerline, 'Color', obj.CENTERLINE_COLOR);
-            centerCircle = plot(circleXs, circleYs,'--');
-            set(centerCircle, 'Color', obj.CENTERLINE_COLOR);
-            
-            obj.handleAgent{1} = plot(0,0); % ballPlot
+
+            obj.handleAgent{1} = plot(obj.PLOT_W / 2, obj.PLOT_H / 2);
             set(obj.handleAgent{1}, 'Marker', obj.BALL_SHAPE);
             set(obj.handleAgent{1}, 'MarkerEdgeColor', obj.BALL_OUTLINE);
             set(obj.handleAgent{1}, 'MarkerFaceColor', obj.BALL_COLOR);
             set(obj.handleAgent{1}, 'MarkerSize', obj.BALL_MARKER_SIZE);
-            obj.handleAgent{2} = plot(0,0, '-', 'LineWidth', obj.PADDLE_LINE_WIDTH); % paddle1Plot
-            set(obj.handleAgent{2}, 'Color', obj.PADDLE_COLOR);
+            
+            obj.handleAgent{2} = rectangle('Position', ...
+                [obj.PADDLE_X - obj.PADDLE_W, obj.PLOT_H / 2 - obj.PADDLE_H, 2 * obj.PADDLE_W, 2 * obj.PADDLE_H], ...
+                'FaceColor', obj.PADDLE_COLOR, ...
+                'EdgeColor', obj.PADDLE_COLOR, ...
+                'LineWidth', obj.PADDLE_LINE_WIDTH);
         end
 
         function obj = updateplot(obj, state)
@@ -195,14 +201,10 @@ classdef PongWall < MDP
             ballY = state(2,:);
             paddleY = state(6,:);
             
-            paddle = [obj.PADDLE_X - obj.PADDLE_W, paddleY - obj.PADDLE_H
-                obj.PADDLE_X + obj.PADDLE_W, paddleY - obj.PADDLE_H
-                obj.PADDLE_X + obj.PADDLE_W, paddleY + obj.PADDLE_H
-                obj.PADDLE_X - obj.PADDLE_W, paddleY + obj.PADDLE_H
-                obj.PADDLE_X - obj.PADDLE_W, paddleY - obj.PADDLE_H];
-            
             set(obj.handleAgent{1}, 'XData', ballX, 'YData', ballY);
-            set(obj.handleAgent{2}, 'Xdata', paddle(:,1), 'YData', paddle(:,2));
+            set(obj.handleAgent{2}, 'Position', ...
+                [obj.PADDLE_X - obj.PADDLE_W, paddleY - obj.PADDLE_H, 2 * obj.PADDLE_W, 2 * obj.PADDLE_H]);
+
             drawnow limitrate
         end
 
