@@ -1,4 +1,7 @@
 classdef Pong2P < MDP
+% 2-player pong.
+%
+% =========================================================================
 % Based on the implementation by David Buckingham.
 % http://www.mathworks.com/matlabcentral/fileexchange/31177-dave-s-matlab-pong
     

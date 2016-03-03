@@ -50,17 +50,15 @@ classdef CartPole < MDP
             
             costheta = cos(theta);
             sintheta = sin(theta);
-            
-            polemass_length = obj.masspole .* obj.length;
+            polemass_length = obj.length .* obj.masspole;
+            temp = obj.mu_p .* thetad ./ polemass_length;
+            F_tilde = - obj.masspole .* obj.length .* thetad.^2 .* sintheta ...
+                + 0.75 .* obj.masspole .* costheta .* (obj.g .* sintheta - temp);
+            mass_tilde = obj.masspole .* (1 - 0.75 .* costheta.^2);
 
-            F_effective = polemass_length .* thetad.^2 .* sintheta + ...
-                3 ./ 4 .* obj.masspole .* costheta .* (obj.mu_p .* thetad ./ polemass_length + obj.g .* sintheta);
-            
-            masspole_effective = obj.masspole .* (1 - 3 ./ 4 .* costheta.^2);
-            
-            xdd = F + F_effective - obj.mu_c .* sign(xd) ./ (obj.masscart + masspole_effective);
-            thetadd = - 3 ./ 4 ./ obj.length .* (xdd .* costheta + obj.g .* sintheta + obj.mu_p .* thetad ./ polemass_length);
-            
+            xdd = ( F - obj.mu_c .* sign(xd) + F_tilde ) ./ (obj.masscart + mass_tilde);
+            thetadd = 0.75 .* ( xdd .* costheta + obj.g .* sintheta + temp ) ./ obj.length;
+
             x = x + obj.dt .* xd;
             xd = xd + obj.dt .* xdd;
             theta = theta + obj.dt .* thetad;
@@ -98,7 +96,7 @@ classdef CartPole < MDP
             x1 = state(1);
             y1 = 0.1;
             theta = state(3);
-            x2 = sin(theta) * 2 * obj.length + x1;
+            x2 = -sin(theta) * 2 * obj.length + x1;
             y2 = cos(theta) * 2 * obj.length + y1;
             
             obj.handleAgent{1}.XData = [x1-0.2 x1+0.2];

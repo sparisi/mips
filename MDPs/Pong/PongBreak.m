@@ -1,4 +1,7 @@
 classdef PongBreak < MDP
+% Pong with bricks to break (breakout / brick-breaker game).
+%
+% =========================================================================
 % Based on the implementation by David Buckingham.
 % http://www.mathworks.com/matlabcentral/fileexchange/31177-dave-s-matlab-pong
     

@@ -1,4 +1,7 @@
 classdef Pong1P < MDP
+% 1-player pong (the wall replaces the second player).
+%
+% =========================================================================
 % Based on the implementation by David Buckingham.
 % http://www.mathworks.com/matlabcentral/fileexchange/31177-dave-s-matlab-pong
     

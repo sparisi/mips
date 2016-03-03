@@ -1,14 +1,7 @@
-classdef DoubleCartPole2 < MDP
+classdef CartPoleDouble < MDP
 % REFERENCE
-% S Loscalzo, R Wright, L Yu
-% Predictive feature selection for genetic policy search (2014)
-%
-% Differences from the original cart-pole:
-% - additional 0 action
-% - friction 'mu_c' is 0
-% - timestep 'dt' is smaller
-% - different state bounds
-% - different reward
+% A P Wieland
+% Evolving Controls for Unstable Systems (1991)
     
     %% Properties
     properties
@@ -18,8 +11,8 @@ classdef DoubleCartPole2 < MDP
         masspole = [0.1 0.01]';
         length = [0.5 0.05]'; % Actually distance from the pivot to the poles centre of mass (so full length is the double)
         force = 10.0;
-        dt = 0.01;
-        mu_c = 0.0; % Coefficient of friction of cart on track
+        dt = 0.02;
+        mu_c = 0.0005; % Coefficient of friction of cart on track
         mu_p = 0.000002; % Coefficient of friction of the pole's hinge
         
         % MDP variables
@@ -30,20 +23,20 @@ classdef DoubleCartPole2 < MDP
         gamma = 0.9;
 
         % Bounds : state = [x xd theta thetad]
-        stateLB = [-2.4, -inf, -deg2rad(36), -deg2rad(36) -inf, -inf]';
-        stateUB = [2.4, inf, deg2rad(36), deg2rad(36), inf, inf]';
+        stateLB = [-2.4, -inf, -deg2rad(15), -deg2rad(15) -inf, -inf]';
+        stateUB = [2.4, inf, deg2rad(15), deg2rad(15), inf, inf]';
         actionLB = 1;
-        actionUB = 3;
-        rewardLB = 0;
-        rewardUB = 1;
+        actionUB = 2;
+        rewardLB = -1;
+        rewardUB = 0;
     end
     
     methods
         
         %% Simulator
         function state = initstate(obj,n)
-            initLB = [-2.4, -1, -deg2rad(36), -deg2rad(36) -1, -1]';
-            initUB = [2.4, 1, deg2rad(36), deg2rad(36), 1, 1]';
+            initLB = [-2.4, -1, -deg2rad(15), -deg2rad(15) -1, -1]';
+            initUB = [2.4, 1, deg2rad(15), deg2rad(15), 1, 1]';
             state = bsxfun(@plus, ...
                 bsxfun(@times, (initUB - initLB), rand(obj.dstate,n)), initLB);
             state(1:2,:) = 0; % the cart is always in the middle, with 0 vel
@@ -51,7 +44,7 @@ classdef DoubleCartPole2 < MDP
         end
         
         function [nextstate, reward, absorb] = simulator(obj, state, action)
-            forces = [-obj.force 0 obj.force];
+            forces = [-obj.force obj.force];
             F = forces(action);
             
             x = state(1,:);
@@ -62,18 +55,14 @@ classdef DoubleCartPole2 < MDP
             costheta = cos(theta);
             sintheta = sin(theta);
             
-            polemass_length = obj.masspole .* obj.length;
-
-            F_effective = bsxfun(@times, bsxfun(@times, polemass_length, thetad.^2), sintheta) + ...
-                (3/4) * bsxfun(@times, obj.masspole, costheta) .* ...
-                ( bsxfun(@times, bsxfun(@times, obj.mu_p, thetad), 1./polemass_length) + obj.g * sintheta );
+            polemass_length = obj.length .* obj.masspole;
+            temp = obj.mu_p .* bsxfun(@times, thetad, 1./ polemass_length);
+            F_tilde = - bsxfun(@times, obj.masspole .* obj.length, thetad.^2) .* sintheta ...
+                + 0.75 .* bsxfun(@times, obj.masspole, costheta) .* (obj.g .* sintheta - temp);
+            mass_tilde = bsxfun(@times, obj.masspole, (1 - 0.75 .* costheta.^2));
             
-            masspole_effective = bsxfun(@times, obj.masspole, (1 - (3/4) * costheta.^2));
-            
-            xdd = F + sum(F_effective,1) - ...
-                obj.mu_c * bsxfun(@times, sign(xd), 1./(obj.masscart + sum(masspole_effective,1)));
-            thetadd = - bsxfun(@times, (3/4)./obj.length, ...
-                (bsxfun(@times, xdd, costheta) + obj.g * sintheta + obj.mu_p * bsxfun(@times, thetad, 1./polemass_length)));
+            xdd = ( F - obj.mu_c .* sign(xd) + sum(F_tilde,1) ) ./ (obj.masscart + sum(mass_tilde,1));
+            thetadd = 0.75 .* bsxfun( @times, ( bsxfun(@times, xdd, costheta) + obj.g .* sintheta + temp ), 1 ./ obj.length );
             
             x = x + obj.dt .* xd;
             xd = xd + obj.dt .* xdd;
@@ -85,10 +74,10 @@ classdef DoubleCartPole2 < MDP
             
             nstates = size(state,2);
             absorb = false(1,nstates);
-            reward = ones(1,nstates);
+            reward = zeros(1,nstates);
             fallen = max(bsxfun(@lt, nextstate, obj.stateLB),[],1) | ...
                 max(bsxfun(@gt, nextstate, obj.stateUB),[],1);
-            reward(fallen) = 0;
+            reward(fallen) = -1;
             absorb(fallen) = true;
             
             if obj.realtimeplot, obj.plotAgent(nextstate); end
@@ -117,7 +106,7 @@ classdef DoubleCartPole2 < MDP
             x1 = state(1);
             y1 = 0.1;
             theta = state(3:4);
-            x2 = sin(theta) .* 2 .* obj.length + x1;
+            x2 = -sin(theta) .* 2 .* obj.length + x1;
             y2 = cos(theta) .* 2 .* obj.length + y1;
             
             obj.handleAgent{1}.XData = [x1-0.2 x1+0.2];
