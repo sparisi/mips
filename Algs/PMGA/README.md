@@ -13,9 +13,9 @@ Additional requirements: *Symbolic Toolbox*.
 How To Use It
 -------------
 
-There are two versions of PMGA: exact and sampled. The former is available only for the LQR domain and can be found in *lqr_exact*. As this implementation relies on exact symbolic equations, for the 3-dimensional LQR we provide a MEX interface for a fast estimate of the integrals. If you want to try different parameterizations / indicators or new exact domains, the necessary steps to generate new MEX files are the following:
+There are two versions of PMGA: exact and sampled. The former is available only for the LQR domain and can be found in `lqr_exact`. As this implementation relies on exact symbolic equations and needs to estimate integrals in closed form, for the 3-dimensional LQR we provide a MEX interface for faster computation. If you want to try different parameterizations / indicators or new exact domains, the necessary steps to generate new MEX files are the following:
 
- - run `genCcode` to generate C code from the exact symbolic equations,
+ - run `genCcode` to generate C code from the exact symbolic equations defining your problem,
  - run `genHeader` to generate C headers,
  - run `compileSrc` to build the MEX files.
 
