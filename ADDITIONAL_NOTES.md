@@ -31,5 +31,5 @@ Using the entropy as a scaling factor seems the most reasonable choice, but for 
 ___
 **MORL Frontiers**
 
-When evaluating a policy with *evaluate_policies*, you can choose to make the policy deterministic or not. In MORL, this affects the resulting Pareto frontier, as any convex combination of the points one the deterministic frontier belongs to the stochastic frontier.
+When evaluating a policy with *evaluate_policies*, you can choose to make the policy deterministic or not. In MORL, this affects the resulting Pareto frontier, as any convex combination of the points on the deterministic frontier belongs to the stochastic frontier.
 Of course, considering only deterministic policies is much less time consuming, as only 1 episode is required to evaluate it (except when the environment is stochastic).
