@@ -84,17 +84,15 @@ classdef Gridworld < MDP
         function initplot(obj)
             obj.handleEnv = figure(); hold all
             
-            cells = obj.isopen;
-            cells(obj.reward > 0) = 0.5;
-            
+            cells = obj.reward;
             cells = flipud(cells);
             h = image(cells); % Plot environment
-            colormap([0 0 0; 0.5 0.5 0.5; 1 1 1]);
+            colormap([1 0 0; 1 1 1; 0 1 0]);
             
             imggrid(h,'k',0.5); % Add grid
             axis off
             
-            obj.handleAgent = plot(1,10,'ro','MarkerSize',8,'MarkerFaceColor','r');
+            obj.handleAgent = plot(1,7,'bo','MarkerSize',8,'MarkerFaceColor','b');
         end
         
         function updateplot(obj, state)
