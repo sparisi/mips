@@ -35,16 +35,15 @@ classdef GaussianLinearFixedvar < GaussianLinear
         function hlpdt = hlogPidtheta(obj, state, action)
             nsamples = size(state,2);
             phi = obj.basis1(state);
-            dphi = size(phi,1);
             phimat = kron(phi',eye(obj.daction));
             invSigma = inv(obj.Sigma);
             hlpdt = zeros(obj.dparams,obj.dparams,nsamples);
             for i = 1 : nsamples
-                idx1 = dphi*(i-1)+1;
-                idx2 = idx1+dphi-1;
+                idx1 = obj.daction*(i-1)+1;
+                idx2 = idx1+obj.daction-1;
                 subphimat = phimat(idx1:idx2,:);
                 hlpdt(:,:,i) = - subphimat' * invSigma * subphimat;
-            end            
+            end
         end
 
         %% WML

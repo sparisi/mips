@@ -55,8 +55,8 @@ classdef GaussianLinearDiag < GaussianLinear
             hlogpdt = zeros(obj.dparams,obj.dparams,nsamples);
 
             for i = 1 : nsamples
-                idx1 = dphi*(i-1)+1;
-                idx2 = idx1+dphi-1;
+                idx1 = obj.daction*(i-1)+1;
+                idx2 = idx1+obj.daction-1;
                 subphimat = phimat(idx1:idx2,:);
 
                 % dlogpdt / (dmu dmu)

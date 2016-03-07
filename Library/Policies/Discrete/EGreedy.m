@@ -30,12 +30,13 @@ classdef EGreedy < PolicyDiscrete
         %% Distribution
         function prob_list = distribution(obj, States)
             Q = obj.qFunction(States);
-            [~, idx] = max(Q,[],1);
+            maxval = max(Q,[],1);
+            idx = bsxfun(@ismember,Q,maxval);
             nactions = length(obj.action_list);
             nstates = size(States,2);
-            linearIdx = (0:nstates-1)*nactions + idx;
             prob_list = obj.epsilon / nactions * ones(nactions,nstates);
-            prob_list(linearIdx) = prob_list(linearIdx) + 1 - obj.epsilon;
+            remainder = bsxfun(@times, (1 - obj.epsilon) * ones(size(prob_list)), 1 ./ sum(idx,1));
+            prob_list(idx) = prob_list(idx) + remainder(idx);
             prob_list = bsxfun(@times, prob_list, 1./sum(prob_list)); % Ensure that the sum is 1
         end
 

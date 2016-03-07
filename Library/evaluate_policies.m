@@ -73,8 +73,8 @@ while ( (step < maxsteps) && sum(ongoing) > 0 )
 end
 
 % If we are in the average reward setting, then normalize the return
-if isAveraged && gamma == 1, J = bsxfun(@times, J, 1 ./ endingstep); end
-
 J = permute( mean( reshape(J,[nvar_reward episodes npolicy]), 2), [1 3 2] );
+
+if isAveraged && gamma == 1, J = bsxfun(@times, J, 1 ./ endingstep); end
 
 return
