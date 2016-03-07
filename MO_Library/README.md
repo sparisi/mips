@@ -6,7 +6,7 @@ This observation points out the necessity of normalizing ALL the gradients when 
 ___
 **Policy Randomization in PFA**
 
-PFA (usually) needs to randomization the policy after the optimization of each objective. Such randomization is needed to guarantee enough exploration to optimize the remaining objectives and depends on the policy used. 
+PFA (usually) needs to randomize the policy after the optimization of each objective. Such randomization is needed to guarantee enough exploration to optimize the remaining objectives and depends on the policy used. 
 
 For instance: 
 - for a Gibbs policy we can reduce the temperature or scale theta with a constant factor (e.g., we can halve theta),
