@@ -22,6 +22,11 @@ Also, a history of the results is usually kept. For example, `J_history` stores 
 This folder contains some scripts to set up experiments. Each script inizializes the MDP, the policies and the number of samples and episodes per learning iteration.
 After running a setup script, just run an algorithm script to start the learning.
 
+`SettingMC % mountain car setup` <br />
+`RUN_PG % run policy gradient (terminate by CTRL+C` <br />
+`plot(J_history) % plot average return` <br />
+`show_simulation(mdp,policy.makeDeterministic,0.1,1000) % visualize learned policy (see below)`
+
 Notice that, in the case of episodic (black box) RL, these scripts define both the *low level policy* (the one used by the agent) and the *high level policy* (the sampling distribution used to draw the low level policy parameters).
 In this setting, it is important to set up the variable `makeDet`: if `true`, the low level policy is deterministic (e.g., the covariance of a Gaussian is zeroed and the high level policy only draws its mean).
 
@@ -75,12 +80,13 @@ Launch `mdp.showplot` to initialize the plotting and an animation of the agent-e
 - For step-based algorithms, you can directly use the built-in plotting function of the MDPs.
 As `collect_samples` returns a low-level dataset of the episodes, you just have to call `mdp.plotepisode`
 
-`data = collect_samples(mdp,policy,episodes,steps,policy);
-mdp.plotepisode(data(1),0.001)`
+`data = collect_samples(mdp,policy,episodes,steps,policy)` <br />
+`mdp.plotepisode(data(1),0.001)`
 
 - For episode-based algorithms, the low-level dataset is not returned. In this case, you can call `show_simulation`, which executes only one episode and shows an animation. This approach can be used also in step-based algorithms.
 
-`show_simulation(mdp,policy,0.001,100)` or `show_simulation(mdp,policy.update(policy_high.drawAction(1)),0.001,100)`
+`show_simulation(mdp,policy,0.001,100)` <br />
+`show_simulation(mdp,policy.update(policy_high.drawAction(1)),0.001,100)`
 
 ### MOMDPs Pareto frontier
 
