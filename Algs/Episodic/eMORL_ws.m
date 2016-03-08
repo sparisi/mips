@@ -6,9 +6,9 @@ N = 20;
 N_MAX = N * 1;
 if makeDet, policy = policy.makeDeterministic; end
 solver = REPS_Solver(0.9);
-% solver = NES_Solver(1);
+solver = NES_Solver(1);
 
-verboseOut = false;
+verboseOut = true;
 utopia = mdp.utopia;
 antiutopia = mdp.antiutopia;
 
@@ -51,8 +51,7 @@ for i = 1 : ndir
         Jw = metric(J,W(i,:)');
 
         % Perform an update step
-        [weights, div] = solver.optimize(Jw);
-        current_pol = current_pol.weightedMLUpdate(weights, Theta);
+        [current_pol, div] = solver.step(Jw, Theta, current_pol);
 
         % Print info
         if verboseOut
