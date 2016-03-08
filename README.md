@@ -23,7 +23,7 @@ This folder contains some scripts to set up experiments. Each script inizializes
 After running a setup script, just run an algorithm script to start the learning.
 
 `SettingMC % mountain car setup` <br />
-`RUN_PG % run policy gradient (terminate by CTRL+C` <br />
+`RUN_PG % run policy gradient (terminate by CTRL+C)` <br />
 `plot(J_history) % plot average return` <br />
 `show_simulation(mdp,policy.makeDeterministic,0.1,1000) % visualize learned policy (see below)`
 
