@@ -6,13 +6,13 @@
 % Policy gradient approaches for multi-objective sequential decision making
 % (2014)
 
-simplexstep = 10; % Density of the directions in the simplex
+simplexstep = 31; % Density of the directions in the simplex
 tolerance = 0.001; % Tolerance for the norm of the gradient
-maxIter = 200; % Max number of policy gradient steps in the same direction
+maxIter = 100; % Max number of policy gradient steps in the same direction
 minS = 0.1; % Min entropy of the policy (stopping condition)
-lrate = 1;
+lrate = 10;
 gradient = @eNACbase;
-verboseOut = false;
+verboseOut = true;
 
 % Generate all combinations of weights for the directions in the simplex
 W = convexcomb(dreward, simplexstep);
@@ -26,7 +26,7 @@ grads_init = bsxfun(@times, grads_init, stepsize); % Apply stepsize
 iter = 1;
 
 %% For all the directions in the simplex
-parfor k = 1 : ndir
+for k = 1 : ndir
     fixedLambda = W(k,:)';
     newDir = grads_init * fixedLambda;
     curr_pol = policy.update(policy.theta + lrate * newDir);

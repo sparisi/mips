@@ -20,8 +20,8 @@ while true
     
 %     updateplot('Return',iter,J,1)
     
-%     policy = policy.update(policy.theta + grad(:,robj) * stepsize(robj));
-    policy = policy.update(policy.theta + grad(:,robj) / norm(grad(:,robj)));
+    policy = policy.update(policy.theta + grad(:,robj) * stepsize(robj));
+%     policy = policy.update(policy.theta + grad(:,robj) / norm(grad(:,robj)));
     
     iter = iter + 1;
 
