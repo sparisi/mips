@@ -78,17 +78,30 @@ classdef GaussianLinearChol < GaussianLinear
         end
 
         %% Update
-        function obj = update(obj, theta)
-            obj.theta(1:length(theta)) = theta;
-            n = length(obj.theta) - sum(1:obj.daction);
-            A = vec2mat(obj.theta(1:n),obj.daction);
-            indices = tril(ones(obj.daction));
-            cholU = indices;
-            cholU(indices == 1) = obj.theta(n+1:end);
-            cholU = cholU';
-            obj.A = A;
-            obj.U = cholU;
-            obj.Sigma = cholU'*cholU;
+        function obj = update(obj, varargin)
+            if nargin == 2 % Update by params
+                theta = nargin{1};
+                obj.theta(1:length(theta)) = theta;
+                n = length(obj.theta) - sum(1:obj.daction);
+                A = vec2mat(obj.theta(1:n),obj.daction);
+                indices = tril(ones(obj.daction));
+                cholU = indices;
+                cholU(indices == 1) = obj.theta(n+1:end);
+                cholU = cholU';
+                obj.A = A;
+                obj.U = cholU;
+                obj.Sigma = cholU'*cholU;
+            elseif nargin == 3 % Update by mean and covariance
+                obj.A = varargin{1};
+                obj.Sigma = varargin{2};
+                [U, p] = chol(varargin{2});
+                assert(p == 0, 'Covariance must be positive definite.')
+                U = U';
+                U = U(tril(true(obj.daction), 0)).';
+                obj.theta = [obj.A(:); U'];
+            else
+                error('Wrong number of input arguments')
+            end
         end
         
         %% Change stochasticity

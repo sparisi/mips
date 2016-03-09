@@ -111,16 +111,29 @@ classdef GaussianConstantChol < GaussianConstant
         end
         
         %% Update
-        function obj = update(obj, theta)
-            obj.theta(1:length(theta)) = theta;
-            mu = obj.theta(1:obj.daction);
-            indices = tril(ones(obj.daction));
-            cholU = indices;
-            cholU(indices == 1) = obj.theta(obj.daction+1:end);
-            cholU = cholU';
-            obj.mu = mu;
-            obj.Sigma = cholU'*cholU;
-            obj.U = cholU;
+        function obj = update(obj, varargin)
+            if nargin == 2 % Update by params
+                theta = varargin{1};
+                obj.theta(1:length(theta)) = theta;
+                mu = obj.theta(1:obj.daction);
+                indices = tril(ones(obj.daction));
+                cholU = indices;
+                cholU(indices == 1) = obj.theta(obj.daction+1:end);
+                cholU = cholU';
+                obj.mu = mu;
+                obj.Sigma = cholU'*cholU;
+                obj.U = cholU;
+            elseif nargin == 3 % Update by mean and covariance
+                obj.mu = varargin{1};
+                obj.Sigma = varargin{2};
+                [U, p] = chol(varargin{2});
+                assert(p == 0, 'Covariance must be positive definite.')
+                U = U';
+                U = U(tril(true(obj.daction), 0)).';
+                obj.theta = [obj.mu; U'];
+            else
+                error('Wrong number of input arguments')
+            end
         end
 
         %% Change stochasticity
