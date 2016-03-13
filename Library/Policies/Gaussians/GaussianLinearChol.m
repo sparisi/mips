@@ -96,6 +96,7 @@ classdef GaussianLinearChol < GaussianLinear
                 obj.Sigma = varargin{2};
                 [U, p] = chol(varargin{2});
                 assert(p == 0, 'Covariance must be positive definite.')
+                obj.U = U;
                 U = U';
                 U = U(tril(true(obj.daction), 0)).';
                 obj.theta = [obj.A(:); U'];
