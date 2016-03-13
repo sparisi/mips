@@ -1,11 +1,15 @@
 classdef REPS_Solver < handle
 % Relative Entropy Policy Search.
+% It supports Importance Sampling (IS).
 %
 % =========================================================================
 % REFERENCE
 % M P Deisenroth, G Neumann, J Peters
-% A Survey on Policy Search for Robotics, Foundations and Trends in 
+% A Survey on Policy Search for Robotics, Foundations and Trends in
 % Robotics (2013)
+%
+% C Daniel, G Neumann, J Peters
+% Learning Concurrent Motor Skills in Versatile Solution Spaces (2012)
 
     properties
         epsilon % KL divergence bound
@@ -18,8 +22,17 @@ classdef REPS_Solver < handle
             obj.epsilon = epsilon;
         end
         
+        %% PERFORM AN OPTIMIZATION STEP
+        function [policy, divKL] = step(obj, J, Actions, policy, W)
+            if nargin < 5, W = ones(1, size(J,2)); end % IS weights
+            [d, divKL] = obj.optimize(J, W);
+            policy = policy.weightedMLUpdate(d, Actions);
+        end
+
         %% CORE
-        function [d, divKL] = optimize(obj, J)
+        function [d, divKL] = optimize(obj, J, W)
+            if nargin < 3, W = ones(1,size(J)); end % IS weights
+            
             % Optimization problem settings
             options = optimset('GradObj', 'on', ...
                 'Display', 'off', ...
@@ -31,27 +44,28 @@ classdef REPS_Solver < handle
             lowerBound = 1e-8; % eta > 0
             upperBound = 1e8; % eta < inf
             eta0 = 1;
-            eta = fmincon(@(eta)obj.dual(eta,J), ...
+            eta = fmincon(@(eta)obj.dual(eta,J,W), ...
                 eta0, [], [], [], [], lowerBound, upperBound, [], options);
             
             % Compute weights for weighted ML update
-            d = exp( (J - max(J)) / eta );
+            d = W .* exp( (J - max(J)) / eta );
 
             % Compute KL divergence
-            qWeighting = ones(size(J));
+            qWeighting = W;
             pWeighting = d;
             divKL = getKL(pWeighting, qWeighting);
         end
         
         %% DUAL FUNCTION
-        function [g, gd] = dual(obj, eta, J)
+        function [g, gd] = dual(obj, eta, J, W)
+            if nargin < 4, W = ones(1,size(J)); end % IS weights
+            
             % Numerical trick
             maxJ = max(J);
             J = J - maxJ;
             
-            N = length(J);
-            A = sum(exp(J / eta)) / N;
-            B = sum(exp(J / eta) .* J) / N;
+            A = sum(W .* exp(J / eta)) / sum(W);
+            B = sum(W .* exp(J / eta) .* J) / sum(W);
             
             g = eta * obj.epsilon + eta * log(A) + maxJ; % dual function
             gd = obj.epsilon + log(A) - B / (eta * A);   % gradient

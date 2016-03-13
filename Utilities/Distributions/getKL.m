@@ -5,7 +5,7 @@ function div = getKL(pWeighting, qWeighting)
 % If no weights for Q are provided, they are assumed to be 1.
 
 if(nargin == 1)
-    qWeighting = ones(length(pWeighting));
+    qWeighting = ones(1,length(pWeighting));
 end
 qWeighting = qWeighting / sum(qWeighting);
 pWeighting = pWeighting / sum(pWeighting);

@@ -1,4 +1,4 @@
-function W = mixtureIS(target, samplers, Actions, N_TOT, N)
+function W = mixtureIS(target, samplers, Actions, N)
 % MIXTUREIS Computes importance sampling weights. N_TOT samples are drawn 
 % from a uniform mixture of N_TOT / N policies. Each policy collects N 
 % batches of samples.
@@ -9,17 +9,17 @@ function W = mixtureIS(target, samplers, Actions, N_TOT, N)
 %                  to an uniform mixture of N_TOT / N policies
 %     - Actions  : [D x N_TOT] matrix of parameters (D is the size of the
 %                  parameters)
-%     - N_TOT    : total number of samples
 %     - N        : number of samples drawn by each sampler distribution
 %
 %    OUTPUT
-%     - W        : importance sampling weights
+%     - W        : [1 x N_TOT] importance sampling weights
 %
 % =========================================================================
 % REFERENCE
 % A Owen and Y Zhou
 % Safe and effective importance sampling (2000)
 
+N_TOT = size(Actions,2);
 Q = zeros(N_TOT, N_TOT); % Q(i,j) = probability of drawing Actions(i) from policy q(j) (q = sampling)
 p = target.evaluate(Actions)'; % p(i) = probability of drawing Actions(i) from policy p (p = target)
 for j = 1 : N : N_TOT
@@ -28,3 +28,4 @@ for j = 1 : N : N_TOT
 end
 Q = Q / N_TOT;
 W = p ./ sum(Q,2); % Mixture IS (mixture proportions are equal)
+W = W';

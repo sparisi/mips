@@ -21,16 +21,17 @@ b(isnan(b)) = 0;
 diff = bsxfun(@times, bsxfun(@minus,J,b), W);
 grad = permute( sum(bsxfun(@times, dlogPidtheta, diff), 2), [1 3 2] );
 
-% grad = grad / length(W); % unbiased
-grad = grad / sum(W); % lower variance
+N = length(W); % unbiased
+% N = sum(W); % lower variance
+
+grad = grad / N:
 
 % If we can compute the FIM in closed form, we use it
 if ismethod(pol_high,'fisher')
     F = pol_high.fisher;
 else
     F = bsxfun(@times, dlogPidtheta * dlogPidtheta', W);
-    % F = F / length(W); % unbiased
-    F = F / sum(W); % lower variance
+    F = F / N;
 end
 
 % If we can compute the FIM inverse in closed form, we use it
