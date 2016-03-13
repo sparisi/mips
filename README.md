@@ -88,6 +88,16 @@ As `collect_samples` returns a low-level dataset of the episodes, you just have 
 `show_simulation(mdp,policy,0.001,100)` <br />
 `show_simulation(mdp,policy.update(policy_high.drawAction(1)),0.001,100)`
 
+### Plot discrete policies
+If the state space is 2-dimensional, you can plot the value functions learned by discrete policies and the action distribution over the states.
+
+`SettingDeep % deep sea treasure setup` <br />
+`RUN_PG % run policy gradient (terminate by CTRL+C)` <br />
+`policy.plotQ(1,11,1,10) % plot Q-function` <br />
+`policy.plotV(1,11,1,10) % plot V-function` <br />
+`policy.plotActions(1,11,1,10) % plot action probabilities` <br />
+`policy.plotDeterministic(1,11,1,10) % plot the action taken by zeroing the exploration`
+
 ### MOMDPs Pareto frontier
 
 To plot a set of points as a Pareto frontier of a MOMDP, use `mdp.plotfront`. Each MOMDP has its own plotting style for better clarity. Please note that the points have to be passed as rows and that the function does not filter dominated points.

@@ -86,7 +86,9 @@ classdef (Abstract) PolicyDiscrete < Policy
             
             actions = obj.makeDeterministic.drawAction([X(:)';Y(:)']);
             Z = reshape(actions,step,step);
-            contourf(X,Y,Z)
+            surf(X,Y,Z,'EdgeColor','none')
+            view(0,90)
+            axis([xmin,xmax,ymin,ymax])
             title('Deterministic actions')
             xlabel x
             ylabel y
