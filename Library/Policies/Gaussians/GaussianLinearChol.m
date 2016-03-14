@@ -80,7 +80,7 @@ classdef GaussianLinearChol < GaussianLinear
         %% Update
         function obj = update(obj, varargin)
             if nargin == 2 % Update by params
-                theta = nargin{1};
+                theta = varargin{1};
                 obj.theta(1:length(theta)) = theta;
                 n = length(obj.theta) - sum(1:obj.daction);
                 A = vec2mat(obj.theta(1:n),obj.daction);
