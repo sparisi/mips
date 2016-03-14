@@ -9,16 +9,15 @@
 tolerance_step = 0.5; % Tolerance on the norm of the gradient (stopping condition) during the optimization step
 tolerance_corr = 0.5; % The same, but during the correction step
 minS = 0.1; % Min entropy of the policy (stopping condition)
-lrate_single = 2; % Lrate during single-objective optimization phase
 lrate_step = 1; % Lrate during optimization step
 lrate_corr = 0.5; % Lrate during correction step
 maxIter = 500; % Max iterations per optimization
 maxCorrection = 25; % Max iterations during the correction
-randfactor = 1; % Randomization after single-objective optimization
+randfactor = 10; % Randomization after single-objective optimization
 alg = @eNACbase;
-solver = PFA_Solver(lrate_single,lrate_step,lrate_corr,gamma,alg);
+solver = PFA_Solver(lrate_step,lrate_corr,gamma,alg);
 iter = 1;
-verboseOut = false;
+verboseOut = 1;
 
 %% Learn the last objective
 while true
