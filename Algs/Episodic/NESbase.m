@@ -24,7 +24,7 @@ grad = permute( sum(bsxfun(@times, dlogPidtheta, diff), 2), [1 3 2] );
 N = length(W); % unbiased
 % N = sum(W); % lower variance
 
-grad = grad / N:
+grad = grad / N;
 
 % If we can compute the FIM in closed form, we use it
 if ismethod(pol_high,'fisher')
@@ -46,7 +46,7 @@ else
 end
 
 if nargin > 3
-    lambda = sqrt(diag(grad' * nat_grad) / (4 * lrate));
+    lambda = sqrt(diag(grad' * nat_grad) / (4 * lrate))';
     lambda = max(lambda,1e-8); % to avoid numerical problems
     stepsize = 1 ./ (2 * lambda);
 end
