@@ -1,11 +1,15 @@
 classdef CREPS_Solver < handle
 % Contextual Relative Entropy Policy Search.
+% It supports Importance Sampling (IS).
 %
 % =========================================================================
 % REFERENCE
 % M P Deisenroth, G Neumann, J Peters
 % A Survey on Policy Search for Robotics, Foundations and Trends in
 % Robotics (2013)
+%
+% C Daniel, G Neumann, J Peters
+% Learning Concurrent Motor Skills in Versatile Solution Spaces (2012)
 
     properties
         epsilon % KL divergence bound
@@ -20,8 +24,17 @@ classdef CREPS_Solver < handle
             obj.basis = bfs;
         end
         
+        %% PERFORM AN OPTIMIZATION STEP
+        function [policy, divKL] = step(obj, J, Actions, Phi, policy, W)
+            if nargin < 6, W = ones(1, size(J,2)); end % IS weights
+            [d, divKL] = obj.optimize(J, Phi, W);
+            policy = policy.weightedMLUpdate(d, Actions, Phi);
+        end
+        
         %% CORE
-        function [d, divKL] = optimize(obj, J, Phi)
+        function [d, divKL] = optimize(obj, J, Phi, W)
+            if nargin < 4, W = ones(1, size(J,2)); end % IS weights
+            
             [dphi, N] = size(Phi);
             
             % Optimization problem settings
@@ -53,7 +66,7 @@ classdef CREPS_Solver < handle
             % Iteratively solve fmincon for eta and theta separately
             for i = 1 : maxIter
                 if ~validKL || numStepsNoKL < 5
-                    eta = fmincon(@(eta)obj.dual_eta(eta,theta,J,Phi), ...
+                    eta = fmincon(@(eta)obj.dual_eta(eta,theta,J,Phi,W), ...
                         eta, [], [], [], [], lowerBound_eta, upperBound_eta, [], options);
                     
                     % Numerical trick
@@ -61,10 +74,10 @@ classdef CREPS_Solver < handle
                     maxAdvantage = max(advantage);
                     
                     % Compute the weights
-                    d = exp( (advantage - maxAdvantage) / eta );
+                    d = W .* exp( (advantage - maxAdvantage) / eta );
                     
                     % Check conditions
-                    qWeighting = ones(1,N);
+                    qWeighting = W;
                     pWeighting = d;
                     pWeighting = pWeighting / sum(pWeighting);
                     divKL = getKL(pWeighting, qWeighting);
@@ -76,7 +89,7 @@ classdef CREPS_Solver < handle
                 end
                 
                 if ~validSF
-                    theta = fmincon(@(theta)obj.dual_theta(theta,eta,J,Phi), ...
+                    theta = fmincon(@(theta)obj.dual_theta(theta,eta,J,Phi,W), ...
                         theta, [], [], [], [], lowerBound_theta, upperBound_theta, [], options);
                     
                     % Numerical trick
@@ -84,10 +97,10 @@ classdef CREPS_Solver < handle
                     maxAdvantage = max(advantage);
                     
                     % Compute the weights
-                    d = exp( (advantage - maxAdvantage) / eta );
+                    d = W .* exp( (advantage - maxAdvantage) / eta );
                     
                     % Check conditions
-                    qWeighting = ones(1,N);
+                    qWeighting = W;
                     pWeighting = d;
                     pWeighting = pWeighting / sum(pWeighting);
                     divKL = getKL(pWeighting, qWeighting);
@@ -104,15 +117,17 @@ classdef CREPS_Solver < handle
         end
         
         %% DUAL FUNCTIONS
-        function [g, gd] = dual_full(obj, params, J, Phi)
+        function [g, gd] = dual_full(obj, params, J, Phi, W)
+            if nargin < 5, W = ones(1, size(J,2)); end % IS weights
+            
             theta = params(1:end-1);
             eta = params(end);
             
             V = theta' * Phi;
-            n = length(J);
+            n = sum(W);
             advantage = J - V;
             maxAdvantage = max(advantage);
-            weights = exp( ( advantage - maxAdvantage ) / eta ); % numerical trick
+            weights = W .* exp( ( advantage - maxAdvantage ) / eta ); % numerical trick
             sumWeights = sum(weights);
             sumWeightsV = sum( weights .* (advantage - maxAdvantage) );
             meanFeatures = mean(Phi,2);
@@ -125,12 +140,14 @@ classdef CREPS_Solver < handle
                 obj.epsilon + log(sumWeights/n) - sumWeightsV / (eta * sumWeights)];
         end
         
-        function [g, gd, h] = dual_eta(obj, eta, theta, J, Phi)
+        function [g, gd, h] = dual_eta(obj, eta, theta, J, Phi, W)
+            if nargin < 6, W = ones(1, size(J,2)); end % IS weights
+
             V = theta' * Phi;
-            n = length(J);
+            n = sum(W);
             advantage = J - V;
             maxAdvantage = max(advantage);
-            weights = exp( ( advantage - maxAdvantage ) / eta ); % numerical trick
+            weights = W .* exp( ( advantage - maxAdvantage ) / eta ); % numerical trick
             sumWeights = sum(weights);
             sumWeightsV = sum( weights .* (advantage - maxAdvantage) );
             sumWeightsVSquare = sum( weights .* (advantage - maxAdvantage).^2 );
@@ -144,12 +161,14 @@ classdef CREPS_Solver < handle
             h = ( sumWeightsVSquare * sumWeights - sumWeightsV^2 ) / ( eta^3 * sumWeightsV^2 );
         end
         
-        function [g, gd, h] = dual_theta(obj, theta, eta, J, Phi)
+        function [g, gd, h] = dual_theta(obj, theta, eta, J, Phi, W)
+            if nargin < 6, W = ones(1, size(J,2)); end % IS weights
+
             V = theta' * Phi;
-            n = length(J);
+            n = sum(W);
             advantage = J - V;
             maxAdvantage = max(advantage);
-            weights = exp( ( advantage - maxAdvantage ) / eta ); % numerical trick
+            weights = W .* exp( ( advantage - maxAdvantage ) / eta ); % numerical trick
             sumWeights = sum(weights);
             meanFeatures = mean(Phi,2);
             sumWeightsPhi = ( weights * Phi' )';

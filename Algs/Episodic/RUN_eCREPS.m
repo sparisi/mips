@@ -5,7 +5,6 @@ solver = CREPS_Solver(0.9,bfs_solver);
 
 J = zeros(dreward,N_MAX);
 Theta = zeros(policy_high.daction,N_MAX);
-
 PhiSolver = zeros(N_MAX,solver.basis());
 PhiPolicy = zeros(N_MAX,policy_high.basis());
 
@@ -42,7 +41,7 @@ while true
     fprintf( '%d) Avg Reward: %.4f, \tKL Div: %.2f, \tEntropy: %.3f\n', ...
         iter, avgRew, divKL, policy_high.entropy );
     
-    policy_high = policy_high.weightedMLUpdate(weights, Theta, PhiPolicy);
+    policy_high = policy_high.weightedMLUpdate(weights, Theta, [ones(1,N_MAX); PhiPolicy]);
     
     iter = iter + 1;
 
