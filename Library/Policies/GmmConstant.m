@@ -1,6 +1,6 @@
 classdef GmmConstant < Policy
 % GMMCONSTANT Gaussian Mixture Model with constant means and covariances.
-% Parameters: means and covariances.
+% Parameters: means, covariances and mixture weights.
 % Means are stored in rows, as in Matlab's GMDISTRIBUTION.
 %
 % As the number of components is variable (up to GMAX), this class does not
@@ -15,7 +15,7 @@ classdef GmmConstant < Policy
     
     methods
 
-        %% Construction
+        %% Constructor
         function obj = GmmConstant(varargin)
             if nargin == 3 % Initialize with a single Gaussian
                 mu0 = varargin{1};
