@@ -1,3 +1,10 @@
+## ! CHECKOUT THE LOOPLESS BRANCH ! ##
+--------------------------------------------
+
+> *This is the first version of the toolbox and it is no longer mantained. It has all loops unfolded and the code is very computational demanding. However, most of the algorithms are also clearer to read, so use it just to understand their implementation.*
+
+
+
 Description
 -----------
 
