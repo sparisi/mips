@@ -8,7 +8,7 @@ bfs = @deep_basis_poly;
 dreward = mdp.dreward;
 gamma = mdp.gamma;
 nactions = mdp.actionUB;
-pol = Gibbs(bfs, zeros(bfs()*(nactions-1),1),mdp.actionLB:mdp.actionUB);
+pol = Gibbs(bfs, zeros((bfs()+1)*(nactions-1),1),mdp.actionLB:mdp.actionUB);
 
 g0 = zeros(pol.dparams, trials);
 g1 = zeros(pol.dparams, trials);

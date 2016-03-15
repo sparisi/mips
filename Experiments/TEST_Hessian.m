@@ -43,7 +43,6 @@ J_ex = double(subs(J,theta,policy.theta));
 trials = 10;
 episodes = 200;
 steps = 50;
-gamma = mdp.gamma;
 
 for i = 1 : trials
     
