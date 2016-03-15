@@ -1,4 +1,4 @@
-function [grad, stepsize] = PGPEbase (pol_high, J, Theta, lrate, W)
+function [grad, stepsize] = PGPEbase(policy_high, data, lrate, W)
 % Policy Gradient with Parameter-based Exporation and optimal baseline.
 % It supports Importance Sampling (IS).
 % GRAD is a [D x R] matrix, where D is the length of the gradient and R is
@@ -20,22 +20,22 @@ function [grad, stepsize] = PGPEbase (pol_high, J, Theta, lrate, W)
 % On a Connection between Importance Sampling and the Likelihood Ratio 
 % Policy Gradient (2010)
 
-if nargin < 5, W = ones(1, size(J,2)); end % IS weights
+if nargin < 4, W = ones(1, size(data.J,2)); end % IS weights
 
-dlogPidtheta = pol_high.dlogPidtheta(Theta);
-J = permute(J,[3 2 1]);
+dlogPidtheta = policy_high.dlogPidtheta(data.Theta);
+data.J = permute(data.J,[3 2 1]);
 
 den = sum( bsxfun(@times, dlogPidtheta.^2, W.^2), 2 );
-num = sum( bsxfun(@times, dlogPidtheta.^2, bsxfun(@times, J, W.^2)), 2 );
+num = sum( bsxfun(@times, dlogPidtheta.^2, bsxfun(@times, data.J, W.^2)), 2 );
 b = bsxfun(@times, num, 1./den);
 b(isnan(b)) = 0;
-diff = bsxfun(@times, bsxfun(@minus,J,b), W);
+diff = bsxfun(@times, bsxfun(@minus,data.J,b), W);
 grad = permute( sum(bsxfun(@times, dlogPidtheta, diff), 2), [1 3 2] );
 
 % grad = grad / length(W); % unbiased
 grad = grad / sum(W); % lower variance
 
-if nargin > 3
+if nargin > 2
     normgrad = matrixnorms(grad,2);
     lambda = max(normgrad,1e-8); % to avoid numerical problems
     stepsize = sqrt(lrate) ./ lambda;

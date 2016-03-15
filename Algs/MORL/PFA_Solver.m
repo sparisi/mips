@@ -11,22 +11,20 @@ classdef PFA_Solver < handle
         lrate_step   % lrate during optimization step
         lrate_corr   % lrate during correction step
         gradient     % handle for the algorithm for computing the gradient
-        gamma        % discount factor
     end
     
     methods
         
         %% CLASS CONSTRUCTOR
-        function obj = PFA_Solver(lrate_step, lrate_corr, gamma, alg)
+        function obj = PFA_Solver(lrate_step, lrate_corr, alg)
             obj.lrate_step = lrate_step;
             obj.lrate_corr = lrate_corr;
-            obj.gamma = gamma;
             obj.gradient = alg;
         end
         
         %% OPTIMIZATION
         function [policy, gnorm] = optimization_step(obj, data, policy, objective)
-            [grad, stepsize] = obj.gradient(policy,data,obj.gamma,obj.lrate_step);
+            [grad, stepsize] = obj.gradient(policy, data, obj.lrate_step);
             grad = grad(:,objective);
             stepsize = stepsize(objective);
             gnorm = norm(grad);
@@ -35,8 +33,8 @@ classdef PFA_Solver < handle
         
         %% CORRECTION
         function [policy, gnorm] = correction_step(obj, data, policy)
-            grads = obj.gradient(policy,data,obj.gamma,obj.lrate_corr);
-            normgrads = matrixnorms(grads,2);
+            grads = obj.gradient(policy, data, obj.lrate_corr);
+            normgrads = max(matrixnorms(grads,2),1e-8);
             grads = bsxfun(@times,grads,1./normgrads); % Always normalize during the correction
             pareto_dir = paretoDirection(grads); % Minimal-norm Pareto-ascent direction
             gnorm = norm(pareto_dir);

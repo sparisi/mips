@@ -3,23 +3,23 @@
 % scalarizations.
 
 N = 20;
-N_MAX = N * 1;
+N_MAX = N * 10;
 if makeDet, policy = policy.makeDeterministic; end
 solver = REPS_Solver(0.9);
-solver = NES_Solver(1);
+solver = NES_Solver(0.1);
 
 verboseOut = true;
 utopia = mdp.utopia;
 antiutopia = mdp.antiutopia;
 
 metric = @(r,w)metric_ws(r,w); % scalarization function
-step = 31; % density of the weights
+step = 10; % density of the weights
 W = convexcomb(dreward, step);
 ndir = size(W,1);
 
 front_pol = cell(ndir,1);
 iter = 0;
-maxIter = 20;
+maxIter = 120;
 
 
 %% Learning
@@ -35,17 +35,17 @@ for i = 1 : ndir
 
     %% Single objective optimization
     while true
-        [J_iter, Theta_iter] = collect_episodes(mdp, N, steps_learn, current_pol, policy);
+        [data, avgRew] = collect_episodes(mdp, N, steps_learn, current_pol, policy);
         
         % First, fill the pool to maintain the samples distribution
         if current_iter == 1
-            J = repmat(min(J_iter,[],2),1,N_MAX);
+            J = repmat(min(data.J,[],2),1,N_MAX);
             Theta = current_pol.drawAction(N_MAX);
         end
         
         % Enqueue the new samples and remove the old ones
-        J = [J_iter, J(:, 1:N_MAX-N)];
-        Theta = [Theta_iter, Theta(:, 1:N_MAX-N)];
+        J = [data.J, J(:, 1:N_MAX-N)];
+        Theta = [data.Theta, Theta(:, 1:N_MAX-N)];
         
         % Scalarized return
         Jw = metric(J,W(i,:)');
@@ -55,7 +55,7 @@ for i = 1 : ndir
 
         % Print info
         if verboseOut
-            str_obj = strtrim(sprintf('%.4f, ', mean(J,2)));
+            str_obj = strtrim(sprintf('%.4f, ', avgRew));
             str_obj(end) = [];
             fprintf('[ %s ] || Iter %d ) Dev: %.4f, \t J = [ %s ] \n', ...
                 str_dir, current_iter, div, str_obj)

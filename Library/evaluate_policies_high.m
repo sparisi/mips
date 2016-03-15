@@ -17,6 +17,5 @@ npolicies = numel(policies_high);
 J = zeros(mdp.dreward,npolicies);
 
 parfor i = 1 : npolicies
-    J_ep = collect_episodes(mdp, episodes, maxsteps, policies_high(i), policy_low);
-    J(:,i) = mean(J_ep,2);
+    [~, J(:,i)] = collect_episodes(mdp, episodes, maxsteps, policies_high(i), policy_low);
 end

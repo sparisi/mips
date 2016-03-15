@@ -12,20 +12,19 @@ solver = REPS_Solver(0.9);
 %% Learning
 while true
 
-    [J_iter, Theta_iter] = collect_episodes(mdp, N, steps_learn, policy_high, policy);
-    Policies_iter = repmat(policy_high,1,N);
+    [data, avgRew] = collect_episodes(mdp, N, steps_learn, policy_high, policy);
 
     % First, fill the pool to maintain the samples distribution
     if iter == 1
-        J = repmat(min(J_iter(robj,:),[],2),1,N_MAX);
+        J = repmat(min(data.J(robj,:),[],2),1,N_MAX);
         Policies = repmat(policy_high,1,N_MAX);
         Theta = policy_high.drawAction(N_MAX);
     end
         
     % Enqueue the new samples and remove the old ones
-    J = [J_iter(robj,:), J(:, 1:N_MAX-N)];
-    Theta = [Theta_iter, Theta(:, 1:N_MAX-N)];
-    Policies = [Policies_iter, Policies(:, 1:N_MAX-N)];
+    J = [data.J(robj,:), J(:, 1:N_MAX-N)];
+    Theta = [data.Theta, Theta(:, 1:N_MAX-N)];
+    Policies = [repmat(policy_high,1,N), Policies(:, 1:N_MAX-N)];
     
     % Compute IS weights
     W = mixtureIS(policy_high, Policies, Theta, N);
@@ -33,10 +32,9 @@ while true
     % Perform an update step
     [policy_high, div] = solver.step(J, Theta, policy_high, W);
 
-    avgRew = mean(J_iter(robj,:));
-    J_history(:,iter) = J_iter(robj,:);
+    J_history(:,iter) = data.J(robj,:);
     fprintf( 'Iter: %d, Avg Reward: %.4f, Div: %.2f\n', ...
-        iter, avgRew, div );
+        iter, avgRew(robj), div );
 
     iter = iter + 1;
     
