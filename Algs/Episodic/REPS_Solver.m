@@ -31,7 +31,7 @@ classdef REPS_Solver < handle
 
         %% CORE
         function [d, divKL] = optimize(obj, J, W)
-            if nargin < 3, W = ones(1,size(J)); end % IS weights
+            if nargin < 3, W = ones(1,size(J,2)); end % IS weights
             
             % Optimization problem settings
             options = optimset('GradObj', 'on', ...
@@ -58,7 +58,7 @@ classdef REPS_Solver < handle
         
         %% DUAL FUNCTION
         function [g, gd] = dual(obj, eta, J, W)
-            if nargin < 4, W = ones(1,size(J)); end % IS weights
+            if nargin < 4, W = ones(1,size(J,2)); end % IS weights
             
             % Numerical trick
             maxJ = max(J);
