@@ -172,6 +172,8 @@ classdef Resource < MOMDP
                 obj.handleAgent{3}.YData = y;
                 obj.handleAgent{3}.MarkerSize = 24;
             end
+            
+            drawnow limitrate
         end
         
     end

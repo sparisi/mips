@@ -191,6 +191,7 @@ classdef Dam < MOMDP
                 0 0 z1];
             z = state / obj.S;
             obj.handleAgent.Vertices = vertices(0,z);
+            drawnow limitrate
         end
         
     end

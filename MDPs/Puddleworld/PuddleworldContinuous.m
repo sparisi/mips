@@ -144,6 +144,7 @@ classdef PuddleworldContinuous < MDP
         function updateplot(obj, state)
             obj.handleAgent.XData = state(1);
             obj.handleAgent.YData = state(2);
+            drawnow limitrate
         end
         
     end

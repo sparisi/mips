@@ -119,6 +119,7 @@ classdef CartPoleDouble < MDP
             obj.handleAgent{3}.YData = [y1 y2(1)];
             obj.handleAgent{4}.XData = [x1 x2(2)];
             obj.handleAgent{4}.YData = [y1 y2(2)];
+            drawnow limitrate
         end
         
     end

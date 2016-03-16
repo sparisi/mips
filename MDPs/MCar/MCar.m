@@ -113,6 +113,7 @@ classdef MCar < MDP
         function updateplot(obj, state)
             obj.handleAgent.XData = state(1);
             obj.handleAgent.YData = obj.hill(state(1));
+            drawnow limitrate
         end
         
     end

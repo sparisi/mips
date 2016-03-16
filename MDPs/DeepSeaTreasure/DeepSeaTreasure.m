@@ -151,6 +151,7 @@ classdef DeepSeaTreasure < MOMDP
             
             obj.handleAgent.XData = state(1);
             obj.handleAgent.YData = state(2);
+            drawnow limitrate
         end
         
     end
