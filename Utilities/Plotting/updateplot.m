@@ -34,8 +34,7 @@ if isempty(fig)
 end
 
 % Find plots in the figure
-axesObjs = get(fig, 'Children');
-dataObjs = get(axesObjs, 'Children');
+dataObjs = findobj(fig,'Type','line');
 X = get(dataObjs, 'XData')';
 Y = get(dataObjs, 'YData')';
 if ~iscell(X), X = {X}; Y = {Y}; end % If there is only one plot
