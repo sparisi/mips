@@ -10,20 +10,24 @@ function S = metric_hv(J, HVF)
 %
 %    OUTPUT
 %     - S   : [N x 1] vector of the hypervolume contribution of each sample
+%
+% =========================================================================
+% REFERENCE
+% N Beume, B Naujoks, M Emmerich
+% SMS-EMOA: Multiobjective selection based on dominated hypervolume (2007)
 
-[uniqueJ, ~, idx] = unique(J,'rows'); % avoid duplicates to save time
-front = pareto(uniqueJ);
+[uniqueJ, ~, idx] = unique(J,'rows'); % Ignore duplicates
+[front, ~, idx2] = pareto(uniqueJ); % Dominated solutions have 0 contribution
+
 hyperv_ref = HVF(front);
 
-idx2 = all(ismember(uniqueJ,front),2); % dominated solutions metric value is 0
-hvUnique = zeros(size(uniqueJ,1),1);
-hvContrib = zeros(size(front,1),1);
 parfor i = 1 : size(front,1)
     front_tmp = front;
     front_tmp(i,:) = [];
     hvContrib(i) = hyperv_ref - HVF(pareto(front_tmp));
 end
-hvUnique(idx2) = hvContrib;
-S = hvUnique(idx); % map back to duplicates
 
-S = max(0,S); % the contribution estimation might be negative using a Monte Carlo approx of the hypervolume
+hvUnique = zeros(size(uniqueJ,1),1);
+hvUnique(idx2) = hvContrib;
+S = hvUnique(idx); % Map back to duplicates
+S = max(0,S); % The contribution estimation might be negative using a Monte Carlo approx of the hypervolume

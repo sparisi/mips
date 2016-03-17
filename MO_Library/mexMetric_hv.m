@@ -24,3 +24,4 @@ hvContrib = mexHypervolumeContribution(front,AU,U,N);
 hvUnique = zeros(size(uniqueJ,1),1);
 hvUnique(idx2) = hvContrib;
 S = hvUnique(idx); % Map back to duplicates
+S = max(0,S); % The contribution estimation might be negative using a Monte Carlo approx of the hypervolume
