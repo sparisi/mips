@@ -36,7 +36,7 @@ action = zeros(mdp.daction,totepisodes);
 ongoing = true(1,totepisodes);
 
 % Save the last step per episode
-endingstep = maxsteps*ones(1,episodes);
+endingstep = maxsteps*ones(1,totepisodes);
 
 % Run the episodes until maxsteps or all ends
 while ( (step < maxsteps) && sum(ongoing) > 0 )
@@ -73,8 +73,8 @@ while ( (step < maxsteps) && sum(ongoing) > 0 )
 end
 
 % If we are in the average reward setting, then normalize the return
-J = permute( mean( reshape(J,[nvar_reward episodes npolicy]), 2), [1 3 2] );
-
 if isAveraged && gamma == 1, J = bsxfun(@times, J, 1 ./ endingstep); end
+
+J = permute( mean( reshape(J,[nvar_reward episodes npolicy]), 2), [1 3 2] );
 
 return
