@@ -8,66 +8,67 @@ classdef Genetic_Solver < handle
         crossover % crossover function
         mutate    % mutation function
         max_size  % max population size
+        fitness   % function to assess the fitness of single individuals
+        n_params  % number of policy parameters (can change if the policy is deterministic)
     end
-
     
     methods
         
         %% CLASS CONSTRUCTOR
-        function obj = Genetic_Solver(elitism, mutation, crossover, mutate, max_size)
+        function obj = Genetic_Solver(elitism, mutation, crossover, ...
+                mutate, max_size, fitness, n_params)
             obj.elitism = elitism;
             obj.mutation = mutation;
             obj.crossover = crossover;
             obj.mutate = mutate;
             obj.max_size = max_size;
+            obj.fitness = fitness;
+            obj.n_params = n_params;
         end
         
         %% INDIVIDUALS EVOLUTION
-        function offspring = getOffspring ( obj, population )
-            population_size = numel(population);
-            offspring = population(1).empty(population_size,0);
-
-            for i = 1 : population_size
-                % Get 2 parents
-                idx1 = randi(population_size,1);
-                idx2 = randi(population_size,1);
-                theta1 = population(idx1).theta;
-                theta2 = population(idx2).theta;
-                
-                % Do the crossover
-                new_theta = obj.crossover(theta1,theta2);
-                
-                % Mutate
-                if rand < obj.mutation
-                    new_theta = obj.mutate(new_theta);
-                end
-                
-                % Add the child to the offspring
-                child = population(idx1);
-                child = child.update(new_theta);
-                offspring(i) = child;
+        function offspring = mate(obj, population)
+            n = numel(population);
+            offspring = population(1).empty(n,0);
+            
+            % Get random pairs of individuals
+            k = randperm(n/2*(n-1),n);
+            q = floor(sqrt(8*(k-1) + 1)/2 + 3/2);
+            p = k - (q-1).*(q-2)/2;
+            parents_idx = sortrows([p;q]',[2 1]);
+            
+            % See which pair will go under mutation
+            mutated = rand(1,n) < obj.mutation;
+            
+            all_theta = [population.theta];
+            all_theta = all_theta(1:obj.n_params, :);
+            theta1 = all_theta(:, parents_idx(:,1));
+            theta2 = all_theta(:, parents_idx(:,2));
+            
+            % Perform crossover and mutation
+            new_theta = obj.crossover(theta1, theta2);
+            new_theta(:,mutated) = obj.mutate(new_theta(:, mutated));
+            
+            % Generate offspring
+            for i = 1 : n
+                offspring(i) = population(1).update(new_theta(:,i));
             end
         end
 
         %% INDIVIDUALS SELECTION
-        function [new_population, new_J] = getNewPopulation(obj, population, J, offspring, J_offspring)
-        % J must be stored in rows!
+        function [new_population, new_J] = evolve(obj, population, J, offspring, J_offspring)
             population_size = numel(population);
             offspring_size = numel(offspring);
-            [J_size, ~] = size(J);
-            [Joff_size, nobj] = size(J_offspring);
+            J_size = size(J, 2);
+            Joff_size = size(J_offspring, 2);
             assert(population_size == J_size && offspring_size == Joff_size, ...
                 'Number of individuals and fitnesses not consistent.')
             
-            % If the max size has not been reached, keep them all
             all_pop = [population, offspring];
-            all_J = [J; J_offspring];
+            all_J = [J, J_offspring];
             
-            % In MO problems, filter the population and take only non-dominated solutions
-            if nobj > 1
-                [all_J, all_pop] = pareto(all_J, all_pop);
-            end
-            if numel(all_pop) < obj.max_size
+            % If the max size has not been reached, keep them all
+            if numel(all_pop) <= obj.max_size
                 new_population = all_pop;
                 new_J = all_J;
                 return
@@ -75,34 +76,29 @@ classdef Genetic_Solver < handle
             
             % Otherwise take the elites of the current population...
             n_elites = ceil( population_size * obj.elitism );
-            current_fitness = obj.getFitness(J);
-            [~, indices] = sort(current_fitness,1,'ascend');
+            current_fitness = obj.fitness(J);
+            [~, indices] = sort(current_fitness,'ascend');
             sorted_population = population(indices);
-            J_sorted = J(indices,:);
+            J_sorted = J(:, indices);
             elites = sorted_population(1:n_elites);
-            J_elites = J_sorted(1:n_elites,:);
+            J_elites = J_sorted(:, 1:n_elites);
             
             % ...remove them from the remaining individuals...
-            sorted_population = sorted_population(n_elites+1:end);
-            J_sorted = J_sorted(n_elites+1:end,:);
+            sorted_population = sorted_population(n_elites+1: end);
+            J_sorted = J_sorted(:, n_elites+1:end);
             
             % ...merge the remaining ones with the offspring, sort them and 
             % take the best ones
-            n_remaining = population_size - n_elites;
+            n_remaining = obj.max_size - n_elites;
             remaining = [sorted_population, offspring];
-            remaining_J = [J_sorted; J_offspring];
-            remaining_fitness = obj.getFitness(remaining_J);
-            [~, indices] = sort(remaining_fitness,1,'ascend');
+            remaining_J = [J_sorted, J_offspring];
+            remaining_fitness = obj.fitness(remaining_J);
+            [~, indices] = sort(remaining_fitness,'ascend');
             sorted_remaining = remaining(indices);
-            J_sorted = remaining_J(indices,:);
+            J_sorted = remaining_J(:, indices);
             
             new_population = [elites, sorted_remaining(1:n_remaining)];
-            new_J = [J_elites; J_sorted(1:n_remaining,:)];
-        end
-        
-        %% SIMPLE SINGLE-OBJECTIVE FITNESS. MULTI-OBJECTIVE ALGS OVERRIDE IT
-        function J = getFitness(obj, J)
-            J = -J; % Since population sorting is done in ascending order
+            new_J = [J_elites, J_sorted(:, 1:n_remaining)];
         end
         
     end
@@ -111,44 +107,18 @@ classdef Genetic_Solver < handle
         
         %% CROSSOVERS
         function new_theta = uniformCrossover(theta1, theta2)
+            idx = rand(size(theta1)) < 0.5;
             new_theta = zeros(size(theta1));
-            for j = 1 : size(theta1,1)
-                if rand < 0.5
-                    new_theta(j) = theta1(j);
-                else
-                    new_theta(j) = theta2(j);
-                end
-            end
+            new_theta(idx) = theta1(idx);
+            new_theta(~idx) = theta2(~idx);
         end
 
         %% MUTATORS
-        function theta = myMutation(theta)
-            idx = randi(length(theta),1);
-            
-            if rand < 0.5 % Add or subtract the mean value
-                mutation_value = mean(theta);
-                if rand < 0.5
-                    mutation_value = - mutation_value;
-                end
-                theta(idx) = theta(idx) + mutation_value;
-            else
-                mutation_value = 2; % Halve or double
-                if rand < 0.5
-                    mutation_value = 1 / mutation_value;
-                end
-                theta(idx) = theta(idx) * mutation_value;
-            end
-        end
-        
         function theta = gaussianMutation(theta, noise, chance)
         % Adds Gaussian noise to random chromosomes.
-            n_noise = 0;
-            while n_noise <= 0 % Do at least one perturbation
-                randIdx = rand(size(theta)) < chance;
-                n_noise = sum(randIdx);
-            end
-            wNoise = mymvnrnd(zeros(n_noise,1), diag(noise(randIdx)));
-            theta(randIdx) = theta(randIdx) + wNoise';
+            idx = rand(size(theta)) < chance;
+            wNoise = mymvnrnd(zeros(size(theta,1),1), noise, size(theta,2));
+            theta(idx) = theta(idx) + wNoise(idx);
         end
         
     end
