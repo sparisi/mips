@@ -2,7 +2,7 @@
 % multi-objective problems. See METRIC functions for details about the 
 % scalarizations.
 
-N = 20;
+N = 30;
 N_MAX = N * 10;
 if makeDet, policy = policy.makeDeterministic; end
 solver = REPS_Solver(0.9);
@@ -17,7 +17,6 @@ step = 10; % density of the weights
 W = convexcomb(dreward, step);
 ndir = size(W,1);
 
-front_pol = cell(ndir,1);
 iter = 0;
 maxIter = 120;
 
@@ -68,13 +67,12 @@ for i = 1 : ndir
         iter = iter + 1;
     end
     
-    front_pol{i} = current_pol;
+    front_pol(i) = current_pol;
     
 end
 
 
 %% Eval
-front_pol = vertcat(front_pol{:});
 fr = evaluate_policies_high(mdp, episodes_eval, steps_eval, policy, front_pol);
 [f, p] = pareto(fr', front_pol);
 fig = mdp.plotfront(mdp.truefront);

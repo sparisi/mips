@@ -80,7 +80,7 @@ classdef CartPoleDouble < MDP
             reward(fallen) = -1;
             absorb(fallen) = true;
             
-            if obj.realtimeplot, obj.plotAgent(nextstate); end
+            if obj.realtimeplot, obj.updateplot(nextstate); end
         end
         
     end

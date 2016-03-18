@@ -33,6 +33,7 @@ lrate_corr = 5; % Lrate during correction step
 maxIter = 200; % Max iterations per optimization
 maxCorrection = 100; % Max iterations during the correction
 randfactor = 1.5; % Randomization after single-objective optimization
+if makeDet, policy = policy.makeDeterministic; end
 
 target_policy = policy_high; % Learn the high-level policy
 alg = @(policy, data, lrate) NESbase(policy, data, lrate);

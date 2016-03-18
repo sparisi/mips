@@ -1,5 +1,6 @@
 N = 20;
 N_MAX = N * 10;
+if makeDet, policy = policy.makeDeterministic; end
 bfs_solver = @(varargin)basis_poly(1,mdp.dctx,1,varargin{:});
 solver = CREPS_Solver(0.9,bfs_solver);
 

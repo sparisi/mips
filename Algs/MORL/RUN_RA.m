@@ -25,6 +25,7 @@ tolerance = 0.1; % Tolerance for the norm of the gradient
 maxIter = 200; % Max number of policy gradient steps in the same direction
 minS = 1.5; % Min entropy of the policy (stopping condition)
 lrate = 1;
+if makeDet, policy = policy.makeDeterministic; end
 
 target_policy = policy_high; % Learn the high-level policy
 gradient = @(policy, data, lrate) NESbase(policy, data, lrate);
