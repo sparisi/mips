@@ -18,6 +18,6 @@ function y = multigrid(n, varargin)
 %  -5 -5 -5 -3 -3 -3 -1 -1 -1 -5 -5 -5 -3 -3 -3 -1 -1 -1 -5 -5 -5 -3 -3 -3 -1 -1 -1
 
 y = cellfun(@(x)linspace(x(1),x(2),n),varargin,'uni',0);
-c = cell(1,length(varargin{1}));
+c = cell(1,numel(varargin));
 [c{:}] = ndgrid(y{:});
 y = cell2mat( cellfun(@(v)v(:), c, 'UniformOutput', false) )';
