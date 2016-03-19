@@ -116,5 +116,7 @@ end
 %% Eval
 fr = eval(front_pol);
 [f, p] = pareto(fr', front_pol);
-fig = mdp.plotfront(mdp.truefront);
-fig = mdp.plotfront(f,fig);
+fig = mdp.plotfront(mdp.truefront,'o','DisplayName','True frontier');
+hold all
+mdp.plotfront(f,'+','DisplayName','Approximate frontier');
+legend show

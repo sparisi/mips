@@ -128,21 +128,8 @@ classdef Dam < MOMDP
             weights = dlmread(['dam_w' num2str(obj.dreward) 'd.dat']);
         end
 
-        function fig = plotfront(obj, front, fig)
-            front = sortrows(front);
-            if nargin == 2, fig = figure(); end
-            hold all
-            
-            if obj.dreward == 2
-                plot(front(:,1),front(:,2),'+')
-            elseif obj.dreward == 3
-                plot3(front(:,1),front(:,2),front(:,3),'o')
-                box on
-            else
-                warning('Can plot only 2- and 3- dimensional frontiers.')
-                return
-            end
-            
+        function fig = plotfront(obj, front, varargin)
+            fig = plotfront@MOMDP(obj, front, varargin{:});
             xlabel 'Flooding'
             ylabel 'Water Demand'
             zlabel 'Hydroelectric Demand'

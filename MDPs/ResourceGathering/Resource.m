@@ -95,11 +95,8 @@ classdef Resource < MOMDP
             weights = [];
         end
 
-        function fig = plotfront(obj, front, fig)
-            front = sortrows(front);
-            if nargin == 2, fig = figure(); end
-            hold all
-            plot3(front(:,1),front(:,2),front(:,3),'o')
+        function fig = plotfront(obj, front, varargin)
+            fig = plotfront@MOMDP(obj, front, varargin{:});
             xlabel 'Fight Penalty'
             ylabel 'Gold'
             zlabel 'Gems'

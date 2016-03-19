@@ -53,5 +53,7 @@ end
 %% Evaluate and plot
 J = evaluate_policies(mdp, episodes_eval, steps_eval, current_population)';
 [f, p] = pareto(J, current_population);
-fig = mdp.plotfront(mdp.truefront);
-fig = mdp.plotfront(f,fig);
+fig = mdp.plotfront(mdp.truefront,'o','DisplayName','True frontier');
+hold all
+mdp.plotfront(f,'+','DisplayName','Approximate frontier');
+legend show

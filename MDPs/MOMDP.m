@@ -15,9 +15,17 @@ classdef (Abstract) MOMDP < MDP
         % Returns the true Pareto frontier (or a reference one) and a set of
         % weights if the frontier is obtained by weighted sum.
         
-        fig = plotfront(obj, front, fig);
-        % Plots a frontier and return the figure handle. To overlap two
-        % frontiers, provide the same figure handle as input.
+        function fig = plotfront(obj, front, varargin)
+        % Plots a frontier and returns the figure handle.
+            front = sortrows(front);
+            if size(front,2) == 2
+                fig = plot(front(:,1),front(:,2),varargin{:});
+            elseif size(front,2) == 3
+                fig = plot3(front(:,1),front(:,2),front(:,3),varargin{:});
+            else
+                warning('Cannot plot more than three objectives.')
+            end
+        end
     end
     
 end

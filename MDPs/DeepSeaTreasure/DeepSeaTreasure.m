@@ -100,11 +100,8 @@ classdef DeepSeaTreasure < MOMDP
             weights = [];
         end
 
-        function fig = plotfront(obj, front, fig)
-            front = sortrows(front);
-            if nargin == 2, fig = figure(); end
-            hold all
-            plot(front(:,1),front(:,2),'square-.')
+        function fig = plotfront(obj, front, varargin)
+            fig = plotfront@MOMDP(obj, front, varargin{:});
             xlabel 'Treasure'
             ylabel 'Time'
         end
