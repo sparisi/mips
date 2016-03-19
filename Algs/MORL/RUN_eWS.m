@@ -2,17 +2,16 @@
 % multi-objective problems. See METRIC functions for details about the 
 % scalarizations.
 
-N = 30;
+N = 50;
 N_MAX = N * 10;
 if makeDet, policy = policy.makeDeterministic; end
 solver = REPS_Solver(0.9);
 solver = NES_Solver(0.1);
 
 verboseOut = true;
-utopia = mdp.utopia;
-antiutopia = mdp.antiutopia;
 
 metric = @(r,w)metric_ws(r,w); % scalarization function
+% metric = @(r,w)metric_cheby(r,w,mdp.utopia');
 step = 10; % density of the weights
 W = convexcomb(dreward, step);
 ndir = size(W,1);
@@ -34,6 +33,7 @@ for i = 1 : ndir
 
     %% Single objective optimization
     while true
+        
         [data, avgRew] = collect_episodes(mdp, N, steps_learn, current_pol, policy);
         
         % First, fill the pool to maintain the samples distribution
