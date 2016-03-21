@@ -22,6 +22,7 @@ classdef (Abstract) MOMDP < MDP
                 fig = plot(front(:,1),front(:,2),varargin{:});
             elseif size(front,2) == 3
                 fig = plot3(front(:,1),front(:,2),front(:,3),varargin{:});
+                box on, grid on
             else
                 warning('Cannot plot more than three objectives.')
             end

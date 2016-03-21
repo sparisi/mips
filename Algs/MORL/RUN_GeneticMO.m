@@ -12,7 +12,7 @@ if dreward == 2
 else
     hvf = @(J) hypervolume(J, mdp.antiutopia, mdp.utopia, 1e6);
 end    
-fitness_single = @(J) -nds(J'); % NSGA-II
+fitness_single = @(J) nds(J'); % NSGA-II
 % fitness_single = @(J) -metric_hv(J',hvf); %% SMS-EMOA
 fitness_population = @(J) hvf(J');
 

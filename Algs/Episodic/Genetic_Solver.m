@@ -77,7 +77,7 @@ classdef Genetic_Solver < handle
             % Otherwise take the elites of the current population...
             n_elites = ceil( population_size * obj.elitism );
             current_fitness = obj.fitness(J);
-            [~, indices] = sort(current_fitness,'ascend');
+            [~, indices] = sortrows(current_fitness);
             sorted_population = population(indices);
             J_sorted = J(:, indices);
             elites = sorted_population(1:n_elites);
@@ -93,7 +93,7 @@ classdef Genetic_Solver < handle
             remaining = [sorted_population, offspring];
             remaining_J = [J_sorted, J_offspring];
             remaining_fitness = obj.fitness(remaining_J);
-            [~, indices] = sort(remaining_fitness,'ascend');
+            [~, indices] = sortrows(remaining_fitness);
             sorted_remaining = remaining(indices);
             J_sorted = remaining_J(:, indices);
             

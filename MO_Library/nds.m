@@ -7,19 +7,15 @@ function R = nds(P)
 %           number of elements (objectives) of each point.
 %
 %    OUTPUT
-%     - R : [N x 3] matrix. First column has the number of solutions by 
-%           which each solution is weakly dominated. Second column has the 
-%           sub-front where each solution belongs. Third column has a 
-%           crowding distance.
+%     - R : [N x 2] matrix. First column has the sub-front where each 
+%           solution belongs. Second column has the crowding distance.
 %
 % =========================================================================
 % WARNING
-% The crowding distance used in this code is not exactly the one described
-% in NSGA-II. In this implementation, it is the average normalized 
-% Euclidean distance between each solution and the solutions belonging to 
-% the same sub-front. Also notice that the distance is negated to sort the 
-% solution correctly (as we prefer sparse solution, the higher the distance
-% the better).
+% The crowding distance is negated to sort solutions correctly. 
+% Otherwise, a sort on the matrix would order it incorrectly, as the rule 
+% for the rank is "the lower, the better", while for the distance is 
+% "the higher, the better".
 %
 % =========================================================================
 % REFERENCE
@@ -35,41 +31,38 @@ function R = nds(P)
 %     0.3659    0.0754
 %     0.0220    0.5690
 %     0.5135    0.3447
-%     0.1898    0.4758]
+%     0.1898    0.4758];
 %
-% nds(P)
-%     0    0    -0.3878
-%     3    2     1.0000
-%     0    0    -0.4473
-%     1    1    -0.2666
-%     2    1    -0.4706
-%     1    1    -0.3674
-%     0    0    -0.2809
-%     1    1    -0.2493
+% R = nds(P)
+%     0      -Inf
+%     2      -Inf
+%     0      -Inf
+%     1   -1.3233
+%     1      -Inf
+%     1      -Inf
+%     0   -2.0000
+%     1   -1.0746
 %
-% We can then sort R and use the indices to sort P.
 % [Rs, idx] = sortrows(R);
 % Ps = P(idx,:);
 % 
-% Here is an analysis of [Rs, Ps] components and how solutions are sorted 
-% according to the algorithm:
+%                 Rs              |         Ps
+%     -----------------------------------------------
+%     rank   crowd. dist.   #dom. |    Obj1      Obj2
+%     0          -Inf         0   |  0.6850    0.2048
+%     0          -Inf         0   |  0.3348    0.6344
+%     0       -2.0000         0   |  0.5135    0.3447
+%     -----------------------------------------------
+%     1          -Inf         1   |  0.0220    0.5690
+%     1          -Inf         2   |  0.3659    0.0754
+%     1       -1.3233         1   |  0.3037    0.4429
+%     1       -1.0746         1   |  0.1898    0.4758
+%     -----------------------------------------------
+%     2          -Inf         3   |  0.2649    0.2967
 %
-%              Rs                     Ps
-%     #dom  subf  avg dist  |    Obj1      Obj2
-%     -----------------------------------------
-%     0     0     -0.4473   |   0.6850    0.2048
-%     0     0     -0.3878   |   0.3348    0.6344  <- Pareto-front solutions
-%     0     0     -0.2809   |   0.5135    0.3447
-%     -----------------------------------------
-%     2     1     -0.4706   |   0.3659    0.0754
-%     1     1     -0.3674   |   0.3037    0.4429
-%     1     1     -0.2666   |   0.1898    0.4758  <- First subfront
-%     1     1     -0.2493   |   0.0220    0.5690
-%     -----------------------------------------
-%     3     2      1.0000   |   0.2649    0.2967  <- Second subfront
+% (#dom column has been manually added)
 
 tmp = P;
-uniqueP = unique(P,'rows');
 [n, d] = size(P);
 rank = zeros(n,1);
 avgdist = zeros(n,1);
@@ -94,24 +87,28 @@ while ~isempty(tmp)
     % Assign the crowding distance
     subfront = P(idx_P,:); % Include duplicates for correct indexing
     subfront = normalize_points(subfront,min(subfront),max(subfront)); % Normalize the objectives
-    C = mat2cell(subfront,ones(size(subfront,1),1),d);
-    subdist = cellfun( ...
-        @(X)mean( nonzeros( sqrt( sum( bsxfun(@plus, X, -subfront).^2, 2) ) ) ), ...
-        C, 'UniformOutput', false );
-    % We take only 'nonzeros' elements because 0 distances are due to duplicates
-    avgdist(idx_P) = vertcat(subdist{:});
-    avgdist(idx_P) = avgdist(idx_P) / sum(avgdist(idx_P)); % Normalize distance
+
+    avgdist(idx_P) = crowding_distance(subfront);
 
 end
 
-avgdist(isnan(avgdist)) = 1; % NaN will occur if a subfront has only one element
+R = [rank, -avgdist];
 
-% Count the number of solutions by which every solution is weakly dominated
-C = mat2cell(P,ones(n,1),d);
-dominance = cellfun( ...
-    @(X) sum( sum( bsxfun(@ge, uniqueP, X), 2) == d ), ...
-    C, 'UniformOutput', false);
-ndominate = vertcat(dominance{:}) - 1;
 
-% Since we prefer sparse solutions, we negate the distance
-R = [ndominate, rank, -avgdist];
+
+function dist = crowding_distance(sub_P)
+
+[n, d] = size(sub_P);
+tmp = [sub_P, zeros(n,1)];
+for m = 1 : d
+    tmp = sortrows(tmp,m);
+    tmp([1,n],end) = inf; % Boundary solutions have max distance
+    tmp(2:end-1,end) = tmp(2:end-1,end) + ...
+        (tmp(3:end,m) - tmp(1:end-2,m)) / (max(tmp(:,m)) - min(tmp(:,m)));
+end
+
+% Original ordering
+[~, idx] = sortrows(sub_P,d);
+[~, idx] = sort(idx);
+
+dist = tmp(idx,end);
