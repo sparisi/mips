@@ -35,6 +35,9 @@ action = zeros(mdp.daction,totepisodes);
 % Keep track of the states which did not terminate
 ongoing = true(1,totepisodes);
 
+% Duplicate contexts for indexing
+contexts = repmat(contexts,1,episodes);
+
 % Save the last step per episode
 endingstep = maxsteps*ones(1,totepisodes);
 
