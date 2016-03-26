@@ -36,7 +36,7 @@ action = zeros(mdp.daction,totepisodes);
 ongoing = true(1,totepisodes);
 
 % Duplicate contexts for indexing
-contexts = repmat(contexts,1,episodes);
+if nargin == 5, contexts = repmat(contexts,1,episodes); end
 
 % Save the last step per episode
 endingstep = maxsteps*ones(1,totepisodes);
