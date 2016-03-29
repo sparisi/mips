@@ -1,26 +1,30 @@
-% Script for plotting mean and std of some data from several trials. 
-% In this example, trials are saved in files 'NAME1', 'NAME2', 'NAME3' ...
+% Script for comparing the results of different methods averaged over 
+% several trials. Data is in files named 'METHOD_TRIAL.mat' (1_1.mat,
+% 1_2.mat, ..., 2_2.mat, etc...).
 
-% close all
+close all
 clear all
 
-filename = 'NAME';
-counter = 1;
-for i = 1 : 999
-    try
-        load([filename num2str(i)])
-        dataMatrix(counter,:) = J_history; % change to your desired data
-        counter = counter + 1;
-    catch
+for METHOD = [1 3 4 10 11]
+    
+    counter = 1;
+    for TRIAL = 1 : 999
+        try
+            load([num2str(METHOD) '_' num2str(TRIAL)])
+            dataMatrix(counter,:) = J_history; % Change to your desired data
+            counter = counter + 1;
+        catch
+        end
     end
+    % dataMatrix = moving(dataMatrix',2)';
+    
+    hold all
+    shadedErrorBar( ...
+        1:size(dataMatrix,2), ...
+        mean(dataMatrix,1), ...
+        std(dataMatrix), ...
+        {'LineWidth', 2, 'DisplayName', num2str(METHOD)}, ...
+        0.1 );
+    legend('-DynamicLegend');
+    
 end
-% dataMatrix = moving(dataMatrix',2)';
-
-hold all
-shadedErrorBar( ...
-    1:size(dataMatrix,2), ...
-    mean(dataMatrix,1), ...
-    std(dataMatrix), ...
-    {'LineWidth', 2, 'DisplayName', filename}, ...
-    0.1 );
-legend('-DynamicLegend');
