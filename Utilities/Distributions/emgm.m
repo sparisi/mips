@@ -127,8 +127,9 @@ for i = 1 : k
     Xo = bsxfun(@minus,X,mu(:,i));
     Xo = bsxfun(@times,Xo,sqrtR(:,i)');
     Sigma(:,:,i) = Xo * Xo' / nk(i);
+    R(:,i) = R(:,i) / sum(R(:,i));
     Z = (sum(R(:,i))^2 - sum(R(:,i).^2)) / sum(R(:,i))^2;
-    if Z ~= 0, Sigma(:,:,i) = Sigma(:,:,i) / Z; end
+    Sigma(:,:,i) = Sigma(:,:,i) / Z;
     Sigma(:,:,i) = nearestSPD(Sigma(:,:,i));
 end
 

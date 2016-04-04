@@ -17,7 +17,5 @@ end
 y = max(x,[],dim);
 x = bsxfun(@minus,x,y);
 s = y + log(sum(exp(x),dim));
-i = find(~isfinite(y));
-if ~isempty(i)
-    s(i) = y(i);
-end
+i = isinf(y);
+if any(i(:)), s(i) = y(i); end

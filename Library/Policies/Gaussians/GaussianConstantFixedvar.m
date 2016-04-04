@@ -38,6 +38,7 @@ classdef GaussianConstantFixedvar < GaussianConstant
         %% WML
         function obj = weightedMLUpdate(obj, weights, Actions)
             assert(min(weights) >= 0, 'Weights cannot be negative.')
+            weights = weights / sum(weights);
             mu = Actions * weights / sum(weights);
             obj = obj.update(mu);
         end        

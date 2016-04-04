@@ -84,6 +84,7 @@ classdef GaussianConstantDiag < GaussianConstant
         %% WML
         function obj = weightedMLUpdate(obj, weights, Action)
             assert(min(weights) >= 0, 'Weights cannot be negative.')
+            weights = weights / sum(weights);
             mu = Action * weights' / sum(weights);
             std = sum(bsxfun(@times,bsxfun(@minus,Action,mu).^2,weights),2);
             Z = (sum(weights)^2 - sum(weights.^2)) / sum(weights);

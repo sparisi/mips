@@ -61,6 +61,7 @@ classdef GaussianConstantChol < GaussianConstant
         %% WML
         function obj = weightedMLUpdate(obj, weights, Action)
             assert(min(weights) >= 0, 'Weights cannot be negative.')
+            weights = weights / sum(weights);
             mu = Action * weights' / sum(weights);
             diff = bsxfun(@minus,Action,mu);
             Sigma = bsxfun(@times, diff, weights) * diff';
