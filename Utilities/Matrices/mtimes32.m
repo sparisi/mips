@@ -1,7 +1,7 @@
 function C = mtimes32(A,B)
 % MTIMES32 Multiplies a 3d matrix by a 2d matrix.
 % It is equivalent to the following loop:
-% >> C = zeros(size(B));
+% >> C = zeros(size(A,1),size(A,3));
 % >> for i = 1 : size(B,2)
 % >>     C(:,i) = A(:,:,i) * B(:,i);
 % >> end
