@@ -8,6 +8,7 @@ clear all
 for METHOD = [1 3 4 10 11]
     
     counter = 1;
+    dataMatrix = [];
     for TRIAL = 1 : 999
         try
             load([num2str(METHOD) '_' num2str(TRIAL)])
