@@ -12,10 +12,9 @@ function R = nds(P)
 %
 % =========================================================================
 % WARNING
-% The crowding distance is negated to sort solutions correctly. 
-% Otherwise, a sort on the matrix would order it incorrectly, as the rule 
-% for the rank is "the lower, the better", while for the distance is 
-% "the higher, the better".
+% The crowding distance is negated to sort solutions correctly (recall that
+% the rank grading rule is "the lower, the better", while for the distance 
+% is "the higher, the better").
 %
 % =========================================================================
 % REFERENCE
