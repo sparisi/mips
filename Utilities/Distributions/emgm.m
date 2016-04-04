@@ -116,25 +116,24 @@ function model = maximization(X, R, W)
 d = size(X,1);
 k = size(R,2);
 
-R = bsxfun(@times,R,W');
-nk = sum(R,1);
-w = nk / sum(W);
-mu = bsxfun(@times, X * R, 1 ./ nk);
+W = W / sum(W);
+
+w = bsxfun(@times, R, W');
+model.ComponentProportion = sum(w,1) / sum(sum(w));
+
+w = bsxfun(@times, w, 1 ./ sum(w,1));
+mu = X * w;
 
 Sigma = zeros(d,d,k);
-sqrtR = sqrt(R);
 for i = 1 : k
-    Xo = bsxfun(@minus,X,mu(:,i));
-    Xo = bsxfun(@times,Xo,sqrtR(:,i)');
-    Sigma(:,:,i) = Xo * Xo' / nk(i);
-    R(:,i) = R(:,i) / sum(R(:,i));
-    Z = (sum(R(:,i))^2 - sum(R(:,i).^2)) / sum(R(:,i))^2;
+    Xo = bsxfun(@minus, X, mu(:,i));
+    Sigma(:,:,i) = bsxfun(@times, Xo, w(:,i)') * Xo';
+    Z = (sum(w(:,i))^2 - sum(w(:,i).^2)) / sum(w(:,i));
     Sigma(:,:,i) = Sigma(:,:,i) / Z;
     Sigma(:,:,i) = nearestSPD(Sigma(:,:,i));
 end
 
 model.mu = mu;
 model.Sigma = Sigma;
-model.ComponentProportion = w;
 
 end
