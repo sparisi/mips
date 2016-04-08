@@ -85,7 +85,7 @@ while ~isempty(tmp)
 
     % Assign the crowding distance
     subfront = P(idx_P,:); % Include duplicates for correct indexing
-    subfront = normalize_points(subfront,min(subfront),max(subfront)); % Normalize the objectives
+    subfront = normalize_data(subfront,min(subfront),max(subfront)); % Normalize the objectives
 
     avgdist(idx_P) = crowding_distance(subfront);
 

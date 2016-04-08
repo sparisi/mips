@@ -87,7 +87,7 @@ while ~isempty(tmp)
 
     % Assign the crowding distance
     subfront = P(idx_P,:); % Include duplicates for correct indexing
-    subfront = normalize_points(subfront,min(subfront),max(subfront)); % Normalize the objectives
+    subfront = normalize_data(subfront,min(subfront),max(subfront)); % Normalize the objectives
     C = mat2cell(subfront,ones(size(subfront,1),1),d);
     subdist = cellfun( ...
         @(X)mean( nonzeros( sqrt( sum( bsxfun(@plus, X, -subfront).^2, 2) ) ) ), ...

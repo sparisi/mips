@@ -14,5 +14,5 @@ function THETA = linear_regression(X, Y, W)
 if nargin < 3, W = ones(1,N); end
 
 XW = bsxfun(@times, X, W);
-lambda = 1e-3;
+lambda = 1e-2;
 THETA = (XW * X' + lambda * eye(D)) \ (XW * Y');

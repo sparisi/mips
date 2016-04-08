@@ -21,7 +21,7 @@ function hv = hypervolume2d(f, antiutopia, utopia)
 f = pareto(f); % Be sure that the front does not have dominated solutions
 
 if nargin == 3
-    f = normalize_points(f,antiutopia,utopia);
+    f = normalize_data(f,antiutopia,utopia);
     r = zeros(1, size(f,2));
 else
     r = antiutopia;
