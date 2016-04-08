@@ -3,11 +3,17 @@ function combs = nmultichoosek(values, k)
 % nchoosek is performed are columns. If VALUES is a matrix, nchoosek is
 % performed for each column and COMBS is a matrix as well.
 
-[n, ncombs] = size(values);
-if n == 1
-    n = values;
-    combs = nchoosek(n+k-1, k);
+[d, ncombs] = size(values);
+if d == 1
+    d = values;
+    combs = nchoosek(d+k-1, k);
 else
-    combs = bsxfun(@minus, nchoosek(1:n+k-1,k), 0:k-1);
+    if k == 2
+        combs = nchoose2(1:d+k-1);
+        combs(:,2) = combs(:,2) - 1;
+    else
+        combs = bsxfun(@minus, nchoosek(1:d+k-1,k), 0:k-1);
+    end
+    
     combs = reshape(values(combs,:), [], k, ncombs);
 end
