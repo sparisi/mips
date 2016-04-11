@@ -53,7 +53,7 @@ classdef EGreedy < PolicyDiscrete
                 zeros(1,nstates)]; % last action has 0 weights
 
             if nargin == 3
-                idx = (0:nstates-1)*dphi+Actions;
+                idx = (0:nstates-1)*lactions+Actions;
                 Q = Q(idx); % linear indexing
             end
         end

@@ -12,4 +12,18 @@ classdef (Abstract) CMDP < MDP
         context = getcontext(obj,n);
     end
     
+    methods
+        function plotepisode(obj, episode, context, pausetime)
+        % Plots the state of the MDP during an episode for a given context.
+            if nargin == 3, pausetime = 0; end
+            try close(obj.handleEnv), catch, end
+            obj.initplot(context);
+            obj.updateplot(episode.s(:,1));
+            for i = 1 : size(episode.nexts,2)
+                pause(pausetime)
+                obj.updateplot(episode.nexts(:,i))
+            end
+        end
+    end        
+    
 end
