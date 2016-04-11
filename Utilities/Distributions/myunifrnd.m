@@ -12,6 +12,8 @@ function r = myunifrnd(a,b,n)
 if ~iscolumn(a), a = a'; end
 if ~iscolumn(b), b = b'; end
 assert(min(a <= b) == 1, 'Bounds are not consistent.')
-    
+
+if nargin < 3, n = 1; end
+
 d = length(a);
 r = bsxfun(@plus, a, bsxfun(@times, (b - a), rand(d,n)));

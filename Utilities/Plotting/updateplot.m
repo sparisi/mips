@@ -24,10 +24,19 @@ if numel(newX) == 1, newX = repmat(newX,1,numel(newY)); end
 if isempty(fig)
     fig = figure();
     fig.Name = name;
+    
+    % Get the figure's datacursor mode and activate it
+    cursorMode = datacursormode(fig);
+    set(cursorMode, 'enable', 'on');
+    
     hold all
     for i = 1 : numel(newX)
-        plot(newX{i}, newY{i})
+        dataObjs = plot(newX{i}, newY{i});
+        if nargin == 4
+            set(dataObjs, 'UserData', cursorMode.createDatatip(dataObjs));
+        end
     end
+    
     hold off
     title(name)
     return
@@ -39,9 +48,6 @@ X = get(dataObjs, 'XData')';
 Y = get(dataObjs, 'YData')';
 if ~iscell(X), X = {X}; Y = {Y}; end % If there is only one plot
 
-% Delete all previous annotations
-delete(findall(fig,'Type','hggroup'));
-
 % Append new points
 for i = 1 : numel(dataObjs)
     X{i}(end+1) = newX{i};
@@ -50,15 +56,8 @@ for i = 1 : numel(dataObjs)
     set(dataObjs(i), 'YData', Y{i});
     
     if nargin == 4
-        % Get the figure's datacursor mode and activate it
-        cursorMode = datacursormode(fig);
-        set(cursorMode, 'enable', 'on');
-        
-        % Create a new data tip
-        hDatatip = cursorMode.createDatatip(dataObjs(i));
-        
         % Update annotation position
-        hDatatip.Cursor.Position = [newX{i}, newY{i} 0];
+        set(get(dataObjs(i), 'UserData'), 'Position', [newX{i}, newY{i} 0])
     end
 end
 
