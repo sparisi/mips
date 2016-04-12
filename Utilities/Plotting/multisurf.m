@@ -27,4 +27,6 @@ for i = 1 : size(Z,3)
     surf(X,Y,Z(:,:,i))
 end
 
+axis([xmin,xmax,ymin,ymax])
+
 end
