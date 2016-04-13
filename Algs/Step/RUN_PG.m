@@ -10,7 +10,6 @@ while true
 %     [grad, stepsize] = GPOMDPbase(policy,ds,gamma,lrate);
 %     [grad, stepsize] = eREINFORCEbase(policy,ds,gamma,lrate);
     [grad, stepsize] = eNACbase(policy,ds,gamma,lrate);
-%     [grad, stepsize] = NaturalPG('r',policy,ds,gamma,lrate);
     
     J = evaluate_policies(mdp, episodes_learn, steps_learn, policy.makeDeterministic);
     norm_g = norm(grad(:,robj));

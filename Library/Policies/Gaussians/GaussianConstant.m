@@ -27,6 +27,7 @@ classdef (Abstract) GaussianConstant < Gaussian
 
         %% MVNRND
         function Actions = drawAction(obj, N)
+            if nargin == 1, N = 1; end
             Actions = bsxfun(@plus, obj.U'*randn(obj.daction,N), obj.mu);
         end
         
