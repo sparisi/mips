@@ -1,6 +1,5 @@
 classdef EGreedy < PolicyDiscrete
-% EGREEDY Epsilon-greedy distribution with preferences on all but last 
-% action.
+% EGREEDY Epsilon-greedy distribution with preferences on all actions.
     
     properties(GetAccess = 'public', SetAccess = 'private')
         basis
@@ -16,7 +15,7 @@ classdef EGreedy < PolicyDiscrete
         function obj = EGreedy(basis, theta, action_list, epsilon)
             assert(isvector(action_list), ...
                 'Action list is not a vector.')
-            assert((basis()+1)*(length(action_list)-1) == length(theta), ...
+            assert((basis()+1)*length(action_list) == length(theta), ...
                 'Wrong number of initial parameters.')
 
             obj.basis = basis;
@@ -49,8 +48,7 @@ classdef EGreedy < PolicyDiscrete
             phi = obj.basis1(States);
             dphi = size(phi,1);
 
-            Q = [reshape(obj.theta,dphi,lactions-1)'*phi;
-                zeros(1,nstates)]; % last action has 0 weights
+            Q = reshape(obj.theta,dphi,lactions)'*phi;
 
             if nargin == 3
                 idx = (0:nstates-1)*lactions+Actions;

@@ -96,7 +96,7 @@ If the state space is 2-dimensional, you can plot the value functions learned by
 `policy.plotQ(1,11,1,10) % plot Q-function` <br />
 `policy.plotV(1,11,1,10) % plot V-function` <br />
 `policy.plotActions(1,11,1,10) % plot action probabilities` <br />
-`policy.plotDeterministic(1,11,1,10) % plot the action taken by zeroing the exploration`
+`policy.plotGreedy(1,11,1,10) % plot the action taken by zeroing the exploration`
 
 ### MOMDPs Pareto frontier
 

@@ -1,4 +1,4 @@
-N = 20;
+N = 10;
 N_MAX = N * 10;
 solver = REPS_Solver(0.9);
 if makeDet, policy = policy.makeDeterministic; end
@@ -25,6 +25,8 @@ while true
     
     [weights, divKL] = solver.optimize(J(robj,:));
 
+    % Eval current policy and print info
+%     [data, avgRew] = collect_episodes(mdp, episodes_eval, steps_eval, policy_high.makeDeterministic, policy);
     J_history(:,iter) = data.J(robj,:);
     fprintf( '%d) Avg Reward: %.4f, \tKL Div: %.2f, \tEntropy: %.3f\n', ...
         iter, avgRew(robj), divKL, policy_high.entropy(data.Theta) );

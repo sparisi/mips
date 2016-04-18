@@ -4,7 +4,7 @@ classdef Gridworld < MDP
     properties
         % Environment variables
         reward = [ ...
-            0  0  0  0  0  5  0
+            0  0  0  0  0  9  0
             0  0  0  0  0  0  0
             0  0  0  0  0  0  0
             0  0  0  0  0  0  0
@@ -52,7 +52,6 @@ classdef Gridworld < MDP
         %% Simulator
         function state = initstate(obj, n)
             state = [randi(obj.stateUB(1),1,n); randi(obj.stateUB(2),1,n)];
-%             state = repmat([1; 1], 1, n);
             if obj.realtimeplot, obj.showplot; obj.updateplot(state); end
         end
         

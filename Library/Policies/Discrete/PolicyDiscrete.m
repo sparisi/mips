@@ -8,7 +8,7 @@ classdef (Abstract) PolicyDiscrete < Policy
     methods
         
         %% Value functions
-        Q = obj.qFunction(States,Actions);
+        Q = qFunction(obj, States, Actions);
         
         function V = vFunction(obj, States)
             prob_list = obj.distribution(States);
@@ -17,7 +17,7 @@ classdef (Abstract) PolicyDiscrete < Policy
         end        
         
         %% Distribution functions
-        prob_list = obj.distribution(States);
+        prob_list = distribution(obj, States);
 
         function probability = evaluate(obj, States, Actions)
             % Evaluate pairs (state, action)
@@ -62,7 +62,7 @@ classdef (Abstract) PolicyDiscrete < Policy
             idx = bsxfun(@plus,idx_start,(0:dphi-1)'); % All linear indices
             phiSA = zeros(dphi*nactions,nstates); % Initialize output array with zeros
             phiSA(idx) = Phi;
-            phiSA(end-dphi+1:end,:) = []; % Last action does not have any explicit preference
+            phiSA = phiSA(1:length(obj.theta),:); % Some policies do not have any explicit preference on the last action
         end
         
         %% Adds the constant feature 1 to the basis function
@@ -71,7 +71,7 @@ classdef (Abstract) PolicyDiscrete < Policy
         end
         
         %% Plotting
-        function plotDeterministic(obj, xmin, xmax, ymin, ymax, fig)
+        function plotGreedy(obj, xmin, xmax, ymin, ymax, fig)
         % Plot the most probable action for 2D states
             assert(xmin < xmax, 'X upper bound cannot be lower than lower bound.')
             assert(ymin < ymax, 'Y upper bound cannot be lower than lower bound.')

@@ -57,7 +57,7 @@ ongoing = true(1,episodes);
 % Save the last step per episode
 endingstep = maxsteps*ones(1,episodes);
 
-% Run the episodes until maxsteps or all ends
+% Run the episodes until maxsteps or all episodes end
 while ( (step < maxsteps) && sum(ongoing) > 0 )
     
     step = step + 1;
