@@ -1,16 +1,6 @@
-% Use this script to compile all the mex sources
+% Use this script to compile all the mex sources in the PMGA folder
 
-fileext = '*.cpp';
-listing = dir(fileext);
+script_path = mfilename('fullpath');
+script_path = script_path(1:end-length(mfilename));
 
-addpath(genpath('.'))
-
-mkdir('mexBuild')
-
-for i = 1 : numel(listing)
-
-    filename = listing(i).name;
-    mex('-outdir', 'mexBuild/', filename);
-    
-end
-
+buildMex([script_path 'src/'], [script_path 'include/'])

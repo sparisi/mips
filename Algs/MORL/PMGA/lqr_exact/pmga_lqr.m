@@ -16,10 +16,10 @@ antiutopia = mdp.antiutopia;
 true_front = mdp.truefront;
 dim_J = mdp.dreward;
 
-param_type = 'P1';
-ind_type = {'mix2', [1,1]}; % MIX2: beta1 * L_AU / L_U - beta2
-ind_type = {'mix3', 1}; % MIX3: L_AU * (1 - lambda * L_U)
-[ind_handle, ind_d_handle] = getIndicatorHandle(ind_type{1},ind_type{2},utopia,antiutopia);
+param_type = 'P1'; % P1 unconstrained, P2 constrained
+ind_type = {'mix2', [1,1]}; % MIX2: beta1 * I_AU / I_U - beta2
+ind_type = {'mix3', 1}; % MIX3: I_AU * (1 - lambda * I_U)
+[ind_handle, ind_d_handle] = parse_indicator_handle(ind_type{1},ind_type{2},utopia,antiutopia);
 
 [theta, rho, t, D_t_theta, D_rho_theta, J_sym] = params_lqr( param_type, mdp );
 dim_rho = length(rho);
@@ -43,9 +43,9 @@ end
 tolerance = 0.00001;
 lrate = 0.1;
 
-episodes = 150;
+episodes = 50;
 steps = 50;
-n_points = 50; % #points t used to estimate the integral
+n_points = 5; % #points t used to estimate the integral
 n_points_eval = 10000;
 lo = zeros(dim_t,1);
 hi = ones(dim_t,1);
@@ -55,10 +55,10 @@ MAX_ITER = 1000;
 
 rho_learned = [1 1 0 0];
 % rho_learned = [3 7];
-rho_learned = rand(1,dim_rho);
+% rho_learned = rand(1,dim_rho);
 
 rho_history = [];
-Jr_history = [];
+L_history = [];
 hv_history = [];
 loss_history = [];
 t_history = {};
@@ -93,20 +93,20 @@ while iter < MAX_ITER
     t_points = unifrnds(lo, hi, n_points)';
     t_history{iter} = t_points;
 
-    [Jr_eval, D_jr_eval] = executeTPoint(mdp, policy, episodes, steps, t_points, ...
+    [L_eval, D_L_eval] = executeTPoint(mdp, policy, episodes, steps, t_points, ...
         theta_iter, D_r_Dtheta_iter, D_t_theta_iter, D_rho_theta_iter, ...
         t, ind_handle, ind_d_handle);
 
-    Jr_eval = Jr_eval * volume;
-    D_jr_eval = D_jr_eval * volume;
+    L_eval = L_eval * volume;
+    D_L_eval = D_L_eval * volume;
     
     % Update
-%     fprintf('Iter: %d, Jr: %.4f, Norm: %.3f\n', iter, Jr_eval, norm(D_jr_eval));
-    Jr_history = [Jr_history; Jr_eval];
-    lambda = sqrt(D_jr_eval * eye(dim_rho) * D_jr_eval' / (4 * lrate));
+%     fprintf('Iter: %d, L: %.4f, Norm: %.3f\n', iter, L_eval, norm(D_L_eval));
+    L_history = [L_history; L_eval];
+    lambda = sqrt(D_L_eval * eye(dim_rho) * D_L_eval' / (4 * lrate));
     lambda = max(lambda,1e-8); % to avoid numerical problems
     stepsize = 1 / (2 * lambda);
-    rho_learned = rho_learned + D_jr_eval * stepsize;
+    rho_learned = rho_learned + D_L_eval * stepsize;
     
     iter = iter + 1;
 

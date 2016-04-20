@@ -1,8 +1,8 @@
 function h = HessianRF(policy, data, gamma)
-% Computes the hessian of a policy wrt its parameters.
+% Computes the Hessian of a policy wrt its parameters.
 % H is a [D x D x R] matrix, where D is the length of the policy parameters
 % and R is the number of immediate rewards received at each time step. Each 
-% page of H corresponds to the hessian wrt an objective.
+% page of H corresponds to the Hessian wrt an objective.
 
 actions = horzcat(data.a);
 states = horzcat(data.s);

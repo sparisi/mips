@@ -10,24 +10,27 @@ antiutopia = [360,360,360];
 
 
 %% Parse settings 
-loss_type = {'mix1', 30}; % MIX1: L_AU * (1 - lambda * L_pareto)
-loss_type = {'mix2', [2.5,1]}; % MIX2: beta1 * L_AU / L_U - beta2
-loss_type = {'mix3', 1.4}; % MIX3: L_AU * (1 - lambda * L_U)
-param_type = 'P2'; % P1 unconstrained, P2 constrained
+indicator = {'utopia'};
+% indicator = {'antiutopia'};
+% indicator = {'pareto'};
+% indicator = {'mix1', 30}; % MIX1: L_AU * (1 - lambda * L_pareto)
+% indicator = {'mix2', [2.5,1]}; % MIX2: beta1 * L_AU / L_U - beta2
+% indicator = {'mix3', 1.4}; % MIX3: L_AU * (1 - lambda * L_U)
+param_type = 'P1'; % P1 unconstrained, P2 constrained
 
-mexName = strcat(['mexIntegrate_LQR3_' param_type '_' loss_type{1}]);
+mexName = strcat(['mexIntegrate_LQR3_' param_type '_' indicator{1}]);
 
-switch loss_type{1}
+switch indicator{1}
     case 'utopia' , params = utopia;
     case 'antiutopia' , params = antiutopia;
-    case 'pareto' , params = {};
-    case 'mix1' , params = [antiutopia, loss_type{2}];
-    case 'mix2' , params = [antiutopia, utopia, loss_type{2}];
-    case 'mix3' , params = [antiutopia, utopia, loss_type{2}];
-    otherwise , error('Unknown loss function.')
+    case 'pareto' , params = [];
+    case 'mix1' , params = [antiutopia, indicator{2}];
+    case 'mix2' , params = [antiutopia, utopia, indicator{2}];
+    case 'mix3' , params = [antiutopia, utopia, indicator{2}];
+    otherwise , error('Unknown indicator.')
 end
 
-[J, theta, rho, t] = settings_lqr3( loss_type{1}, param_type );
+[J, theta, rho, t] = settings_lqr3( indicator{1}, param_type );
 dim_rho = size(rho,2); % k
 
 
@@ -38,12 +41,12 @@ tmin = [0,0];
 tmax = [1,1];
 tolerance = 0.01;
 
-rng(5)
+rng(4)
 rho_learned = rand(1, dim_rho) / 1000;
-% rho_learned = ones(1, dim_rho) / 1000;
+% rho_learned = ones(1, dim_rho);
 % rho_learned = zeros(1, dim_rho);
 rho_history = [];
-Jr_history = [];
+L_history = [];
 iter = 1;
 lrate = 1;
 
@@ -51,45 +54,43 @@ lrate = 1;
 %% Learning
 while true
 
-    [Jr_eval, D_jr_eval] = feval(mexName, tmin, tmax, n_points, 1, rho_learned, params);
+    [L_eval, D_L_eval] = feval(mexName, tmin, tmax, n_points, 1, rho_learned, params);
     
-    fprintf('Iter: %d, Jr: %.4f, Norm: %.3f\n', iter, Jr_eval, norm(D_jr_eval));
+    fprintf('Iter: %d, L: %.4f, Norm: %.3f\n', iter, L_eval, norm(D_L_eval));
     
-    if norm(D_jr_eval) < tolerance || lrate < 1e-12
+    if norm(D_L_eval) < tolerance || lrate < 1e-12
         rho_history = [rho_history; rho_learned];
-        Jr_history = [Jr_history; Jr_eval];
+        L_history = [L_history; L_eval];
         break
-    elseif sum(isnan(D_jr_eval)) > 0
+    elseif any(isnan(D_L_eval)) > 0
         break
     else
         % If the performance decreased, revert and halve the learning rate
-        if ~isempty(Jr_history) && Jr_eval < Jr_history(end)
+        if ~isempty(L_history) && L_eval < L_history(end)
             fprintf('Reducing learning rate...\n')
             lrate = lrate / 2;
             rho_learned = rho_history(end,:);
-            iter = iter - 1;
         else
             rho_history = [rho_history; rho_learned];
-            Jr_history = [Jr_history; Jr_eval];
+            L_history = [L_history; L_eval];
             
-            lambda = sqrt(D_jr_eval' * eye(length(D_jr_eval)) * D_jr_eval / (4 * lrate));
+            lambda = sqrt(D_L_eval' * eye(length(D_L_eval)) * D_L_eval / (4 * lrate));
             lambda = max(lambda,1e-8); % to avoid numerical problems
             stepsize = 1 / (2 * lambda);
             
-            rho_learned = rho_learned + D_jr_eval' * stepsize;
+            rho_learned = rho_learned + D_L_eval' * stepsize;
+            iter = iter + 1;
         end
     end            
-    
-    iter = iter + 1;
 
 end
 
 
-%% Plot J(rho) over time
+%% Plot L(rho) over time
 figure
-plot(Jr_history)
+plot(L_history)
 xlabel 'Iterations'
-ylabel 'J(\rho)'
+ylabel 'L(\rho)'
 
 
 %% Plot front in the parameters space over time

@@ -6,13 +6,12 @@ function [J, ...         % objective functions
     D2_theta_J, ...      % 2nd derivative of J wrt theta
     D_t_theta, ...       % derivative of theta wrt t
     D_r_theta, ...       % derivative of theta wrt rho
-    L, ...               % loss function
-    L_params, ...        % loss function parameters
+    I, ...               % indicator function
+    I_params, ...        % indicator function parameters
     AUp, ...             % antiutopia point
     Up] = ...            % utopia point
-    settings_lqr3( loss_type, param_type )
+    settings_lqr3( indicator_type, param_type )
 
-%% Initialization
 dim   = 3;
 LQR   = lqr_init(dim);
 g     = LQR.g;
@@ -51,7 +50,7 @@ elseif strcmp(param_type, 'P2') % Constrained
     k3_3 = sym('-1/(1+exp(-2.187264336-(-r7-3.338299811)*t1-(-r8-3.338299811)*t2-r7*t1^2-r8*t2^2-r9*t1*t2))');
     dim_r = 9;
 else
-    error('Unknown param type.');
+    error('Unknown parameterization.');
 end
 
 K = subs(K);
@@ -63,34 +62,6 @@ D_theta_J = subs(D_theta_J);
 D2_theta_J = subs(D2_theta_J);
 D_r_theta = jacobian(theta,r);
 
-
-%% Loss functions
-L_params = {};
-if strcmp('pareto',loss_type)
-    L = -paretoDirectionNorm(D_theta_J);
-elseif strcmp('utopia',loss_type)
-    L = -norm(J./Up-ones(size(J)))^2;
-elseif strcmp('antiutopia',loss_type)
-    L = norm(J./AUp-ones(size(J)))^2;
-elseif strcmp('sum_J',loss_type)
-    L = sum(J);
-elseif strcmp('mix1',loss_type)
-    L_params = sym('beta');
-    L_antiutopia = norm(J./AUp-ones(size(J)))^2;
-    L_pa = paretoDirectionNorm(D_theta_J);
-    L = L_antiutopia*(1-L_params*L_pa);
-elseif strcmp('mix2',loss_type)
-    L_params = sym('beta',[1,2]);
-    L_utopia = norm(J./Up-ones(size(J)))^2;
-    L_antiutopia = norm(J./AUp-ones(size(J)))^2;
-    L = L_params(1) * L_antiutopia / L_utopia - L_params(2);
-elseif strcmp('mix3',loss_type)
-    L_params = sym('beta');
-    L_antiutopia = norm(J./AUp-ones(size(J)))^2;
-    L_utopia = norm(J./Up-ones(size(J)))^2;
-    L = L_antiutopia*(1-L_params*L_utopia);
-else
-    error('Unknown loss function.')
-end
+[I, I_params] = parse_indicator(indicator_type, D_theta_J, J, Up, AUp);
 
 end

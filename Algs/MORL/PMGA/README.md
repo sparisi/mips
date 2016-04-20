@@ -7,7 +7,7 @@ Implementation of **P**areto-**M**anifold **G**radient **A**lgorithm as presente
 
 The paper is available at http://www.aaai.org/ocs/index.php/AAAI/AAAI15/paper/view/9798
 
-Additional requirements: *Symbolic Toolbox*.
+It requires the *Symbolic Toolbox*.
 
 
 How To Use It
@@ -17,9 +17,9 @@ There are two versions of PMGA: exact and sampled. The former is available only 
 
  - run `genCcode` to generate C code from the exact symbolic equations defining your problem,
  - run `genHeader` to generate C headers,
+ - write your C / C++ source files in `mexFiles/src` (the filename format is `mexIntegrate_MDP_PARAMETERIZATION_INDICATOR`),
  - run `compileSrc` to build the MEX files.
 
-This procedure will generate files named `mexIntegrate_NAME_PARAMETERIZATION_INDICATOR`.
 You can then write your own script to run PMGA (have a look at `manifold_lqr2` and `manifold_lqr3_mex`).
 
 For the sampled implementation of PMGA, you have to define the manifold parametrization in `params_NAME` and run `pmga`. In `pmga` you need to set the domain and the parameters of the indicator function.

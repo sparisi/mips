@@ -46,7 +46,7 @@ Policies are modeled as objects. Their most important method is `drawAction`, bu
 Each MDP is modeled as an object (`MDP.m`) and requires some properties (dimension of state and action spaces, bounds, etc...) and methods (for simulating and plotting).
 There are also some extension, that are *Contextual MDPs* (`CMDP.m`) and *Multi-objective MDPs* (`MOMDP.m`).
 
-> **IMPORTANT!** To allow parallel execution of multiple episodes, `simulator` functions need to support vectorized operations, i.e., they need to deal with states and actions represented as `S x N` and `A x N` matrices, repsectively.
+> **IMPORTANT!** To allow parallel execution of multiple episodes, `simulator` functions need to support vectorized operations, i.e., they need to deal with states and actions represented as `S x N` and `A x N` matrices, respectively.
 
 ### MO_Library
 This folder contains functions used in the multi-objective framework, e.g., hypervolume estimators and Pareto-optimality filters.
@@ -100,6 +100,6 @@ If the state space is 2-dimensional, you can plot the value functions learned by
 
 ### MOMDPs Pareto frontier
 
-To plot a set of points as a Pareto frontier of a MOMDP, use `mdp.plotfront`. Each MOMDP has its own plotting style for better clarity. Please note that the points have to be passed as rows and that the function does not filter dominated points.
+To plot a set of points as a Pareto frontier of a MOMDP, use `mdp.plotfront`. You can use additional arguments like in the built-in `plot` to customize the plot. Please note that the points have to be passed as rows and that the function does not filter dominated points.
 
-`mdp.plotfront([0.5 0.5; 1 0; 0 1])`
+`mdp.plotfront([0.5 0.5; 1 0; 0 1], '--or', 'LineWidth', 2)`

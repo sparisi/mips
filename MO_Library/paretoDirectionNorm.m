@@ -37,7 +37,7 @@ elseif dim_J == 3
 
 else
     
-    error('Symbolic Pareto-ascent norm with more than 3 objectives not yet implemented.')
+    error('Pareto-ascent norm with more than 3 objectives not yet implemented.')
     % See Wedge product and exterior algebra
 
 end

@@ -1,9 +1,9 @@
 function h = HessianRFbase(policy, data, gamma)
-% Computes the hessian of a policy wrt its parameters using the optimal
+% Computes the Hessian of a policy wrt its parameters using the optimal
 % baseline.
 % H is a [D x D x R] matrix, where D is the length of the policy parameters
 % and R is the number of immediate rewards received at each time step. Each 
-% page of H corresponds to the hessian wrt an objective.
+% page of H corresponds to the Hessian wrt an objective.
 
 actions = horzcat(data.a);
 states = horzcat(data.s);
@@ -27,7 +27,7 @@ bnum = squeeze( sum( bsxfun(@times, tmp, reshape(sumrew',[1 1 size(sumrew')])), 
 b = bnum ./ bden;
 b(isnan(b)) = 0; % When 0 / 0
 
-% Compute the hessian
+% Compute the Hessian
 rewb = bsxfun(@plus, -b, reshape(sumrew,[1 1 size(sumrew)]));
 sumhd = sumdlog2 + sumhlog;
 h = squeeze( sum( repmat(sumhd,1,1,1,dreward).*permute(rewb,[1 2 4 3]), 3) );

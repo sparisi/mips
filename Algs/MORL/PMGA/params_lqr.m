@@ -75,7 +75,7 @@ D_t_theta = jacobian(theta,t);
 D_rho_theta = jacobian(theta,rho);
 
 if nargout == 6
-    dim = mdp.dreward;
+    dim   = mdp.dreward;
     LQR   = lqr_init(dim);
     g     = LQR.g;
     B     = LQR.B;

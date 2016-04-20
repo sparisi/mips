@@ -6,26 +6,29 @@ reset(symengine)
 
 load('front_lqr2.mat');
 utopia = [150,150];
-antiutopia = [310,310];
+antiutopia = [350,350];
 
 
 %% Parse settings 
-loss_type = {'mix1', 1.5}; % MIX1: L_AU * (1 - lambda * L_pareto)
-loss_type = {'mix2', [1,1]}; % MIX2: beta1 * L_AU / L_U - beta2
-loss_type = {'mix3', 1}; % MIX3: L_AU * (1 - lambda * L_U)
+indicator = {'utopia'};
+indicator = {'antiutopia'};
+indicator = {'pareto'};
+indicator = {'mix1', 1.5}; % MIX1: I_AU * (1 - lambda * I_pareto)
+indicator = {'mix2', [3,1]}; % MIX2: beta1 * I_AU / I_U - beta2
+indicator = {'mix3', 1}; % MIX3: I_AU * (1 - lambda * I_U)
 param_type = 'P2'; % P1 unconstrained, P2 constrained
 
-[J, theta, rho, t, D_theta_J, D2_theta_J, D_t_theta, D_rho_theta, L, L_params, AUp, Up] = ...
-    settings_lqr2( loss_type{1}, param_type );
+[J, theta, rho, t, D_theta_J, D2_theta_J, D_t_theta, D_rho_theta, I, I_params, AUp, Up] = ...
+    settings_lqr2( indicator{1}, param_type );
 
-switch loss_type{1}
+switch indicator{1}
     case 'utopia' , params = num2cell(utopia,1);
     case 'antiutopia' , params = num2cell(antiutopia,1);
     case 'pareto' , params = {};
-    case 'mix1' , params = num2cell([antiutopia, loss_type{2}],1);
-    case 'mix2' , params = num2cell([antiutopia, utopia, loss_type{2}],1);
-    case 'mix3' , params = num2cell([antiutopia, utopia, loss_type{2}],1);
-    otherwise , error('Unknown loss function.')
+    case 'mix1' , params = num2cell([antiutopia, indicator{2}],1);
+    case 'mix2' , params = num2cell([antiutopia, utopia, indicator{2}],1);
+    case 'mix3' , params = num2cell([antiutopia, utopia, indicator{2}],1);
+    otherwise , error('Unknown indicator.')
 end
 
 dim_J = size(J,2);     % q
@@ -41,42 +44,46 @@ invX = 1 / X;
 invTX = transpose(invX);
 V = sqrt(detX);
 
-Jr = L*V;
+L = I*V;
 
-% Full gradient of J(rho)
-D_jr = transpose(jacobian(Jr,rho));
+% Full gradient of L(rho)
+D_L = transpose(jacobian(L,rho));
 
-% % Decomposed gradient of J(rho)
-% D_rho_L = jacobian(L,rho);
+% % Decomposed gradient of L(rho)
+% D_rho_I = jacobian(I,rho);
 % Kr_1 = kron(eye(dim_t),transpose(T));
-% K_perm = permutationMatrix(dim_t,dim_t);
+% K_perm = permutationmatrix(dim_t,dim_t);
 % N = 0.5*(eye(dim_t^2)+K_perm);
 % Kr_2 = kron(transpose(D_t_theta),eye(dim_J));
 % Kr_3 = kron(eye(dim_t),D_theta_J);
-% D_jr = sym('D_jr',[dim_rho,1]);
+% D_L = sym('D_L',[dim_rho,1]);
 % for i = 1 : dim_rho
 %     D_r_Dtheta = diff(D_t_theta,rho(i));
-%     D_jr(i) = D_rho_L(i) * V + ...
-%         L * V * transpose(invTX(:)) * N * Kr_1 * ...
+%     D_L(i) = D_rho_I(i) * V + ...
+%         I * V * transpose(invTX(:)) * N * Kr_1 * ...
 %         ( Kr_2 * D2_theta_J * D_rho_theta(:,i) + Kr_3 * D_r_Dtheta(:) );
 % end
 
-D_jr_fun = matlabFunction(D_jr);
-Jr_fun = matlabFunction(Jr);
+D_L_fun = matlabFunction(D_L);
+L_fun = matlabFunction(L);
 
 
 %% Reset learning
-n_points = 1024/2;
+n_points = 1024/2; % points for the Monte-Carlo estimate of the intregrals
 n_points_plot = 100;
 points = linspace(0,1,n_points);
 tolerance = 0.01;
 
 % rho_learned = [3 7]; % quite far
-rho_learned = [12 12]; % symmetric
+% rho_learned = [12 12]; % symmetric
 % rho_learned = [1 1 0 0];
+% rho_learned = [1 2 0 3];
+rho_learned = [2 2];
+% rho_learned = [6 6];
 % rho_learned = zeros(1, dim_rho);
+% rho_learned = rand(1, dim_rho);
 rho_history = [];
-Jr_history = [];
+L_history = [];
 iter = 1;
 lrate = 1;
 
@@ -85,46 +92,44 @@ lrate = 1;
 while true
 
     rho_arg = num2cell(rho_learned,1);
-    D_jr_eval = trapz(points,D_jr_fun(params{:},rho_arg{:},points)');
-    Jr_eval = trapz(points,Jr_fun(params{:},rho_arg{:},points));
+    D_L_eval = trapz(points,D_L_fun(params{:},rho_arg{:},points)');
+    L_eval = trapz(points,L_fun(params{:},rho_arg{:},points));
 
-    fprintf('Iter: %d, Jr: %.4f, Norm: %.3f\n', iter, Jr_eval, norm(D_jr_eval));
+    fprintf('Iter: %d, L: %.4f, Norm: %.3f\n', iter, L_eval, norm(D_L_eval));
 
-    if norm(D_jr_eval) < tolerance || lrate < 1e-3
+    if norm(D_L_eval) < tolerance || lrate < 1e-3
         rho_history = [rho_history; rho_learned];
-        Jr_history = [Jr_history; Jr_eval];
+        L_history = [L_history; L_eval];
         break
-    elseif sum(isnan(D_jr_eval)) > 0
+    elseif any(isnan(D_L_eval)) > 0
         break
     else
         % If the performance decreased, revert and halve the learning rate
-        if ~isempty(Jr_history) && Jr_eval < Jr_history(end)
+        if ~isempty(L_history) && L_eval < L_history(end)
             fprintf('Reducing learning rate...\n')
             lrate = lrate / 2;
             rho_learned = rho_history(end,:);
-            iter = iter - 1;
         else
             rho_history = [rho_history; rho_learned];
-            Jr_history = [Jr_history; Jr_eval];
+            L_history = [L_history; L_eval];
             
-            lambda = sqrt(D_jr_eval * eye(length(D_jr_eval')) * D_jr_eval' / (4 * lrate));
+            lambda = sqrt(D_L_eval * eye(length(D_L_eval')) * D_L_eval' / (4 * lrate));
             lambda = max(lambda,1e-8); % to avoid numerical problems
             stepsize = 1 / (2 * lambda);
             
-            rho_learned = rho_learned + D_jr_eval * stepsize;
+            rho_learned = rho_learned + D_L_eval * stepsize;
+            iter = iter + 1;
         end
-    end            
+    end
     
-    iter = iter + 1;
-
 end
 
 
-%% Plot J(rho) over time
+%% Plot L(rho) over time
 figure
-plot(Jr_history)
+plot(L_history)
 xlabel 'Iterations'
-ylabel 'J(\rho)'
+ylabel 'L(\rho)'
 
 
 %% Plot front in the parameters space over time
@@ -162,20 +167,23 @@ end
 
 autolayout
 
-% %% Plot J(rho) (only if rho is a 2d vector)
-% [xg,yg] = meshgrid(-2:0.2:2, -2:0.2:2);
+% %% Plot L(rho) (only if rho is 2d)
+% interval = linspace(-10,10,20);
+% [xg,yg] = meshgrid(interval, interval);
 % VV = [xg(:), yg(:)];
 % F = zeros(length(VV),3);
 % points = linspace(0,1,100);
 % for i = 1 : length(VV)
-%     D_jr_eval = Jr_fun(params{:},VV(i,1),VV(i,2),points);
-%     z = trapz(points,D_jr_eval');
+%     D_L_eval = L_fun(params{:},VV(i,1),VV(i,2),points);
+%     z = trapz(points,D_L_eval');
 %     F(i,:) = [VV(i,1),VV(i,2),z];
 % end
-% figure; surf(xg,yg,reshape(F(:,3),size(xg,1),size(yg,2)));
+% figure
+% subplot(1,2,1), surf(xg,yg,reshape(F(:,3),size(xg,1),size(yg,2)));
+% subplot(1,2,2), contourf(xg,yg,reshape(F(:,3),size(xg,1),size(yg,2)),50);
 % xlabel('\rho_1')
 % ylabel('\rho_2')
-% zlabel('J(\rho)')
+% zlabel('L(\rho)')
 % title 'Objective Function in the Manifold Parameters Space'
 % [I,II] = max(F(:,3));
 % F(II,:)

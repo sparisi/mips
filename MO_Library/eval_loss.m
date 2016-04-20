@@ -17,7 +17,9 @@ for i = 1 : size(weights,1)
     w = weights(i,:)';
     front_w = front * w;
     reference_front_w = reference_front * w;
-    loss = loss + (max(reference_front_w) - max(front_w)) / (diff_max * w);
+    loss_i = (max(reference_front_w) - max(front_w)) / (diff_max * w);
+    if loss_i > 0, warning('Positive loss!'), end
+    loss = loss + loss_i;
 end
 loss = loss / size(weights,1);
 
