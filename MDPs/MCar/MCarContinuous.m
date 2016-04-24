@@ -33,6 +33,7 @@ classdef MCarContinuous < MDP
         function state = initstate(obj, n)
             state = bsxfun(@plus, bsxfun(@times, ...
                 (obj.stateUB - obj.stateLB), rand(obj.dstate,n)), obj.stateLB);
+            state = repmat([-0.5, 0]',1,n);
             if obj.realtimeplot, obj.showplot; obj.updateplot(state); end
         end
         

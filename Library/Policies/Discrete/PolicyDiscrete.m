@@ -14,7 +14,7 @@ classdef (Abstract) PolicyDiscrete < Policy
             prob_list = obj.distribution(States);
             Q = obj.qFunction(States);
             V = mean(Q .* prob_list);
-        end        
+        end
         
         %% Distribution functions
         prob_list = distribution(obj, States);
