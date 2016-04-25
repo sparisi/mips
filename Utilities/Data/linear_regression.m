@@ -14,5 +14,15 @@ function THETA = linear_regression(X, Y, W)
 if nargin < 3, W = ones(1,N); end
 
 XW = bsxfun(@times, X, W);
-lambda = 1e-2;
-THETA = (XW * X' + lambda * eye(D)) \ (XW * Y');
+lambda = 1e-3;
+
+if D > N
+    A = X'*XW;
+    if rank(A) == N, lambda = 0; end
+    THETA = XW / (A + lambda*eye(N)) * Y';
+    
+else
+    A = XW*X';
+    if rank(A) == D, lambda = 0; end
+    THETA = (A + lambda*eye(D)) \ (XW*Y');
+end
