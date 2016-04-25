@@ -5,7 +5,8 @@ classdef (Abstract) Gaussian < Policy
         
         function S = entropy(obj, varargin)
         % Differential entropy, can be negative
-            S = 0.5*log( (2*pi*exp(1))^obj.daction * det(obj.Sigma) );
+            S = 0.5 * ...
+                ( obj.daction*log(2*pi*exp(1)) + 2*sum(log(diag(obj.U))) );
         end
 
     end
