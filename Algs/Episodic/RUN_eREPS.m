@@ -1,4 +1,4 @@
-N = 10;
+N = 20;
 N_MAX = N * 10;
 solver = REPS_Solver(0.9);
 if makeDet, policy = policy.makeDeterministic; end

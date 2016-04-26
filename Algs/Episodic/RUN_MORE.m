@@ -27,10 +27,9 @@ while true
 
     % Perform an update step
     [policy_high, divKL] = solver.step(J,Theta,policy_high);
-    minH = solver.gamma * (policy_high.entropy - solver.minH) + solver.minH;
     
-    fprintf( 'Iter: %d, Avg Reward: %.4f, KL Div: %.2f, Entropy: %.4f (Min Desired: %.4f) \n', ...
-        iter, avgRew(robj), divKL, policy_high.entropy, minH );
+    fprintf( 'Iter: %d, Avg Reward: %.4f, KL Div: %.2f, Entropy: %.4f \n', ...
+        iter, avgRew(robj), divKL, policy_high.entropy);
     
     iter = iter + 1;
     

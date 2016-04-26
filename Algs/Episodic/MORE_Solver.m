@@ -7,19 +7,20 @@ classdef MORE_Solver < handle
 % Model-based Relative Entropy Stochastic Search (2015)
     
     properties
-        epsilon % KL divergence bound
-        gamma   % Decreasing factor for the bound on the relative entropy
-        minH    % Minimum entropy
-        b       % Mean of the Gaussian search distribution
-        Q       % Covariance of the Gaussian
-        Qi      % Inverse of the covariance (store it for faster computation)
-        model   % Quadratic reward model
+        epsilon       % KL divergence bound
+        gamma         % Decreasing factor for the bound on the relative entropy
+        entropy_bound % How to choose the minimum entropy constraint ('absolute' vs 'relative', see dual function)
+        minH          % Minimum entropy
+        b             % Mean of the Gaussian search distribution
+        Q             % Covariance of the Gaussian
+        Qi            % Inverse of the covariance (store it for faster computation)
+        model         % Quadratic reward model
     end
     
     methods
         
         %% CLASS CONSTRUCTOR
-        function obj = MORE_Solver(epsilon, gamma, minH, policy)
+        function obj = MORE_Solver(epsilon, gamma, minH, policy, entropy_bound)
             obj.epsilon = epsilon;
             obj.gamma = gamma;
             obj.minH = minH;
@@ -30,6 +31,8 @@ classdef MORE_Solver < handle
             obj.model.R = zeros(policy.daction);
             obj.model.r = zeros(policy.daction,1);
             obj.model.r0 = 0;
+            if nargin < 5, entropy_bound = 'absolute'; end
+            obj.entropy_bound = entropy_bound;
         end
         
         %% PERFORM AN OPTIMIZATION STEP
@@ -95,8 +98,21 @@ classdef MORE_Solver < handle
 
             eta = params(1);
             omega = params(2);
-            H = 0.5 * ( dimQ*log(2*pi*exp(1)) + 2*sum(log(diag(chol(Q)))) );
-            beta = (obj.gamma * (H - obj.minH) + obj.minH);
+            H = 0.5 * ( dimQ*log(2*pi*exp(1)) + 2*sum(log(diag(chol(Q)))) ); % Current entropy
+            
+            switch (obj.entropy_bound)
+                case 'relative'
+                    beta = (obj.gamma * (H - obj.minH) + obj.minH);
+                    
+                case 'absolute'
+                    deltaH = obj.minH - H;
+                    if (deltaH > obj.gamma), deltaH = obj.gamma; end
+                    if (deltaH < -obj.gamma), deltaH = -obj.gamma; end
+                    beta = H + deltaH;
+                    
+                otherwise
+                    error('Unknow entropy bound type.')
+            end            
 
             F = eta * Qi - 2 * R;
             tempQ = ( F / (eta + omega) );
