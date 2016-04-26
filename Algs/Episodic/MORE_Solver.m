@@ -37,14 +37,7 @@ classdef MORE_Solver < handle
             if nargin < 5, W = ones(1, size(J,2)); end % IS weights
             obj.model = quadraticfit(Actions, J, ...
                 'weights', W, ...
-                'standardize', 1);
-            
-            % Ensure that R is negative definite -> F is positive definite
-            [U, V] = eig(obj.model.R);
-            V(V > 0) = -1e-8;
-            obj.model.R = U * V * U';
-            obj.model.eval = @(X) sum( (X'*obj.model.R)' .* X, 1 ) + (X'*obj.model.r)' + obj.model.r0';
-            
+                'standardize', 0);
             [eta, omega] = obj.optimize;
             divKL = obj.update(eta, omega);
             policy = policy.update(obj.b, obj.Q);

@@ -34,4 +34,4 @@ policy_high = GaussianConstantChol(n_params, mu0, Sigma0high);
 episodes_eval = 100;
 steps_eval = 2000;
 episodes_learn = 50;
-steps_learn = 200;
+steps_learn = 500;

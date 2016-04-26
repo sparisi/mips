@@ -1,6 +1,6 @@
 function [model, nmse] = quadraticfit(X, Y, varargin)
 % QUADRATICFIT Learns a quadratic model to fit input-output pairs (X, Y):
-% Y = X'*R*X + X'*r + r0 (R is symmetric).
+% Y = X'*R*X + X'*r + r0 (R is symmetric and negative definite). 
 % For the likelihood of the linear model, a multiplicative noise model is 
 % used (the higher the absolute value of Y, the higher the variance).
 %
@@ -56,8 +56,20 @@ AQuadratic = zeros(d);
 ind = logical(tril(ones(d)));
 AQuadratic(ind) = params(d+2:end);
 R = (AQuadratic + AQuadratic') / 2;
-r = params(2:d+1);
+% r = params(2:d+1);
+% r0 = params(1);
+
+% Enforce R to be negative definite
+[U, V] = eig(R);
+V(V > 0) = -1e-8;
+R = U * V * U';
+
+% Re-learn r and r0
+quadYn = sum( (Xn'*R)' .* Xn, 1 );
+linearPhi = basis_poly(1, d, 1, Xn);
+params = linear_regression(linearPhi, Yn - quadYn, W);
 r0 = params(1);
+r = params(2:end);
 
 % De-standardize
 XstdMat = diag((1./Xstd));
