@@ -24,13 +24,10 @@ classdef MORE_Solver < handle
             obj.epsilon = epsilon;
             obj.gamma = gamma;
             obj.minH = minH;
-            assert(isa(policy,'Gaussian'), 'The search distribution must be a Gaussian.')
+            assert(isa(policy,'GaussianConstant'), 'The search distribution must be a Gaussian with constant mean.')
             obj.Q = policy.Sigma;
             obj.b = policy.mu;
             obj.Qi = inv(obj.Q);
-            obj.model.R = zeros(policy.daction);
-            obj.model.r = zeros(policy.daction,1);
-            obj.model.r0 = 0;
             if nargin < 5, entropy_bound = 'absolute'; end
             obj.entropy_bound = entropy_bound;
         end
@@ -49,7 +46,7 @@ classdef MORE_Solver < handle
         %% CORE
         function [eta, omega] = optimize(obj)
             % Optimization problem settings
-            options = optimset('GradObj', 'off', ...
+            options = optimset('GradObj', 'on', ...
                 'Display', 'off', ...
                 'MaxFunEvals', 1000 * 5, ...
                 'Algorithm', 'interior-point', ...
@@ -74,7 +71,7 @@ classdef MORE_Solver < handle
             b_new = F_new * f_new;
             [~, p] = chol(Q_new);
             if(p ~= 0)
-                warning('Covariance is not PSD. Policy has not been updated');
+                warning('Covariance is not PSD. Policy has not been updated.');
                 divKL = 0;
             else
                 divKL = 0.5 * ( ...

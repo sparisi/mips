@@ -2,9 +2,6 @@ N = 20;
 N_MAX = N * 10;
 if makeDet, policy = policy.makeDeterministic; end
 
-J = zeros(dreward,N_MAX);
-Theta = zeros(policy_high.daction,N_MAX);
-
 iter = 1;
 lrate = 0.1;
 

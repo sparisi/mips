@@ -36,7 +36,7 @@ else
     Ystd = ones(1,1);
 end
 
-% Generate feature vectors for linear regression
+% Generate features vector for linear regression
 Phi = basis_quadratic(d,Xn);
 
 % Weight each sample by its inverse of absoltute relative output
