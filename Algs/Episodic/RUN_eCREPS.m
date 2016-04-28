@@ -4,11 +4,6 @@ if makeDet, policy = policy.makeDeterministic; end
 bfs_solver = @(varargin)basis_poly(1,mdp.dctx,1,varargin{:});
 solver = CREPS_Solver(0.9,bfs_solver);
 
-J = zeros(dreward,N_MAX);
-Theta = zeros(policy_high.daction,N_MAX);
-PhiSolver = zeros(N_MAX,solver.basis());
-PhiPolicy = zeros(N_MAX,policy_high.basis());
-
 iter = 1;
 
 

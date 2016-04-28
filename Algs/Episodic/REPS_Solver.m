@@ -53,7 +53,7 @@ classdef REPS_Solver < handle
             % Compute KL divergence
             qWeighting = W;
             pWeighting = d;
-            divKL = getKL(pWeighting, qWeighting);
+            divKL = kl_mle(pWeighting, qWeighting);
         end
         
         %% DUAL FUNCTION

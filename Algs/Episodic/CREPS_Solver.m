@@ -80,7 +80,7 @@ classdef CREPS_Solver < handle
                     qWeighting = W;
                     pWeighting = d;
                     pWeighting = pWeighting / sum(pWeighting);
-                    divKL = getKL(pWeighting, qWeighting);
+                    divKL = kl_mle(pWeighting, qWeighting);
                     error = divKL - obj.epsilon;
                     validKL = error < 0.1 * obj.epsilon;
                     featureDiff = sum(bsxfun(@times, Phi, pWeighting),2) - mean(Phi,2);
@@ -103,7 +103,7 @@ classdef CREPS_Solver < handle
                     qWeighting = W;
                     pWeighting = d;
                     pWeighting = pWeighting / sum(pWeighting);
-                    divKL = getKL(pWeighting, qWeighting);
+                    divKL = kl_mle(pWeighting, qWeighting);
                     error = divKL - obj.epsilon;
                     validKL = error < 0.1 * obj.epsilon;
                     featureDiff = sum(bsxfun(@times, Phi, pWeighting),2) - mean(Phi,2);

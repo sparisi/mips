@@ -1,4 +1,4 @@
-function d = kl_mvn(p, q, varargin)
+function d = kl_mvn(p, q)
 % KL_MVN Computes the Kullback–Leibler divergence KL(P||Q) from distribution
 % P to distribution Q, both Multivariate Normal.
 
