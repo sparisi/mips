@@ -11,9 +11,12 @@ classdef DoubleLink < MDP
         friction_coeff = [2.5 2.5]'; % viscous friction coefficients
         g = 9.81;
         dt = 0.01;
-        q_des = [3/2*pi 0]';
+        endEff_des = [1 1]'; % Goal in task space
+%         q_des = [pi/2 0]'; % Goal in joint space
+        q_des = [0 0]';
         qd_des  = [0 0]';
         qdd_des = [0 0]';
+        mode = 'joint'; % 'joint' or 'task'
         
         % MDP variables
         dstate = 4;
@@ -34,7 +37,7 @@ classdef DoubleLink < MDP
     methods
         %% Simulator
         function state = initstate(obj,n)
-            state = repmat([pi 0 0 0]',1,n);
+            state = repmat([3/2*pi 0 0 0]',1,n);
             if obj.realtimeplot, obj.showplot; obj.updateplot(state); end
         end
         
@@ -58,10 +61,22 @@ classdef DoubleLink < MDP
             nextstate = [q(1,:); qd(1,:); q(2,:); qd(2,:)];
 
             % Compute reward
-            goalstate = [obj.q_des(1), obj.qd_des(1), obj.q_des(2), obj.qd_des(2)]';
-%             distance = bsxfun(@minus,q,obj.q_des);
-            distance = bsxfun(@minus,nextstate,goalstate);
-            reward = -matrixnorms(distance,2).^2;
+            switch obj.mode
+                case 'joint'
+                    goalstate = [obj.q_des(1), obj.qd_des(1), obj.q_des(2), obj.qd_des(2)]';
+                    distance = bsxfun(@minus,q,obj.q_des);
+%                     distance = bsxfun(@minus,nextstate,goalstate);
+%                     reward = -matrixnorms(distance,2).^2;
+                    reward = -exp(matrixnorms(distance,2));
+                case 'task'
+                    X = obj.getJointsInTaskSpace(nextstate);
+                    endEffector = X(5:6,:);
+                    distance2 = sum(bsxfun(@minus,endEffector,obj.endEff_des).^2,1);
+                    reward = exp( -distance2 / (2*(1^2)) ) ... % The closer to the goal, the higher the reward
+                        - 0.05 * sum(abs(action),1); % Penalty on the action
+                otherwise
+                    error('Unknown mode.')
+            end
 
             absorb = false(1,size(state,2)); % Infinite horizon
 
@@ -109,16 +124,20 @@ classdef DoubleLink < MDP
 
         %% Kinematics
         function X = getJointsInTaskSpace(obj, state)
-            % Each column of X is a state in the task space (x1,y1,xd1,yd1,x2,y2,xd1,yd2)
-            xy1 = obj.lengths(1) .* [sin(state(1,:)); cos(state(1,:))];
-            xy2 = xy1 + obj.lengths(2) .* [sin(state(3,:)+state(1,:)); cos(state(3,:)+state(1,:))];
+        % Each column of X is a state in the task space (x1,y1,xd1,yd1,x2,y2,xd1,yd2)
+            q1 = state(1,:);
+            qd1 = state(2,:);
+            q2 = state(3,:);
+            qd2 = state(4,:);
+            xy1 = obj.lengths(1) .* [cos(q1); sin(q1)];
+            xy2 = xy1 + obj.lengths(2) .* [cos(q2+q1); sin(q2+q1)];
             
             xy1d = obj.lengths(1) .* ...
-                [state(2,:).*cos(state(1,:)); ...
-                -state(2,:).*sin(state(1,:))];
+                [qd1.*cos(q1); ...
+                -qd1.*sin(q1)];
             xy2d = xy1d + obj.lengths(2) .* ...
-                [(state(4,:)+state(2,:)).*cos(state(3,:)+state(1,:)); ...
-                -(state(4,:)+state(2,:)).*sin(state(3,:)+state(1,:))];
+                [(qd2+q2).*cos(qd1+q1); ...
+                -(qd2+q2).*sin(qd1+q1)];
             
             X = [xy1; xy1d; xy2; xy2d];
         end
@@ -143,23 +162,31 @@ classdef DoubleLink < MDP
             obj.handleAgent{4} = rectangle('Position',[0,0,0,0],'Curvature',[1,1],'FaceColor',colors{2});
 
             % 'Ghost' desired state
-            r = 0.1;
-            goalstate = [obj.q_des(1), obj.qd_des(1), obj.q_des(2), obj.qd_des(2)]';
-            X = obj.getJointsInTaskSpace(goalstate);
-            xy1 = X(1:2,:);
-            xy2 = X(5:6,:);
-
-            % 'Ghost' desired state
-            h = line([0 xy1(1)], [0, xy1(2)], 'linewidth', lw, 'color', 'r');
-            h.Color(4) = 0.3;
-            h = line([xy1(1) xy2(1)], [xy1(2) xy2(2)], 'linewidth', lw, 'color', 'r');
-            h.Color(4) = 0.3;
-            h = rectangle('Position',[xy1(1)-r,xy1(2)-r,2*r,2*r],'Curvature',[1,1],'FaceColor','r');
-            h.EdgeColor(4) = 0.1;
-            h.FaceColor(4) = 0.1;
-            h = rectangle('Position',[xy2(1)-r,xy2(2)-r,2*r,2*r],'Curvature',[1,1],'FaceColor','r');
-            h.EdgeColor(4) = 0.1;
-            h.FaceColor(4) = 0.1;
+            switch obj.mode
+                case 'joint'
+                    r = 0.1;
+                    goalstate = [obj.q_des(1), obj.qd_des(1), obj.q_des(2), obj.qd_des(2)]';
+                    X = obj.getJointsInTaskSpace(goalstate);
+                    xy1 = X(1:2,:);
+                    xy2 = X(5:6,:);
+                    h = line([0 xy1(1)], [0, xy1(2)], 'linewidth', lw, 'color', 'r');
+                    h.Color(4) = 0.3;
+                    h = line([xy1(1) xy2(1)], [xy1(2) xy2(2)], 'linewidth', lw, 'color', 'r');
+                    h.Color(4) = 0.3;
+                    h = rectangle('Position',[xy1(1)-r,xy1(2)-r,2*r,2*r],'Curvature',[1,1],'FaceColor','r');
+                    h.EdgeColor(4) = 0.1;
+                    h.FaceColor(4) = 0.1;
+                    h = rectangle('Position',[xy2(1)-r,xy2(2)-r,2*r,2*r],'Curvature',[1,1],'FaceColor','r');
+                    h.EdgeColor(4) = 0.1;
+                    h.FaceColor(4) = 0.1;
+                case 'task'
+                    r = 0.1;
+                    h = rectangle('Position',[obj.endEff_des(1)-r,obj.endEff_des(2)-r,2*r,2*r],'Curvature',[1,1],'FaceColor','r');
+                    h.EdgeColor(4) = 0.1;
+                    h.FaceColor(4) = 0.1;
+                otherwise
+                    error('Unknown mode.')
+            end
         end
         
         function updateplot(obj, state)
