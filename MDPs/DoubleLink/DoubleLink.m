@@ -11,9 +11,9 @@ classdef DoubleLink < MDP
         friction_coeff = [2.5 2.5]'; % viscous friction coefficients
         g = 9.81;
         dt = 0.01;
-        endEff_des = [1 1]'; % Goal in task space
-%         q_des = [pi/2 0]'; % Goal in joint space
-        q_des = [0 0]';
+        endEff_des = [0.5 -0.5]'; % Goal in task space
+%         q_des = [-pi/2 0]'; % Goal in joint space
+        q_des = [-pi/4 0]';
         qd_des  = [0 0]';
         qdd_des = [0 0]';
         mode = 'joint'; % 'joint' or 'task'
@@ -64,8 +64,8 @@ classdef DoubleLink < MDP
             switch obj.mode
                 case 'joint'
                     goalstate = [obj.q_des(1), obj.qd_des(1), obj.q_des(2), obj.qd_des(2)]';
-                    distance = bsxfun(@minus,q,obj.q_des);
-%                     distance = bsxfun(@minus,nextstate,goalstate);
+                    distance = abs(angdiff(q,obj.q_des,'rad'));
+%                     distance = abs(angdiff(nextstate,goalstate,'rad'));
 %                     reward = -matrixnorms(distance,2).^2;
                     reward = -exp(matrixnorms(distance,2));
                 case 'task'
