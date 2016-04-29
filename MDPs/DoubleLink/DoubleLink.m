@@ -9,14 +9,16 @@ classdef DoubleLink < MDP
         lengths = [1 1];
         masses = [1 1];
         friction_coeff = [2.5 2.5]'; % viscous friction coefficients
-        g = 9.81;
+%         g = 9.81; % If 0, the problem because a simpler planar reaching task
+        g = 0;
         dt = 0.01;
         endEff_des = [0.5 -0.5]'; % Goal in task space
-%         q_des = [-pi/2 0]'; % Goal in joint space
-        q_des = [-pi/4 0]';
+        q_des = [pi/2 0]'; % Goal in joint space
+%         q_des = [-pi/4 0]';
         qd_des  = [0 0]';
         qdd_des = [0 0]';
-        mode = 'joint'; % 'joint' or 'task'
+        mode = 'joint';
+%         mode = 'task';
         
         % MDP variables
         dstate = 4;
