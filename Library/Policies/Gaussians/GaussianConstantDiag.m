@@ -105,7 +105,7 @@ classdef GaussianConstantDiag < GaussianConstant
         
         %% Change stochasticity
         function obj = makeDeterministic(obj)
-            obj.theta(end-obj.daction+1:end) = 1e-4;
+            obj.theta(end-obj.daction+1:end) = 0;
             obj = obj.update(obj.theta);
         end
         

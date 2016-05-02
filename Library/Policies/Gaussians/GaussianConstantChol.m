@@ -141,7 +141,7 @@ classdef GaussianConstantChol < GaussianConstant
         %% Change stochasticity
         function obj = makeDeterministic(obj)
             n = obj.daction;
-            obj.theta(n+1:end) = obj.theta(n+1:end) * 1e-4;
+            obj.theta(n+1:end) = obj.theta(n+1:end) * 0;
             obj = obj.update(obj.theta);
         end
         

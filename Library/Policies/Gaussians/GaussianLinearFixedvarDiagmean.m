@@ -60,8 +60,8 @@ classdef GaussianLinearFixedvarDiagmean < GaussianLinear
 
         %% Change stochasticity
         function obj = makeDeterministic(obj)
-            obj.Sigma = 1e-8 * obj.Sigma;
-            obj.U = chol(obj.Sigma);
+            obj.Sigma = 0 * obj.Sigma;
+            obj.U = 0 * obj.Sigma;
         end
         
         function obj = randomize(obj,varargin)

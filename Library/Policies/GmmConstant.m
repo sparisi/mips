@@ -85,7 +85,7 @@ classdef GmmConstant < Policy
 
         %% Change stochasticity
         function obj = makeDeterministic(obj)
-            obj.Sigma = obj.Sigma * 1e-8;
+            obj.Sigma = obj.Sigma * 1e-100;
         end
         
         function obj = randomize(obj, factor)
