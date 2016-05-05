@@ -3,7 +3,7 @@
 
 **Mi**nimal **P**olicy **S**earch is a toolbox for Matlab providing the implementation of some of the most famous policy search algorithms, as well as some recent multi-objective methods and benchmark problems in reinforcement learning.
 
-It requires the *Optimization Toolbox*.
+Some algorithms require the *Optimization Toolbox*.
 
 Some utility functions are imported from File Exchange (original authors are always acknowledged).
 
@@ -67,7 +67,9 @@ Here is a list with examples of all ways of visualizing a particular data / anim
 ### Real time data plotting
 During the learning, it is possible to plot in real time a desired data (e.g., the return `J`) by using `updateplot`. 
 
-`updateplot('Return',iter,J,1)`
+```
+updateplot('Return',iter,J,1)
+```
 
 ### Mean and std of data from multiple trials
 If you are interested on evaluating an algorithm on several trials you can use the function `shadedErrorBar`. For a complete example, please refer to `myplot.m`.
@@ -110,4 +112,6 @@ policy.plotGreedy(1,11,1,10) % plot the action taken by zeroing the exploration
 
 To plot a set of points as a Pareto frontier of a MOMDP, use `mdp.plotfront`. You can use additional arguments like in the built-in `plot` to customize the plot. Please note that the points have to be passed as rows and that the function does not filter dominated points.
 
-`mdp.plotfront([0.5 0.5; 1 0; 0 1], '--or', 'LineWidth', 2)`
+```
+mdp.plotfront([0.5 0.5; 1 0; 0 1], '--or', 'LineWidth', 2)
+```
