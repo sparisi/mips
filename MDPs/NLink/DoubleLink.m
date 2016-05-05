@@ -8,7 +8,7 @@ classdef DoubleLink < MDP
         % Environment variables
         lengths = [1 1];
         masses = [1 1];
-        friction_coeff = [2.5 2.5]'; % viscous friction coefficients
+        friction_coeff = [2.5 2.5]'; % Viscous friction coefficients
 %         g = 9.81; % If 0, the problem because a simpler planar reaching task
         g = 0;
         dt = 0.01;
@@ -16,7 +16,6 @@ classdef DoubleLink < MDP
         q_des = [pi/2 0]'; % Goal in joint space
 %         q_des = [-pi/4 0]';
         qd_des  = [0 0]';
-        qdd_des = [0 0]';
         mode = 'joint';
 %         mode = 'task';
         
@@ -27,7 +26,7 @@ classdef DoubleLink < MDP
         isAveraged = 0;
         gamma = 1;
 
-        % Bounds : state = [theta(1) thetad(1) theta(2) thetad(2)]
+        % Bounds : state = [q1 qd1 q2 qd2]
         stateLB = [-pi, -50, -pi, -50]';
         stateUB = [pi, 50, pi, 50]';
         actionLB = [-10, -10]';
@@ -54,22 +53,15 @@ classdef DoubleLink < MDP
             qdd = mtimes32(invM, action - coriolis - gravity - friction);
             qd = state(2:2:end,:) + obj.dt * qdd;
             q = state(1:2:end,:) + obj.dt * qd;
-
-            % Check velocity 
-%             real_vel = bsxfun(@max, bsxfun(@min,qd,obj.stateUB(2:2:end)), obj.stateLB(2:2:end));
-%             penalty_vel = matrixnorms(real_vel-qd,2);
-%             qd = real_vel;
             
             nextstate = [q(1,:); qd(1,:); q(2,:); qd(2,:)];
 
             % Compute reward
             switch obj.mode
                 case 'joint'
-                    goalstate = [obj.q_des(1), obj.qd_des(1), obj.q_des(2), obj.qd_des(2)]';
                     distance = abs(angdiff(q,obj.q_des,'rad'));
-%                     distance = abs(angdiff(nextstate,goalstate,'rad'));
-%                     reward = -matrixnorms(distance,2).^2;
-                    reward = -exp(matrixnorms(distance,2));
+                    reward = -matrixnorms(distance,2).^2 ...
+                        - 0.05 * sum(abs(action),1); % Penalty on the action
                 case 'task'
                     X = obj.getJointsInTaskSpace(nextstate);
                     endEffector = X(5:6,:);
@@ -126,7 +118,7 @@ classdef DoubleLink < MDP
 
         %% Kinematics
         function X = getJointsInTaskSpace(obj, state)
-        % Each column of X is a state in the task space (x1,y1,xd1,yd1,x2,y2,xd1,yd2)
+        % X = [ x1 y1 x1d y1d x2 y2 x2d y2d ]
             q1 = state(1,:);
             qd1 = state(2,:);
             q2 = state(3,:);
@@ -134,12 +126,8 @@ classdef DoubleLink < MDP
             xy1 = obj.lengths(1) .* [cos(q1); sin(q1)];
             xy2 = xy1 + obj.lengths(2) .* [cos(q2+q1); sin(q2+q1)];
             
-            xy1d = obj.lengths(1) .* ...
-                [qd1.*cos(q1); ...
-                -qd1.*sin(q1)];
-            xy2d = xy1d + obj.lengths(2) .* ...
-                [(qd2+q2).*cos(qd1+q1); ...
-                -(qd2+q2).*sin(qd1+q1)];
+            xy1d = obj.lengths(1) .* [qd1.*cos(q1); -qd1.*sin(q1)];
+            xy2d = xy1d + obj.lengths(2) .* [(qd2+q2).*cos(qd1+q1); -(qd2+q2).*sin(qd1+q1)];
             
             X = [xy1; xy1d; xy2; xy2d];
         end
@@ -158,29 +146,28 @@ classdef DoubleLink < MDP
             % Agent handle
             lw = 4.0;
             colors = {[0.1 0.1 0.4], [0.4 0.4 0.8]};
-            obj.handleAgent{1} = line([0 0], [0, 0], 'linewidth', lw, 'color', colors{1});
-            obj.handleAgent{2} = line([0 0], [0, 0], 'linewidth', lw, 'color', colors{2});
-            obj.handleAgent{3} = rectangle('Position',[0,0,0,0],'Curvature',[1,1],'FaceColor',colors{1});
-            obj.handleAgent{4} = rectangle('Position',[0,0,0,0],'Curvature',[1,1],'FaceColor',colors{2});
+            for i = 1 : 2 : length(obj.lengths)*2
+                obj.handleAgent{i} = line([0 0], [0, 0], 'linewidth', lw, 'color', colors{mod((i+1)/2,2)+1});
+                obj.handleAgent{i+1} = rectangle('Position',[0,0,0,0],'Curvature',[1,1],'FaceColor',colors{mod((i+1)/2,2)+1});
+            end
 
             % 'Ghost' desired state
             switch obj.mode
                 case 'joint'
                     r = 0.1;
-                    goalstate = [obj.q_des(1), obj.qd_des(1), obj.q_des(2), obj.qd_des(2)]';
+                    goalstate = [obj.q_des; obj.qd_des];
+                    goalstate = [goalstate(1:2:end); goalstate(2:2:end)];
                     X = obj.getJointsInTaskSpace(goalstate);
-                    xy1 = X(1:2,:);
-                    xy2 = X(5:6,:);
-                    h = line([0 xy1(1)], [0, xy1(2)], 'linewidth', lw, 'color', 'r');
-                    h.Color(4) = 0.3;
-                    h = line([xy1(1) xy2(1)], [xy1(2) xy2(2)], 'linewidth', lw, 'color', 'r');
-                    h.Color(4) = 0.3;
-                    h = rectangle('Position',[xy1(1)-r,xy1(2)-r,2*r,2*r],'Curvature',[1,1],'FaceColor','r');
-                    h.EdgeColor(4) = 0.1;
-                    h.FaceColor(4) = 0.1;
-                    h = rectangle('Position',[xy2(1)-r,xy2(2)-r,2*r,2*r],'Curvature',[1,1],'FaceColor','r');
-                    h.EdgeColor(4) = 0.1;
-                    h.FaceColor(4) = 0.1;
+                    X = [ zeros(4,1); X ];
+                    X(4:4:end,:) = []; % Remove velocities
+                    X(3:3:end,:) = [];
+                    for i = 1 : 2 : size(X,1) - 2
+                        h = line([X(i,:) X(i+2,:)], [X(i+1,:), X(i+3,:)], 'linewidth', lw, 'color', 'r');
+                        h.Color(4) = 0.3;
+                        h = rectangle('Position',[X(i+2,:)-r,X(i+3,:)-r,2*r,2*r],'Curvature',[1,1],'FaceColor','r');
+                        h.EdgeColor(4) = 0.1;
+                        h.FaceColor(4) = 0.1;
+                    end
                 case 'task'
                     r = 0.1;
                     h = rectangle('Position',[obj.endEff_des(1)-r,obj.endEff_des(2)-r,2*r,2*r],'Curvature',[1,1],'FaceColor','r');
@@ -194,17 +181,48 @@ classdef DoubleLink < MDP
         function updateplot(obj, state)
             r = 0.1;
             X = obj.getJointsInTaskSpace(state);
-            xy1 = X(1:2,:);
-            xy2 = X(5:6,:);
-            
-            obj.handleAgent{1}.XData = [0 xy1(1)];
-            obj.handleAgent{1}.YData = [0 xy1(2)];
-            obj.handleAgent{2}.XData = [xy1(1) xy2(1)];
-            obj.handleAgent{2}.YData = [xy1(2) xy2(2)];
-            obj.handleAgent{3}.Position = [xy1(1)-r,xy1(2)-r,2*r,2*r];
-            obj.handleAgent{4}.Position = [xy2(1)-r,xy2(2)-r,2*r,2*r];
-
+            X = [ zeros(4,1); X ];
+            X(4:4:end,:) = []; % Remove velocities
+            X(3:3:end,:) = [];
+            for i = 1 : 2 : size(X,1) - 2
+                obj.handleAgent{i}.XData = [X(i,:) X(i+2,:)];
+                obj.handleAgent{i}.YData = [X(i+1,:), X(i+3,:)];
+                obj.handleAgent{i+1}.Position = [X(i+2,:)-r,X(i+3,:)-r,2*r,2*r];
+            end
             drawnow limitrate
+        end
+        
+        function pixels = render(obj, state)
+            n_links = length(obj.lengths);
+            meters_to_pixels = 5;
+            tot_size = meters_to_pixels*n_links*2+2;
+            
+            if nargin == 1, pixels = tot_size^2; return, end
+            
+            n = size(state,2);
+            pixels = zeros(tot_size,tot_size,n);
+            
+            X = obj.getJointsInTaskSpace(state) * meters_to_pixels;
+            X = [ zeros(4,n); X ];
+            X(4:4:end,:) = []; % Remove velocities
+            X(3:3:end,:) = [];
+            
+            x = X(1:2:end-2,:)';
+            y = X(2:2:end-2,:)';
+            from = [x(:); y(:)]';
+            x = X(3:2:end,:)';
+            y = X(4:2:end,:)';
+            to = [x(:); y(:)]';
+            rows_cols = ceil( linspaceNDim(from(:)',to(:)',meters_to_pixels+1) + tot_size/2 );
+            rows = rows_cols(1:end/2,:);
+            cols = rows_cols(end/2+1:end,:);
+            cols = -cols + tot_size;
+            pages = repmat((1:n)',n_links,meters_to_pixels+1);
+            pixels(sub2ind(size(pixels), cols, rows, pages)) = 1;
+            
+%             for i = 1 : n
+%                 clf, imagesc(pixels(:,:,i)), drawnow limitrate
+%             end
         end
         
     end
