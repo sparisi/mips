@@ -123,21 +123,21 @@ classdef (Abstract) PolicyDiscrete < Policy
             assert(xmin < xmax, 'X upper bound cannot be lower than lower bound.')
             assert(ymin < ymax, 'Y upper bound cannot be lower than lower bound.')
             
-            nactions = length(obj.action_list);
-            n = floor(sqrt(nactions));
-            m = ceil(nactions/n);
-            
             step = 30;
             xnodes = linspace(xmin,xmax,step);
             ynodes = linspace(ymin,ymax,step);
             [X, Y] = meshgrid(xnodes,ynodes);
             Q = obj.qFunction([X(:)';Y(:)']);
 
+            nactions = size(Q,1);
+            n = floor(sqrt(nactions));
+            m = ceil(nactions/n);
+            
             fig = findobj('type','figure','name','Q-function');
             if isempty(fig)
                 fig = figure();
                 fig.Name = 'Q-function';
-                for i = obj.action_list
+                for i = nactions : -1 : 1
                     subplot(n,m,i,'align')
                     Z = reshape(Q(i,:),step,step);
                     contourf(X,Y,Z)
@@ -146,7 +146,7 @@ classdef (Abstract) PolicyDiscrete < Policy
                     ylabel y
                 end
             else
-                for i = obj.action_list
+                for i = 1 : nactions
                     h = fig.Children(i).Children;
                     Z = reshape(Q(i,:),step,step);
                     h.XData = X;
