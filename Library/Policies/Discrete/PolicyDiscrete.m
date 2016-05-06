@@ -13,7 +13,7 @@ classdef (Abstract) PolicyDiscrete < Policy
         function V = vFunction(obj, States)
             prob_list = obj.distribution(States);
             Q = obj.qFunction(States);
-            V = mean(Q .* prob_list);
+            V = sum(Q .* prob_list);
         end
         
         %% Distribution functions
@@ -71,73 +71,58 @@ classdef (Abstract) PolicyDiscrete < Policy
         end
         
         %% Plotting
-        function plotGreedy(obj, xmin, xmax, ymin, ymax, fig)
-        % Plot the most probable action for 2D states
+        function fig = plotGreedy(obj, LB, UB)
+        % Plot the most probable action for 2D states.
+            xmin = LB(1);
+            ymin = LB(2);
+            xmax = UB(1);
+            ymax = UB(2);
             assert(xmin < xmax, 'X upper bound cannot be lower than lower bound.')
             assert(ymin < ymax, 'Y upper bound cannot be lower than lower bound.')
 
-            if nargin == 5, figure, else figure(fig), end
-            
             nactions = length(obj.action_list);
             step = 30;
             xnodes = linspace(xmin,xmax,step);
             ynodes = linspace(ymin,ymax,step);
             [X, Y] = meshgrid(xnodes,ynodes);
-            
             actions = obj.makeDeterministic.drawAction([X(:)';Y(:)']);
             Z = reshape(actions,step,step);
-            surf(X,Y,Z,'EdgeColor','none')
-            view(0,90)
-            axis([xmin,xmax,ymin,ymax])
-            title('Deterministic actions')
-            xlabel x
-            ylabel y
             
-            cmap = jet(nactions);
-            nonzeroActions = ismember(obj.action_list,actions);
-            cmap = cmap(nonzeroActions,:);
-            colormap(cmap)
-            labels = num2cell(obj.action_list(nonzeroActions));
-            labels = cellfun(@num2str,labels,'uni',0);
-            lcolorbar(labels);
-            drawnow limitrate
-        end
-        
-        function plotActions(obj, xmin, xmax, ymin, ymax, fig)
-        % Plot actions distribution for 2D states
-            assert(xmin < xmax, 'X upper bound cannot be lower than lower bound.')
-            assert(ymin < ymax, 'Y upper bound cannot be lower than lower bound.')
-            
-            if nargin == 5, figure, else figure(fig), end
-
-            nactions = length(obj.action_list);
-            n = floor(sqrt(nactions));
-            m = ceil(nactions/n);
-            
-            step = 30;
-            xnodes = linspace(xmin,xmax,step);
-            ynodes = linspace(ymin,ymax,step);
-            [X, Y] = meshgrid(xnodes,ynodes);
-            
-            probs = obj.distribution([X(:)';Y(:)']);
-            for i = obj.action_list
-                subplot(n,m,i,'align')
-                Z = reshape(probs(i,:),step,step);
-                contourf(X,Y,Z)
-                title(['Action ' num2str(i)])
+            fig = findobj('type','figure','name','Greedy');
+            if isempty(fig)
+                fig = figure();
+                fig.Name = 'Greedy';
+                surf(X,Y,Z,'EdgeColor','none')
+                view(0,90)
+                axis([xmin,xmax,ymin,ymax])
+                title('Deterministic actions')
                 xlabel x
                 ylabel y
+                cmap = jet(nactions);
+                nonzeroActions = ismember(obj.action_list,actions);
+                cmap = cmap(nonzeroActions,:);
+                colormap(cmap)
+                labels = num2cell(obj.action_list(nonzeroActions));
+                labels = cellfun(@num2str,labels,'uni',0);
+                lcolorbar(labels);
+            else
+                h = fig.Children(2).Children;
+                h.XData = X;
+                h.YData = Y;
+                h.ZData = Z;
             end
             drawnow limitrate
         end
         
-        function plotQ(obj, xmin, xmax, ymin, ymax, fig)
-        % Plot Q-function for 2D states
+        function fig = plotQ(obj, LB, UB)
+        % Plot Q-function for 2D states.
+            xmin = LB(1);
+            ymin = LB(2);
+            xmax = UB(1);
+            ymax = UB(2);
             assert(xmin < xmax, 'X upper bound cannot be lower than lower bound.')
             assert(ymin < ymax, 'Y upper bound cannot be lower than lower bound.')
             
-            if nargin == 5, figure, else figure(fig), end
-
             nactions = length(obj.action_list);
             n = floor(sqrt(nactions));
             m = ceil(nactions/n);
@@ -146,37 +131,62 @@ classdef (Abstract) PolicyDiscrete < Policy
             xnodes = linspace(xmin,xmax,step);
             ynodes = linspace(ymin,ymax,step);
             [X, Y] = meshgrid(xnodes,ynodes);
-            
             Q = obj.qFunction([X(:)';Y(:)']);
-            for i = obj.action_list
-                subplot(n,m,i,'align')
-                Z = reshape(Q(i,:),step,step);
-                contourf(X,Y,Z)
-                title(['Q(s,' num2str(i) ')'])
-                xlabel x
-                ylabel y
+
+            fig = findobj('type','figure','name','Q-function');
+            if isempty(fig)
+                fig = figure();
+                fig.Name = 'Q-function';
+                for i = obj.action_list
+                    subplot(n,m,i,'align')
+                    Z = reshape(Q(i,:),step,step);
+                    contourf(X,Y,Z)
+                    title(['Q(s,' num2str(i) ')'])
+                    xlabel x
+                    ylabel y
+                end
+            else
+                for i = obj.action_list
+                    h = fig.Children(i).Children;
+                    Z = reshape(Q(i,:),step,step);
+                    h.XData = X;
+                    h.YData = Y;
+                    h.ZData = Z;
+                end
             end
             drawnow limitrate
         end
         
-        function plotV(obj, xmin, xmax, ymin, ymax, fig)
-        % Plot V-function for 2D states
+        function fig = plotV(obj, LB, UB)
+        % Plot V-function for 2D states.
+            xmin = LB(1);
+            ymin = LB(2);
+            xmax = UB(1);
+            ymax = UB(2);
             assert(xmin < xmax, 'X upper bound cannot be lower than lower bound.')
             assert(ymin < ymax, 'Y upper bound cannot be lower than lower bound.')
-            
-            if nargin == 5, figure, else figure(fig), end
-            
+
             step = 30;
             xnodes = linspace(xmin,xmax,step);
             ynodes = linspace(ymin,ymax,step);
             [X, Y] = meshgrid(xnodes,ynodes);
-            
             Z = obj.vFunction([X(:)';Y(:)']);
             Z = reshape(Z,step,step);
-            contourf(X,Y,Z)
-            title('V-function')
-            xlabel x
-            ylabel y
+            
+            fig = findobj('type','figure','name','V-function');
+            if isempty(fig)
+                fig = figure();
+                fig.Name = 'V-function';
+                contourf(X,Y,Z);
+                title('V-function')
+                xlabel x
+                ylabel y
+            else
+                h = fig.Children.Children;
+                h.XData = X;
+                h.YData = Y;
+                h.ZData = Z;
+            end
             drawnow limitrate
         end
         
