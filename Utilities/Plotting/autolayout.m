@@ -17,6 +17,7 @@ function autolayout
     end
 
 F = get(0,'Children');
+if isempty(F), return, end
 F = filterFigures(F);
 F = mat2cell(F(end:-1:1),ones(1,length(F)))';
 if length(F) < 6
