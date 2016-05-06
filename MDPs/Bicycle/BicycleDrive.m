@@ -22,7 +22,7 @@ classdef BicycleDrive < MDP
         stateLB = [-1.3963 -inf -pi/15 -inf -pi -inf -inf -inf -inf]';
         stateUB = [1.3963 inf pi/15 inf pi inf inf inf inf]';
         actionLB = 1;
-        actionUB = 9;
+        actionUB = 5;
         rewardLB = -1;
         rewardUB = 0.002 + 0.01;
     end
@@ -61,8 +61,16 @@ classdef BicycleDrive < MDP
         
         function [nextstate, reward, absorb] = simulator(obj, state, action)
             % Parse input
-            allActions = [-2 -2 -2 0 0 0 2 2 2
-                -0.02 0 0.02 -0.02 0 0.02 -0.02 0 0.02];
+            if obj.actionUB == 9
+                allActions = [-2    -2 -2     0    0 0     2    2 2
+                              -0.02  0  0.02 -0.02 0 0.02 -0.02 0 0.02];
+            elseif obj.actionUB == 5
+                allActions = [-2  0    0 0    2
+                               0 -0.02 0 0.02 0];
+            else
+                error('Wrong number of actions.')
+            end
+            
             T = allActions(1,action); % torque
             d = allActions(2,action); % displacement
             
