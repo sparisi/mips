@@ -41,6 +41,7 @@ classdef (Abstract) MDP < handle
         % Initializes the plotting procedure.
             obj.realtimeplot = 1;
             if isempty(obj.handleEnv), obj.initplot(); end
+            if ~isvalid(obj.handleEnv), obj.initplot(); end
         end
         
         function closeplot(obj)
