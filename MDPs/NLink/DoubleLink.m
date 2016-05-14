@@ -9,11 +9,12 @@ classdef DoubleLink < MDP
         lengths = [1 1];
         masses = [1 1];
         friction_coeff = [2.5 2.5]'; % Viscous friction coefficients
-%         g = 9.81; % If 0, the problem because a simpler planar reaching task
+%         g = 9.81; % If 0, the problem becames a simpler planar reaching task
         g = 0;
-        dt = 0.01;
+        dt = 0.02;
         endEff_des = [0.5 -0.5]'; % Goal in task space
         q_des = [pi/2 0]'; % Goal in joint space
+%         q_des = [pi/3 -pi/3]';
 %         q_des = [-pi/4 0]';
         qd_des  = [0 0]';
         mode = 'joint';
@@ -43,10 +44,8 @@ classdef DoubleLink < MDP
         end
         
         function [nextstate, reward, absorb] = simulator(obj, state, action)
-            % Check action
-            real_action = bsxfun(@max, bsxfun(@min,action,obj.actionUB), obj.actionLB);
-%             penalty_action = matrixnorms(real_action-action,2);
-            action = real_action;
+            % Constrain action
+            action = bsxfun(@max, bsxfun(@min,action,obj.actionUB), obj.actionLB);
 
             % State transition
             [gravity, coriolis, invM, friction] = obj.getDynamicsMatrices(state);

@@ -35,7 +35,7 @@ classdef PuddleworldContinuous < MDP
         
         %% Simulator
         function state = initstate(obj, n)
-            state = multigrid(ceil(sqrt(n)),[0,1]',[0,1]');
+            state = rand(2,n);
             if obj.realtimeplot, obj.showplot; obj.updateplot(state); end
         end
         

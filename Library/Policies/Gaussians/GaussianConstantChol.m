@@ -134,7 +134,7 @@ classdef GaussianConstantChol < GaussianConstant
                 U = U(tril(true(obj.daction), 0)).';
                 obj.theta = [obj.mu; U'];
             else
-                error('Wrong number of input arguments')
+                error('Wrong number of input arguments.')
             end
         end
 

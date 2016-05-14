@@ -102,7 +102,7 @@ classdef GaussianLinearChol < GaussianLinear
                 U = U(tril(true(obj.daction), 0)).';
                 obj.theta = [obj.A(:); U'];
             else
-                error('Wrong number of input arguments')
+                error('Wrong number of input arguments.')
             end
         end
         

@@ -1,7 +1,6 @@
 classdef QuadLink < MDP
 % REFERENCE
-% T Yoshikawa
-% Foundations of Robotics: Analysis and Control (1990)
+% http://www.cs.cmu.edu/~cga/kdc/dynamics-2d/
 
     %% Properties
     properties
@@ -9,7 +8,7 @@ classdef QuadLink < MDP
         lengths = [1 1 1 1];
         masses = [1 1 1 1];
         friction_coeff = [2.5 2.5 2.5 2.5]'; % Viscous friction coefficients
-%         g = 9.81; % If 0, the problem because a simpler planar reaching task
+%         g = 9.81; % If 0, the problem becames a simpler planar reaching task
         g = 0;
         dt = 0.01;
         endEff_des = [0.5 -0.5]'; % Goal in task space
@@ -43,10 +42,8 @@ classdef QuadLink < MDP
         end
         
         function [nextstate, reward, absorb] = simulator(obj, state, action)
-            % Check action
-            real_action = bsxfun(@max, bsxfun(@min,action,obj.actionUB), obj.actionLB);
-%             penalty_action = matrixnorms(real_action-action,2);
-            action = real_action;
+            % Constrain action
+            action = bsxfun(@max, bsxfun(@min,action,obj.actionUB), obj.actionLB);
 
             % State transition
             nextstate = obj.dynamics(state,action);

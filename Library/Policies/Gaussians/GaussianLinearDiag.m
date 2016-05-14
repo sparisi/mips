@@ -87,14 +87,26 @@ classdef GaussianLinearDiag < GaussianLinear
         end
         
         %% Update
-        function obj = update(obj, theta)
-            obj.theta(1:length(theta)) = theta;
-            n = length(obj.theta) - obj.daction;
-            A = vec2mat(obj.theta(1:n),obj.daction);
-            std = obj.theta(n+1:end);
-            obj.A = A;
-            obj.Sigma = diag(std.^2);
-            obj.U = diag(std);
+        function obj = update(obj, varargin)
+            if nargin == 2 % Update by params
+                theta = varargin{1};
+                obj.theta(1:length(theta)) = theta;
+                n = length(obj.theta) - obj.daction;
+                A = vec2mat(obj.theta(1:n),obj.daction);
+                std = obj.theta(n+1:end);
+                obj.A = A;
+                obj.Sigma = diag(std.^2);
+                obj.U = diag(std);
+            elseif nargin == 3 % Update by mean and covariance
+                assert(isdiag(varargin{2}))
+                obj.A = varargin{1};
+                obj.Sigma = varargin{2};
+                std = sqrt(diag(varargin{2}));
+                obj.U = diag(std);
+                obj.theta = [obj.A(:); std];
+            else
+                error('Wrong number of input arguments.')
+            end
         end
         
         %% Change stochasticity
