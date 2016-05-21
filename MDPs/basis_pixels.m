@@ -1,4 +1,5 @@
-function phi = nlink_basis_pixels(mdp, varargin)
+function phi = basis_pixels(mdp, varargin)
+% The MDP requires a function 'render' that returns the pixels.
 
 if nargin < 2
     phi = mdp.render();

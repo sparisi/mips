@@ -387,10 +387,6 @@ classdef QuadLink < MDP
             cols = -cols + tot_size;
             pages = repmat((1:n)',n_links,meters_to_pixels+1);
             pixels(sub2ind(size(pixels), cols, rows, pages)) = 1;
-            
-%             for i = 1 : n
-%                 clf, imagesc(pixels(:,:,i)), drawnow limitrate
-%             end
         end
         
     end

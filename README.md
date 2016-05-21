@@ -96,6 +96,12 @@ show_simulation(mdp,policy,0.001,100)
 show_simulation(mdp,policy.update(policy_high.drawAction(1)),0.001,100)
 ```
 
+If the MDP provides pixels rendering, you can enable it by adding an additional argument to the function call
+
+```
+show_simulation(mdp,policy,0.001,100,1)
+```
+
 ### Plot discrete policies
 If the state space is 2-dimensional, you can plot the value functions learned by discrete policies and the action distribution over the states.
 
