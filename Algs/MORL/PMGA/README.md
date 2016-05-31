@@ -28,9 +28,9 @@ For the sampled implementation of PMGA, you have to define the manifold parametr
 
 The implemented indicators are:
 
- - *utopia* (L_U)     : distance from utopia
- - *antiutopia* (L_A) : distance from antiutopia
- - *pareto* (L_P)     : Pareto-ascent norm (not implemented for the sampled version)
- - *mix1* (L_M1)      : L_A * (1 - lambda * L_P) (not implemented for the sampled version)
- - *mix2* (L_M2)      : beta1 * L_A / L_U - beta2
- - *mix3* (L_M3)      : L_A * (1 - lambda * L_U)
+ - *utopia* (I_U)     : distance from utopia
+ - *antiutopia* (I_A) : distance from antiutopia
+ - *pareto* (I_P)     : Pareto-ascent norm (not implemented for the sampled version)
+ - *mix1* (I_M1)      : I_A * (1 - lambda * I_P) (not implemented for the sampled version)
+ - *mix2* (I_M2)      : beta1 * I_A / I_U - beta2
+ - *mix3* (I_M3)      : I_A * (1 - lambda * I_U)

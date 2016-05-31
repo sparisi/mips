@@ -13,9 +13,9 @@ antiutopia = [360,360,360];
 indicator = {'utopia'};
 % indicator = {'antiutopia'};
 % indicator = {'pareto'};
-% indicator = {'mix1', 30}; % MIX1: L_AU * (1 - lambda * L_pareto)
-% indicator = {'mix2', [2.5,1]}; % MIX2: beta1 * L_AU / L_U - beta2
-% indicator = {'mix3', 1.4}; % MIX3: L_AU * (1 - lambda * L_U)
+% indicator = {'mix1', 30}; % MIX1: I_AU * (1 - lambda * I_P)
+% indicator = {'mix2', [2.5,1]}; % MIX2: beta1 * I_AU / I_U - beta2
+% indicator = {'mix3', 1.4}; % MIX3: I_AU * (1 - lambda * I_U)
 param_type = 'P1'; % P1 unconstrained, P2 constrained
 
 mexName = strcat(['mexIntegrate_LQR3_' param_type '_' indicator{1}]);
