@@ -3,6 +3,11 @@ function h = HessianRF(policy, data, gamma)
 % H is a [D x D x R] matrix, where D is the length of the policy parameters
 % and R is the number of immediate rewards received at each time step. Each 
 % page of H corresponds to the Hessian wrt an objective.
+%
+% =========================================================================
+% REFERENCE
+% S Parisi, M Pirotta, M Restelli
+% Continuous Pareto Manifold Approximation (2016)
 
 actions = horzcat(data.a);
 states = horzcat(data.s);

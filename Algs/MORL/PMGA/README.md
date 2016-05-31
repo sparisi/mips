@@ -3,9 +3,11 @@ Description
 
 Implementation of **P**areto-**M**anifold **G**radient **A**lgorithm as presented in
 
-*PIROTTA, M.; PARISI, S.; RESTELLI, M.. Multi-Objective Reinforcement Learning with Continuous Pareto Frontier Approximation. AAAI Conference on Artificial Intelligence, North America, feb. 2015.*
+[PIROTTA, M; PARISI, S; RESTELLI, M. *Multi-Objective Reinforcement Learning with Continuous Pareto Frontier Approximation*, Proceedings of the Conference on Artificial Intelligence (AAAI)](http://www.aaai.org/ocs/index.php/AAAI/AAAI15/paper/view/9798)
 
-The paper is available at http://www.aaai.org/ocs/index.php/AAAI/AAAI15/paper/view/9798
+and 
+
+PARISI, S; PIROTTA, M; RESTELLI, M. *Continuous Pareto Manifold Approximation*, Journal of Artificial Intelligence Research (JAIR)
 
 It requires the *Symbolic Toolbox*.
 
