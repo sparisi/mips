@@ -75,7 +75,7 @@ end
 %% Eval
 fr = evaluate_policies_high(mdp, episodes_eval, steps_eval, policy, front_pol);
 [f, p] = pareto(fr', front_pol);
-fig = mdp.plotfront(mdp.truefront,'o','DisplayName','True frontier');
+mdp.plotfront(mdp.truefront,'o','DisplayName','True frontier');
 hold all
 mdp.plotfront(f,'+','DisplayName','Approximate frontier');
 legend show

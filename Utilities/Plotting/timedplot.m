@@ -3,8 +3,8 @@ function tim = timedplot(hP, hF, dt)
 %
 %    INPUT
 %     - hP  : handle of the plots to update (must be "ez" plots)
-%     - hF  : handle to the function of each plot
-%     - dt  : (optional) time interval between updates
+%     - hF  : handle to the functions of each plot
+%     - dt  : (optional) time interval between updates (in seconds)
 %
 %    OUTPUT
 %     - tim : timer updating the plots

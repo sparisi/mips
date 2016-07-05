@@ -9,7 +9,7 @@ dreward = mdp.dreward;
 gamma = mdp.gamma;
 daction = mdp.daction;
 
-bfs = @(varargin)basis_poly(1, 8, 0, varargin{:});
+bfs = @(varargin)basis_poly(1, mdp.dstate, 0, varargin{:});
 
 A0 = zeros(daction,bfs()+1);
 Sigma0 = 2500*eye(daction);

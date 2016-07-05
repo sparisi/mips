@@ -25,7 +25,7 @@ After running a setup script, just run an algorithm script to start the learning
 ```
 SettingMC % mountain car setup
 RUN_PG % run policy gradient (terminate by CTRL+C)
-plot(J_history) % plot average return` <br />
+plot(J_history) % plot average return
 show_simulation(mdp,policy.makeDeterministic,0.1,1000) % visualize learned policy (see below)
 ```
 
@@ -89,7 +89,7 @@ data = collect_samples(mdp,policy,episodes,steps,policy)
 mdp.plotepisode(data(1),0.001)
 ```
 
-- For episode-based algorithms, the low-level dataset is not returned. In this case, you can call `show_simulation`, which executes only one episode and shows an animation. This approach can be used also in step-based algorithms.
+- For episode-based algorithms, the low-level dataset is not returned. In this case, you can call `show_simulation`, which executes only one episode and shows an animation. This visualization can be used also in step-based algorithms.
 
 ```
 show_simulation(mdp,policy,0.001,100)
