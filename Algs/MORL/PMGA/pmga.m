@@ -4,15 +4,12 @@ clear all
 close all
 reset(symengine)
 
-dim = 3;
+dim = 2;
 
-mdp = Dam(dim);
-policy = GaussianLinearDiag(@dam_basis_rbf, mdp.daction, [50, -50, 0, 0, 50], 150^2);
+mdp = Dam(dim); bfs = @dam_basis_rbf; mu0 = [50, -50, 0, 0, 50]; sigma0 = 150^2;
+% mdp = LQR(dim); bfs = @(varargin)basis_poly(1,dim,0,varargin{:}); mu0 = -0.5*eye(dim); sigma0 = eye(dim);
 
-% mdp = LQR(dim);
-% policy = GaussianLinearFixedvarDiagmean( ...
-%     @(varargin)basis_poly(1,dim,0,varargin{:}), ...
-%     dim, -0.5*eye(dim), eye(dim));
+policy = GaussianLinearDiag(bfs, mdp.daction, mu0, sigma0);
 
 utopia = mdp.utopia;
 antiutopia = mdp.antiutopia;
