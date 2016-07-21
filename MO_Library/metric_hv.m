@@ -31,4 +31,4 @@ hvUnique = zeros(size(uniqueJ,1),1);
 hvUnique(idx2) = hvContrib;
 S = hvUnique(idx); % Map back to duplicates
 S = max(0,S); % The contribution estimation might be negative using a Monte Carlo approx of the hypervolume
-S(S==0) = -0.1; % Penalty for dominated solutions
+S(S==0) = -0.001; % Penalty for dominated solutions
