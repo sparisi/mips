@@ -111,6 +111,51 @@ classdef LQR < MOMDP
             zlabel 'Obj 3'
         end
         
+        %% Closed form
+        function P = riccati(obj, K)
+            g = obj.gamma;
+            A = obj.A;
+            B = obj.B;
+            R = obj.R;
+            Q = obj.Q;
+            I = eye(obj.dreward);
+
+            P = zeros(obj.dreward,obj.dreward,obj.dreward);
+            
+            for i = 1 : obj.dreward
+                if isequal(A, B, I)
+                    P(:,:,i) = (Q{i} + K * R{i} * K) / (I - g * (I + 2 * K + K^2));
+                else
+                    tolerance = 0.0001;
+                    converged = false;
+                    P(:,:,i) = I;
+                    Pnew(:,:,i) = Q{i} + g*A'*P(:,:,i)*A + g*K'*B'*P(:,:,i)*A + g*A'*P(:,:,i)*B*K + g*K'*B'*P(:,:,i)*B*K + K'*R{i}*K;
+                    while ~converged
+                        P(:,:,i) = Pnew(:,:,i);
+                        Pnew(:,:,i) = Q{i} + g*A'*P(:,:,i)*A + g*K'*B'*P(:,:,i)*A + g*A'*P(:,:,i)*B*K + g*K'*B'*P(:,:,i)*B*K + K'*R{i}*K;
+                        converged = max(abs(P(:)-Pnew(:))) < tolerance;
+                    end
+                end
+            end
+        end
+        
+        function J = avg_return(obj, K, Sigma)
+            P = obj.riccati(K);
+            J = zeros(obj.dreward,1);
+            B = obj.B;
+            R = obj.R;
+            g = obj.gamma;
+            x0 = obj.x0;
+
+            for i = 1 : obj.dreward
+                if g == 1
+                    J(i) = - trace(Sigma*(R{i}+B'*P(:,:,i)*B));
+                else
+                    J(i) = - (x0'*P(:,:,i)*x0 + (1/(1-g))*trace(Sigma*(R{i}+g*B'*P(:,:,i)*B)));
+                end
+            end
+        end
+        
     end
     
     %% Plotting
