@@ -11,7 +11,7 @@ while true
 %     [grad, stepsize] = eREINFORCEbase(policy,ds,gamma,lrate);
     [grad, stepsize] = eNACbase(policy,ds,gamma,lrate);
     
-    J = evaluate_policies(mdp, episodes_learn, steps_learn, policy.makeDeterministic);
+    J = evaluate_policies(mdp, episodes_eval, steps_eval, policy.makeDeterministic);
     norm_g = norm(grad(:,robj));
     fprintf('%d) Entropy: %.2f \tNorm: %.2e \tJ: %s \n', ...
         iter, S, norm_g, num2str(J','%.4f, '))
@@ -19,8 +19,8 @@ while true
     
 %     updateplot('Return',iter,J,1)
     
-    policy = policy.update(policy.theta + grad(:,robj) * stepsize(robj));
-%     policy = policy.update(policy.theta + grad(:,robj) / norm(grad(:,robj)));
+%     policy = policy.update(policy.theta + grad(:,robj) * stepsize(robj));
+    policy = policy.update(policy.theta + grad(:,robj) / norm(grad(:,robj)));
     
     iter = iter + 1;
 

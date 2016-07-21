@@ -6,7 +6,7 @@
 % Reinforcement Learning by Reward-weighted Regression for Operational 
 % Space Control (2007)
 
-N_MAX = 10000;
+N_MAX = episodes_learn * steps_learn * 2;
 Phi = [];
 R = [];
 Action = [];

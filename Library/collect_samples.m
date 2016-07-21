@@ -62,7 +62,7 @@ while ( (step < maxsteps) && sum(ongoing) > 0 )
     
     step = step + 1;
     running_states = state(:,ongoing);
-        
+    
     % Select action
     action = policy.drawAction(running_states);
     
