@@ -95,7 +95,7 @@ classdef PuddleworldMO < MOMDP
         end
 
         function fig = plotfront(obj, front, varargin)
-            fig = plotfront@MOMDP(obj, front, varargin{:});
+            fig = plotfront@MOMDP(front, varargin{:});
             xlabel 'Puddle Penalty'
             ylabel 'Time'
         end

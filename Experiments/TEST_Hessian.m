@@ -2,9 +2,9 @@
 clear all
 clc
 
-dim = 2;
+dim   = 2;
 mdp   = LQR(dim);
-robj = 1;
+robj  = 1;
 gamma = mdp.gamma;
 Q     = mdp.Q;
 R     = mdp.R;

@@ -116,8 +116,8 @@ policy.plotGreedy(1,11,1,10) % plot the action taken by zeroing the exploration
 
 ### MOMDPs Pareto frontier
 
-To plot a set of points as a Pareto frontier of a MOMDP, use `mdp.plotfront`. You can use additional arguments like in the built-in `plot` to customize the plot. Please note that the points have to be passed as rows and that the function does not filter dominated points.
+To plot a set of points as a Pareto frontier of a MOMDP, use `MOMDP.plotfront`. You can use additional arguments like in the built-in `plot` to customize the plot. Please note that the points have to be passed as rows and that the function does not filter dominated points.
 
 ```
-mdp.plotfront([0.5 0.5; 1 0; 0 1], '--or', 'LineWidth', 2)
+MOMDP.plotfront([0.5 0.5; 1 0; 0 1], '--or', 'LineWidth', 2)
 ```

@@ -14,8 +14,10 @@ classdef (Abstract) MOMDP < MDP
         [front, weights] = truefront(obj);
         % Returns the true Pareto frontier (or a reference one) and a set of
         % weights if the frontier is obtained by weighted sum.
-        
-        function fig = plotfront(obj, front, varargin)
+    end
+    
+    methods(Static)
+        function fig = plotfront(front, varargin)
         % Plots a frontier and returns the figure handle.
             front = sortrows(front);
             if size(front,2) == 2

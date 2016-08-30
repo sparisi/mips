@@ -105,7 +105,7 @@ classdef LQR < MOMDP
         end
 
         function fig = plotfront(obj, front, varargin)
-            fig = plotfront@MOMDP(obj, front, varargin{:});
+            fig = plotfront@MOMDP(front, varargin{:});
             xlabel 'Obj 1'
             ylabel 'Obj 2'
             zlabel 'Obj 3'

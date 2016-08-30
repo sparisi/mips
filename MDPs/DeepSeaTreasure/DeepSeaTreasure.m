@@ -101,7 +101,7 @@ classdef DeepSeaTreasure < MOMDP
         end
 
         function fig = plotfront(obj, front, varargin)
-            fig = plotfront@MOMDP(obj, front, varargin{:});
+            fig = plotfront@MOMDP(front, varargin{:});
             xlabel 'Treasure'
             ylabel 'Time'
         end

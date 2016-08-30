@@ -6,14 +6,14 @@ function S = mexMetric_hv(J, AU, U, N)
 % See also MEXHYPERVOLUMECONTRIBUTION.
 %
 %    INPUT
-%     - J  : N-by-M matrix of samples to evaluate, where N is the number of
+%     - J  : [N x M] matrix of samples to evaluate, where N is the number of
 %            samples and M the number of objectives
 %     - AU : antiutopia point
 %     - U  : utopia point
 %     - N  : number of samples for the approximation
 %
 %    OUT
-%     - S  : N-by-1 vector of the non-dominance-based metric value for each
+%     - S  : [N x 1] vector of the non-dominance-based metric value for each
 %            sample
 
 [uniqueJ, ~, idx] = unique(J,'rows'); % Ignore duplicates

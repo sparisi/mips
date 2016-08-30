@@ -96,7 +96,7 @@ classdef Resource < MOMDP
         end
 
         function fig = plotfront(obj, front, varargin)
-            fig = plotfront@MOMDP(obj, front, varargin{:});
+            fig = plotfront@MOMDP(front, varargin{:});
             xlabel 'Fight Penalty'
             ylabel 'Gold'
             zlabel 'Gems'

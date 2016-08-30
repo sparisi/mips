@@ -127,7 +127,7 @@ classdef Dam < MOMDP
         end
 
         function fig = plotfront(obj, front, varargin)
-            fig = plotfront@MOMDP(obj, front, varargin{:});
+            fig = plotfront@MOMDP(front, varargin{:});
             xlabel 'Flooding'
             ylabel 'Water Demand'
             zlabel 'Hydroelectric Demand'
