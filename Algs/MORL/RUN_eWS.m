@@ -2,26 +2,38 @@
 % multi-objective problems. See METRIC functions for details about the 
 % scalarizations.
 
-N = 50;
-N_MAX = N * 10;
+N = 25;
+N_MAX = N * 1;
 if makeDet, policy = policy.makeDeterministic; end
-solver = REPS_Solver(0.9);
-solver = NES_Solver(0.1);
+
+% solver = REPS_Solver(0.9);
+% solver = NES_Solver(0.1);
+solver = MORE_Solver(0.9,0.99,-75,policy_high);
 
 verboseOut = true;
+normalized = true;
+step = 16; % Density of the weights
 
-metric = @(r,w)metric_ws(r,w); % scalarization function
-% metric = @(r,w)metric_cheby(r,w,mdp.utopia');
-step = 10; % density of the weights
-W = convexcomb(dreward, step);
-ndir = size(W,1);
+if normalized
+    normalize = @(J)normalize_data(J',mdp.antiutopia,mdp.utopia);
+    utopia = ones(1,dreward);
+    antiutopia = zeros(1,dreward);
+else
+    normalize = @(J)J';
+    utopia = mdp.utopia;
+    antiutopia = mdp.antiutopia;
+end
 
-iter = 0;
+metric = @(r,w)metric_ws(normalize(r),w); % Linear scalarization function
+metric = @(r,w)metric_cheby(normalize(r),w,utopia); % Chebychev scalarization
+W = convexcomb(dreward, step-1);
+
+iter = 1;
 maxIter = 120;
 
 
 %% Learning
-for i = 1 : ndir
+for i = 1 : size(W,1)
     
     current_pol = policy_high;
     J = zeros(dreward,N_MAX);
@@ -45,9 +57,9 @@ for i = 1 : ndir
         % Enqueue the new samples and remove the old ones
         J = [data.J, J(:, 1:N_MAX-N)];
         Theta = [data.Theta, Theta(:, 1:N_MAX-N)];
-        
-        % Scalarized return
-        Jw = metric(J,W(i,:)');
+
+        % Scalarize return
+        Jw = metric(J,W(i,:))';
 
         % Perform an update step
         [current_pol, div] = solver.step(Jw, Theta, current_pol);
@@ -73,7 +85,17 @@ end
 
 
 %% Eval
-fr = evaluate_policies_high(mdp, episodes_eval, steps_eval, policy, front_pol);
+if makeDet
+    for i = 1 : length(front_pol)
+        p(i) = policy.update(front_pol(i).makeDeterministic.drawAction);
+    end
+    front_pol = p;
+    fr = evaluate_policies(mdp, episodes_eval, steps_eval, front_pol);
+else
+    fr = evaluate_policies_high(mdp, episodes_eval, steps_eval, policy, front_pol);
+end
+
+%% Plot
 [f, p] = pareto(fr', front_pol);
 mdp.plotfront(mdp.truefront,'o','DisplayName','True frontier');
 hold all

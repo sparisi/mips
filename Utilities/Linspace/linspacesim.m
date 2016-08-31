@@ -7,7 +7,8 @@ function p = linspacesim(a, b, n)
 %     - n : number of samples
 %
 %    OUTPUT
-%     - p : [D x N] matrix with random points, where N >= n
+%     - p : [D x N] matrix with random points, where N is the closest 
+%           integer to n satisfying the simplex sampling conditions
 %
 % =========================================================================
 % More information about sampling from the simplex:
@@ -32,13 +33,10 @@ linspaces = cell(dim,0);
 % When using the simplex, the volume of the hypercuboid defined by
 % [lo,hi] is reduced by a factor DIM!. This explains why we need to
 % increase n to guarantee the desired number of samples.
-% Notice that the final number of points N will be higher than the
-% desired one. However, it is the closest integer to n that ensures a
-% complete linear sampling in the simplex of [a,b].
 n = n * factorial(dim);
 
 for i = 1 : dim
-    linspaces{i} = linspace(a(i),b(i),ceil(nthroot(n,dim)));
+    linspaces{i} = linspace(a(i),b(i),floor(nthroot(n,dim)));
 end
 c = cell(1,dim);
 [c{:}] = ndgrid(linspaces{:});
