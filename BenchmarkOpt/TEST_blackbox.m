@@ -1,7 +1,10 @@
 clear
 
+rng(10)
+
 N = 15;
 N_MAX = N * 10;
+N_eval = 1;
 robj = 1;
 
 dim = 15;
@@ -15,17 +18,23 @@ solver = MORE_Solver(0.9,0.99,-75,sampling); divStr = 'KL Div';
 
 f = @(x)rosenbrock(x);
 f = @(x)rastrigin(x);
-% f = @(x)noisysphere(x);
+f = @(x)noisysphere(x); N_eval = 1000;
 
 iter = 1;
 
 %% Learning
-while N * iter < 1e4
+while iter < 150
 
+    % Learning samples
     X_iter = sampling.drawAction(N);
     Y_iter = f(X_iter);
     avgY = mean(Y_iter,2);
-    
+
+    % Eval samples
+    X_eval = sampling.makeDeterministic.drawAction(N_eval);
+    Y_eval = f(X_eval);
+    avgY = mean(Y_eval,2);
+
     % First, fill the pool to maintain the samples distribution
     if iter == 1
         Y = repmat(min(Y_iter,[],2),1,N_MAX);
@@ -39,15 +48,19 @@ while N * iter < 1e4
     % Perform an update step
     [sampling, div] = solver.step(Y,X,sampling);
     
-    J_history(:,iter) = Y_iter;
+    J_history(:,iter) = Y_eval;
     fprintf( ['Iter: %d, Avg Value: %.4f, ' divStr ': %.2f, Entropy: %.4f \n'], ...
         iter, avgY, div, sampling.entropy );
     
-    if div < 0.1, break, end
+%     if div < 0.1, break, end
     
     iter = iter + 1;
     
 end
 
 %%
-plothistory(J_history)
+if N_eval == 1
+    plot(J_history)
+else
+    plothistory(J_history)
+end

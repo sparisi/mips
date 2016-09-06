@@ -39,16 +39,8 @@ end
 % Generate features vector for linear regression
 Phi = basis_quadratic(d,Xn);
 
-% Weight each sample by its inverse of absoltute relative output
-absY = abs( Yn - max(Yn) - 1e-2 * (max(Yn) - min(Yn)) ); % Small regularizer for 0 output
-weight = 1 ./ absY;
-if all(absY == absY(1)), weight(:) = 1; end % If all output are the same
-W = W .* weight;
-
 % Get parameters by linear regression on pairs (Phi, Y)
-params = linear_regression(Phi, Yn, W);
-% params = bayesian_linear_regression(Phi, Yn, W);
-
+params = linear_regression(Phi, Yn, 'weights', W);
 assert(~any(isnan(params)), 'Model fitting failed.')
 
 % Extract model params
@@ -67,7 +59,7 @@ R = U * V * U';
 % Re-learn r and r0
 quadYn = sum( (Xn'*R)' .* Xn, 1 );
 linearPhi = basis_poly(1, d, 1, Xn);
-params = linear_regression(linearPhi, Yn - quadYn, W);
+params = linear_regression(linearPhi, Yn - quadYn, 'weights', W);
 r0 = params(1);
 r = params(2:end);
 
@@ -88,4 +80,6 @@ model.r = r;
 model.r0 = r0;
 model.eval = @(X) sum( (X'*R)' .* X, 1 ) + (X'*r)' + r0';
 
-nmse = mean( ( Y - model.eval(X) ).^2 ) / mean( Y.^2 );
+if nargout > 1
+    nmse = mean( ( Y - model.eval(X) ).^2 ) / mean( Y.^2 );
+end

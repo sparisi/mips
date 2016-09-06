@@ -15,8 +15,6 @@ M = sparse(I(:),J(:),M(:));
 invM = M \ repmat(eye(rows),[pages,1]);
 
 % Reshape to the original dimensions
-invM = reshape(invM, [cols pages rows]);
+invM = reshape(invM,[cols pages rows]);
 invM = permute(invM,[1 3 2]);
 invM = reshape(invM,[cols rows pages]);
-
-end

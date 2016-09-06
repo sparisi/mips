@@ -3,6 +3,7 @@ close all
 
 N = 100;
 N_MAX = N * 1;
+N_eval = 1;
 
 dim = 30; f = @(x)zdt3(x); constrain = @(x)max(min(1,x),0);
 truefront = load('zdt3_front.dat');
@@ -26,9 +27,13 @@ sigma0 = 2 * eye(dim);
 
 step = 150;
 
-metric = @(y,w)metric_ws(normalize(y),w)'; % Linear scalarization function
-metric = @(y,w)metric_cheby(normalize(y),w,utopia)'; % Chebychev scalarization
-W = convexcomb(nobj, step);
+% metric = @(y,w)metric_ws(normalize(y),w)'; % Linear scalarization function
+% metric = @(y,w)metric_cheby(normalize(y),w,utopia)'; % Chebychev scalarization
+% W = convexcomb(nobj, step);
+
+metric = @(y,w)metric_localutopia(normalize(y),w,utopia,antiutopia)'; % Local-utopia distance
+W = linspacesim(antiutopia,utopia,step)'; % Weights in the simplex
+W = -linspacesim(-utopia,-(antiutopia-abs(antiutopia))*0.2,step)'; % Weights in the 'upper' simplex
 
 %% Loop
 for i = 1 : size(W,1)
@@ -46,10 +51,16 @@ for i = 1 : size(W,1)
     %% Learning
     while true
 
+        % Learning samples
         X_iter = sampling.drawAction(N);
         X_iter = constrain(X_iter);
         Y_iter = metric(f(X_iter),W(i,:));
         avgY = mean(Y_iter,2);
+
+        % Eval samples
+        X_eval = sampling.makeDeterministic.drawAction(N_eval);
+        Y_eval = f(X_eval);
+        avgY = mean(Y_eval,2);
 
         % First, fill the pool to maintain the samples distribution
         if iter == 1
@@ -64,7 +75,6 @@ for i = 1 : size(W,1)
         % Perform an update step
         [sampling, div] = solver.step(Y,X,sampling);
 
-        J_history(:,iter) = Y_iter;
         % fprintf( ['%d / %d) Iter: %d, Avg Value: %.4f, ' divStr ': %.2f, Entropy: %.4f \n'], ...
         %     i, size(W,1), iter, avgY, div, policy_high.entropy );
 

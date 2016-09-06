@@ -1,20 +1,22 @@
-function THETA = linear_regression(X, Y, W)
-% LINEAR_REGRESSION Weighted linear regression on input-output pairs (X, Y)
-% with samples weights W.
+function THETA = linear_regression(X, Y, varargin)
+% LINEAR_REGRESSION Weighted linear regression on input-output pairs (X, Y).
 %
 %    INPUT
-%     - X     : [d x N] matrix
-%     - Y     : [1 x N] vector
-%     - W     : (optional) [1 x N] vector
+%     - X      : [d x N] matrix
+%     - Y      : [1 x N] vector
+%     - W      : (optional) [1 x N] vector
+%     - lambda : (optional) regularization coefficient
 %
 %    OUTPUT
-%     - THETA : [d x 1] vector, such that Y = THETA'*X
+%     - THETA  : [d x 1] vector, such that Y = THETA'*X
 
 [D, N] = size(X);
-if nargin < 3, W = ones(1,N); end
+
+options = {'weights', 'lambda'};
+defaults = {ones(1,N), 1e-3};
+[W, lambda] = internal.stats.parseArgs(options, defaults, varargin{:});
 
 XW = bsxfun(@times, X, W);
-lambda = 1e-3;
 
 if D > N
     A = X'*XW;

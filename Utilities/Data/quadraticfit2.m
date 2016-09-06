@@ -38,12 +38,6 @@ else
     X1n = X1;
     X2n = X2;
     Yn = Y;
-    X1mu = zeros(d1,1);
-    X1std = ones(d1,1);
-    X2mu = zeros(d2,1);
-    X2std = ones(d2,1);
-    Ymu = zeros(1,1);
-    Ystd = ones(1,1);
 end
 
 %% Generate features vector for linear regression
@@ -56,16 +50,8 @@ PhiC = 2 * reshape(PhiC,[d1*d2,N]);
 
 Phi = [Phi1; Phi2; PhiC];
 
-%% Weight each sample by its inverse of absoltute relative output
-absY = abs( Yn - max(Yn) - 1e-2 * (max(Yn) - min(Yn)) ); % Small regularizer for 0 output
-weight = 1 ./ absY;
-if all(absY == absY(1)), weight(:) = 1; end % If all output are the same
-W = W .* weight;
-
 %% Get parameters by linear regression on pairs (Phi, Y) and extract model
-params = linear_regression(Phi, Yn, W);
-% params = bayesian_linear_regression(Phi, Yn, W);
-
+params = linear_regression(Phi, Yn, 'weights', W, 'lambda', 1e-5); % Tune lambda
 assert(~any(isnan(params)), 'Model fitting failed.')
 
 % r0 = params(1,:);
@@ -75,7 +61,8 @@ idx = 2;
 idx = idx + d1;
 
 R1 = params(idx:idx+d1*(d1+1)/2-1);
-idx = idx + d1*(d1+1)/2;
+% idx = idx + d1*(d1+1)/2;
+
 AQuadratic = zeros(d1);
 ind = logical(tril(ones(d1)));
 AQuadratic(ind) = R1;
@@ -86,6 +73,7 @@ R1 = (AQuadratic + AQuadratic') / 2;
 % 
 % R2 = params(idx:idx+d2*(d2+1)/2-1);
 % idx = idx+d2*(d2+1)/2;
+%
 % AQuadratic = zeros(d2);
 % ind = logical(tril(ones(d2)));
 % AQuadratic(ind) = R2;
@@ -103,7 +91,7 @@ R1 = U * V * U';
 quadYn = sum( (X1n'*R1)' .* X1n, 1 );
 Phi1(2+d1:end,:) = []; % Remove quadratic features in X1
 Phi = [Phi1; Phi2; PhiC];
-params = linear_regression(Phi, Yn - quadYn, W);
+params = linear_regression(Phi, Yn - quadYn, 'weights', W);
 
 r0 = params(1,:);
 idx = 2;
@@ -125,27 +113,23 @@ Rc = params(idx:end);
 Rc = reshape(Rc,d1,d2);
 
 %% De-standardize
-X1stdMat = diag((1./X1std));
-X2stdMat = diag((1./X2std));
-YstdMat = diag(Ystd);
-A1 = (X1stdMat * R1 * X1stdMat);
-A2 = (X2stdMat * R2 * X2stdMat);
-Ac = (X1stdMat * Rc * X2stdMat);
-newR1 = YstdMat * A1;
-newR2 = YstdMat * A2;
-newRc = YstdMat * Ac;
-newr1 = -YstdMat * (2*A1*X1mu + 2*Ac*X2mu - X1stdMat*r1);
-newr2 = -YstdMat * (2*A2*X2mu + 2*Ac'*X1mu - X2stdMat*r2);
-newr0 = YstdMat * (X1mu'*A1*X1mu - r1'*X1stdMat*X1mu + ...
-    X2mu'*A2*X2mu - r2'*X2stdMat*X2mu + ...
-    2 * X1mu'*Ac*X2mu + ...
-    r0) + Ymu;
-R1 = newR1;
-R2 = newR2;
-Rc = newRc;
-r1 = newr1;
-r2 = newr2;
-r0 = newr0;
+if standardize
+    X1stdMat = diag((1./X1std));
+    X2stdMat = diag((1./X2std));
+    YstdMat = diag(Ystd);
+    A1 = (X1stdMat * R1 * X1stdMat);
+    A2 = (X2stdMat * R2 * X2stdMat);
+    Ac = (X1stdMat * Rc * X2stdMat);
+    R1 = YstdMat * A1;
+    R2 = YstdMat * A2;
+    Rc = YstdMat * Ac;
+    r1 = -YstdMat * (2*A1*X1mu + 2*Ac*X2mu - X1stdMat*r1);
+    r2 = -YstdMat * (2*A2*X2mu + 2*Ac'*X1mu - X2stdMat*r2);
+    r0 = YstdMat * (X1mu'*A1*X1mu - r1'*X1stdMat*X1mu + ...
+        X2mu'*A2*X2mu - r2'*X2stdMat*X2mu + ...
+        2 * X1mu'*Ac*X2mu + ...
+        r0) + Ymu;
+end
 
 %% Save model
 model.dim = D;
@@ -162,4 +146,12 @@ model.eval = @(X1,X2) sum( (X1'*R1)' .* X1, 1 ) + ...
     (X2'*r2)' + ...
     r0';
 
-nmse = mean( ( Y - model.eval(X1,X2) ).^2 ) / mean( Y.^2 );
+% Save also the equivalent formulation
+% [ X1, X2, 1 ] [ R1      R2      0.5r1 ] [ X1 ]
+%               [ R2'     Rc      0.5r2 ] [ X2 ]
+%               [ 0.5r1'  0.5r2'  r0    ] [ 1  ]
+model.H = [ [ [R1 Rc; Rc' R2] [0.5*r1; 0.5*r2] ] ; [ 0.5*r1' 0.5*r2' r0 ] ];
+
+if nargout > 1
+    nmse = mean( ( Y - model.eval(X1,X2) ).^2 ) / mean( Y.^2 );
+end
