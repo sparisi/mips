@@ -3,8 +3,6 @@ function [model, nmse] = quadraticfit2(X1, X2, Y, varargin)
 % (X1, X2, Y):
 % Y = X1'*R1*X1 + X2'*R2*X2 + 2*X1'*Rc*X2 + X1'*r1 + X2'*r2 + r0 
 % (R1 is symmetric and negative definite). 
-% For the likelihood of the linear model, a multiplicative noise model is 
-% used (the higher the absolute value of Y, the higher the variance).
 %
 %    INPUT
 %     - X1          : [d1 x N] matrix, where N is the number of samples
@@ -83,6 +81,7 @@ R1 = (AQuadratic + AQuadratic') / 2;
 % Rc = reshape(Rc,d1,d2);
 
 %% Enforce R1 to be negative definite
+% R1 = -nearestSPD(-R1);
 [U, V] = eig(R1);
 V(V > 0) = -1e-8;
 R1 = U * V * U';
@@ -123,12 +122,14 @@ if standardize
     R1 = YstdMat * A1;
     R2 = YstdMat * A2;
     Rc = YstdMat * Ac;
-    r1 = -YstdMat * (2*A1*X1mu + 2*Ac*X2mu - X1stdMat*r1);
-    r2 = -YstdMat * (2*A2*X2mu + 2*Ac'*X1mu - X2stdMat*r2);
+    newr1 = -YstdMat * (2*A1*X1mu + 2*Ac*X2mu - X1stdMat*r1);
+    newr2 = -YstdMat * (2*A2*X2mu + 2*Ac'*X1mu - X2stdMat*r2);
     r0 = YstdMat * (X1mu'*A1*X1mu - r1'*X1stdMat*X1mu + ...
         X2mu'*A2*X2mu - r2'*X2stdMat*X2mu + ...
         2 * X1mu'*Ac*X2mu + ...
         r0) + Ymu;
+    r1 = newr1;
+    r2 = newr2;
 end
 
 %% Save model

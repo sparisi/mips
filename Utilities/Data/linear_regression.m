@@ -20,11 +20,11 @@ XW = bsxfun(@times, X, W);
 
 if D > N
     A = X'*XW;
-    if rank(A) == N, lambda = 0; end
+%    if rank(A) == N, lambda = 0; end
     THETA = XW / (A + lambda*eye(N)) * Y';
     
 else
     A = XW*X';
-    if rank(A) == D, lambda = 0; end
+%    if rank(A) == D, lambda = 0; end
     THETA = (A + lambda*eye(D)) \ (XW*Y');
 end

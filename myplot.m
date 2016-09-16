@@ -4,34 +4,36 @@
 close all
 clear all
 
-%% Change this values according to your needs
-dataFOLDER = 'results/';
-methodsALL = [1 3 4];
-methodsNAMES = {'Method1', 'OtherMethod', 'SuperAlg'};
-entryNAME = 'J_history';
+%% Change entries according to your needs
+folder = 'results/';
+filenames = {'alg1', 'alg2', 'alg3'};
+variable = 'J_history';
+variable = 'mean(J_history)';
+variable = '-log(-mean(J_history))';
 
 %% Plot
-for method = methodsALL;
-    
+for name = filenames;
     counter = 1;
     dataMatrix = [];
     for trial = 1 : 999
         try
-            load([dataFOLDER num2str(method) '_' num2str(trial)])
-            dataMatrix(counter,:) = eval(entryNAME);
+            load([folder name{:} '_' num2str(trial)])
+            dataMatrix(counter,:) = eval(variable);
             counter = counter + 1;
         catch
         end
     end
     % dataMatrix = moving(dataMatrix',2)';
     
-    hold all
-    shadedErrorBar( ...
-        1:size(dataMatrix,2), ...
-        mean(dataMatrix,1), ...
-        std(dataMatrix), ...
-        {'LineWidth', 2, 'DisplayName', methodsNAMES{methodsALL==method}}, ...
-        0.1 );
-    legend('-DynamicLegend');
+    if ~isempty(dataMatrix)
+        hold all
+        shadedErrorBar( ...
+            1:size(dataMatrix,2), ...
+            mean(dataMatrix,1), ...
+            std(dataMatrix), ...
+            { 'LineWidth', 2, 'DisplayName', name{:} }, ...
+            0.1 );
+        legend('-DynamicLegend');
+    end
     
 end

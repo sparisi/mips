@@ -113,9 +113,9 @@ classdef MORE_Solver < handle
 
             F = eta * Qi - 2 * R;
             tempQ = ( F / (eta + omega) );
-            if any(isnan(tempQ) | any(eig(tempQ) <= 0))
-                g = inf;
-                gD = inf(2,1);
+            if any(any(isnan(tempQ) | any(eig(tempQ) <= 0)))
+                g = nan;
+                gD = nan(2,1);
                 warning('Covariance is not PSD.')
                 return
             end
@@ -135,8 +135,8 @@ classdef MORE_Solver < handle
                 f_d_eta = Q \ b;                % deriv wrt eta of f
                 
                 d_eta = obj.epsilon - 0.5 * b' * f_d_eta + 0.5 * f' * invF_d_eta * f ...
-                    + f' * ( F \ f_d_eta ) - 0.5 * logDetQ + 0.5 * logDetF ...
-                    - 0.5 * (eta + omega) * trace(F \ Qi) + 0.5 * dimQ;
+                    + f' * ( Fi * f_d_eta ) - 0.5 * logDetQ + 0.5 * logDetF ...
+                    - 0.5 * (eta + omega) * trace(Fi * Qi) + 0.5 * dimQ;
                 
                 gD = [d_eta
                     -beta + 0.5 * dimQ + 0.5 * logDetF];

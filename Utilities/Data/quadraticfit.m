@@ -1,8 +1,6 @@
 function [model, nmse] = quadraticfit(X, Y, varargin)
 % QUADRATICFIT Learns a quadratic model to fit input-output pairs (X, Y):
 % Y = X'*R*X + X'*r + r0 (R is symmetric and negative definite). 
-% For the likelihood of the linear model, a multiplicative noise model is 
-% used (the higher the absolute value of Y, the higher the variance).
 %
 %    INPUT
 %     - X           : [d x N] matrix, where N is the number of samples

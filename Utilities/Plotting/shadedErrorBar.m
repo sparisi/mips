@@ -1,4 +1,4 @@
-function H=shadedErrorBar(x,y,errBar,lineProps,opacity,plotLog)
+function H=shadedErrorBar(x,y,errBar,lineProps,opacity)
 % Copyright (c) 2010, Rob Campbell
 % All rights reserved.
 % 
@@ -76,10 +76,6 @@ function H=shadedErrorBar(x,y,errBar,lineProps,opacity,plotLog)
 % Error checking    
 error(nargchk(3,6,nargin))
 
-if(nargin < 6)
-    plotLog = false;
-end
-
 %Process y using function handles if needed to make the error bar
 %dynamically
 if iscell(errBar) && ~isvector(y)
@@ -134,20 +130,12 @@ if nargin<5 || ~isnumeric(opacity)
 end
 
 
-if(plotLog)
-%     errBar = log(errBar);
-end
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
 % Plot the main line. We plot this first in order to extract the RGB values
 % for the line colour. I am not aware of a function that does this.
 
-if plotLog
-    H.mainLine = semilogy(x,y,lineProps{:});
-else
-    H.mainLine = plot(x,y,lineProps{:});
-end
+H.mainLine = plot(x,y,lineProps{:});
 
 
 % Work out the color of the shaded region and associated lines
@@ -196,13 +184,9 @@ H.patch=patch(xP,yP,1,'facecolor',patchColor,...
 set(get(get(H.patch, 'Annotation'), 'LegendInformation'), 'IconDisplayStyle', 'off')
 
 %Make nice edges around the patch.
-if plotLog
-    H.edge(1)=semilogy(x,lE,'-','color',edgeColor);
-    H.edge(2)=semilogy(x,uE,'-','color',edgeColor);
-else    
-    H.edge(1)=plot(x,lE,'-','color',edgeColor);
-    H.edge(2)=plot(x,uE,'-','color',edgeColor);
-end
+H.edge(1)=plot(x,lE,'-','color',edgeColor);
+H.edge(2)=plot(x,uE,'-','color',edgeColor);
+
 set(get(get(H.edge(1), 'Annotation'), 'LegendInformation'), 'IconDisplayStyle', 'off')
 set(get(get(H.edge(2), 'Annotation'), 'LegendInformation'), 'IconDisplayStyle', 'off')
 
@@ -223,13 +207,7 @@ if(step>1)
     y2 = [y2 , y(end)];
 end
 
-if plotLog
-    H.mainLine = semilogy(x2,y2,lineProps{:});
-else
-    H.mainLine = plot(x2,y2,lineProps{:});
-end
-
-% H.mainLine=plot(x2,y2,lineProps{:});
+H.mainLine = plot(x2,y2,lineProps{:});
 
 set(H.mainLine, 'color', col);
 
