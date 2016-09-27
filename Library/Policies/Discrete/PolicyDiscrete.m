@@ -71,123 +71,51 @@ classdef (Abstract) PolicyDiscrete < Policy
         end
         
         %% Plotting
-        function fig = plotGreedy(obj, LB, UB)
+        function plotGreedy(obj, LB, UB)
         % Plot the most probable action for 2D states.
-            xmin = LB(1);
-            ymin = LB(2);
-            xmax = UB(1);
-            ymax = UB(2);
-            assert(xmin < xmax, 'X upper bound cannot be lower than lower bound.')
-            assert(ymin < ymax, 'Y upper bound cannot be lower than lower bound.')
-
             nactions = length(obj.action_list);
             step = 30;
-            xnodes = linspace(xmin,xmax,step);
-            ynodes = linspace(ymin,ymax,step);
+            xnodes = linspace(LB(1),UB(1),step);
+            ynodes = linspace(LB(2),UB(2),step);
             [X, Y] = meshgrid(xnodes,ynodes);
-            actions = obj.makeDeterministic.drawAction([X(:)';Y(:)']);
-            Z = reshape(actions,step,step);
+            A = obj.makeDeterministic.drawAction([X(:)';Y(:)']);
+            A = reshape(A,step,step);
             
-            fig = findobj('type','figure','name','Greedy');
+            fig = findobj('type','figure','name','Greedy Policy');
             if isempty(fig)
-                fig = figure();
-                fig.Name = 'Greedy';
-                surf(X,Y,Z,'EdgeColor','none')
+                figure('Name','Greedy Policy');
+                surf(X,Y,A,'LineStyle','None','CDataMapping','direct')
                 view(0,90)
-                axis([xmin,xmax,ymin,ymax])
-                title('Deterministic actions')
-                xlabel x
-                ylabel y
-                cmap = jet(nactions);
-                nonzeroActions = ismember(obj.action_list,actions);
-                cmap = cmap(nonzeroActions,:);
-                colormap(cmap)
-                labels = num2cell(obj.action_list(nonzeroActions));
-                labels = cellfun(@num2str,labels,'uni',0);
-                lcolorbar(labels);
+                colormap(parula(nactions))
+                axis([LB(1),UB(1),LB(2),UB(2)])
+                lcolorbar(1:nactions)
             else
                 h = fig.Children(2).Children;
                 h.XData = X;
                 h.YData = Y;
-                h.ZData = Z;
+                h.ZData = A;
             end
             drawnow limitrate
         end
         
-        function fig = plotQ(obj, LB, UB)
+        function plotQ(obj, LB, UB)
         % Plot Q-function for 2D states.
-            xmin = LB(1);
-            ymin = LB(2);
-            xmax = UB(1);
-            ymax = UB(2);
-            assert(xmin < xmax, 'X upper bound cannot be lower than lower bound.')
-            assert(ymin < ymax, 'Y upper bound cannot be lower than lower bound.')
-            
             step = 30;
-            xnodes = linspace(xmin,xmax,step);
-            ynodes = linspace(ymin,ymax,step);
-            [X, Y] = meshgrid(xnodes,ynodes);
+            x = linspace(LB(1),UB(1),step);
+            y = linspace(LB(2),UB(2),step);
+            [X, Y] = meshgrid(x,y);
             Q = obj.qFunction([X(:)';Y(:)']);
-
-            nactions = size(Q,1);
-            n = floor(sqrt(nactions));
-            m = ceil(nactions/n);
-            
-            fig = findobj('type','figure','name','Q-function');
-            if isempty(fig)
-                fig = figure();
-                fig.Name = 'Q-function';
-                for i = nactions : -1 : 1
-                    subplot(n,m,i,'align')
-                    Z = reshape(Q(i,:),step,step);
-                    contourf(X,Y,Z)
-                    title(['Q(s,' num2str(i) ')'])
-                    xlabel x
-                    ylabel y
-                end
-            else
-                for i = 1 : nactions
-                    h = fig.Children(i).Children;
-                    Z = reshape(Q(i,:),step,step);
-                    h.XData = X;
-                    h.YData = Y;
-                    h.ZData = Z;
-                end
-            end
-            drawnow limitrate
+            subcontourf('Q-function',X,Y,Q)
         end
         
-        function fig = plotV(obj, LB, UB)
+        function plotV(obj, LB, UB)
         % Plot V-function for 2D states.
-            xmin = LB(1);
-            ymin = LB(2);
-            xmax = UB(1);
-            ymax = UB(2);
-            assert(xmin < xmax, 'X upper bound cannot be lower than lower bound.')
-            assert(ymin < ymax, 'Y upper bound cannot be lower than lower bound.')
-
             step = 30;
-            xnodes = linspace(xmin,xmax,step);
-            ynodes = linspace(ymin,ymax,step);
-            [X, Y] = meshgrid(xnodes,ynodes);
-            Z = obj.vFunction([X(:)';Y(:)']);
-            Z = reshape(Z,step,step);
-            
-            fig = findobj('type','figure','name','V-function');
-            if isempty(fig)
-                fig = figure();
-                fig.Name = 'V-function';
-                contourf(X,Y,Z);
-                title('V-function')
-                xlabel x
-                ylabel y
-            else
-                h = fig.Children.Children;
-                h.XData = X;
-                h.YData = Y;
-                h.ZData = Z;
-            end
-            drawnow limitrate
+            x = linspace(LB(1),UB(1),step);
+            y = linspace(LB(2),UB(2),step);
+            [X, Y] = meshgrid(x,y);
+            V = obj.vFunction([X(:)';Y(:)']);
+            subcontourf('V-function',X,Y,V)
         end
         
     end

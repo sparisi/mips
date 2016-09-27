@@ -108,10 +108,9 @@ If the state space is 2-dimensional, you can plot the value functions learned by
 ```
 SettingDeep % deep sea treasure setup
 RUN_PG % run policy gradient (terminate by CTRL+C)
-policy.plotQ(1,11,1,10) % plot Q-function
-policy.plotV(1,11,1,10) % plot V-function
-policy.plotActions(1,11,1,10) % plot action probabilities
-policy.plotGreedy(1,11,1,10) % plot the action taken by zeroing the exploration
+policy.plotQ([1,11],[1,10]) % plot Q-function
+policy.plotV([1,11],[1,10]) % plot V-function
+policy.plotGreedy([1,11],[1,10]) % plot the action taken by zeroing the exploration
 ```
 
 ### MOMDPs Pareto frontier
