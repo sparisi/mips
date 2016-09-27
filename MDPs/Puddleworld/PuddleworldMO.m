@@ -15,6 +15,9 @@ classdef PuddleworldMO < MOMDP
             0.45 0.8];
         radius = 0.1; % Radius of the puddles
         
+        % Finite actions
+        allactions = [1 2 3 4];
+
         % MDP variables
         dstate = 2;
         daction = 1;

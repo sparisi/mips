@@ -32,6 +32,10 @@ classdef DeepSeaTreasure < MOMDP
             0   0   0   0   0   0   0   0   1   1
             0   0   0   0   0   0   0   0   0   1];
         
+        % Finite states and actions
+        allstates = allcomb([1 2 3 4 5 6 7 8 9 10 11], [1 2 3 4 5 6 7 8 9 10]);
+        allactions = [1 2 3 4];
+
         % MDP variables
         dstate = 2;
         daction = 1;
@@ -139,15 +143,8 @@ classdef DeepSeaTreasure < MOMDP
         end
         
         function updateplot(obj, state)
-            % Convert coordinates from cartesian to matrix
-            nrows = size(obj.treasure);
-            convertY = -(-nrows:-1); % Cartesian coord -> Matrix coord
-            x = state(2); % (X,Y) -> (Y,X)
-            y = state(1);
-            state = [x; convertY(y)];
-            
-            obj.handleAgent.XData = state(1);
-            obj.handleAgent.YData = state(2);
+            [obj.handleAgent.XData, obj.handleAgent.YData] = ...
+                cart2mat(state(1),state(2),size(obj.treasure,1));
             drawnow limitrate
         end
         

@@ -15,6 +15,9 @@ classdef BicycleBalance < MDP
         isAveraged = 0;
         gamma = 0.99;
 
+        % Finite actions
+        allactions = [1 2 3 4 5 6 7 8 9];
+
         % Bounds : state = (theta, theta_dot, omega, omega_dot)
         stateLB = [-1.3963 -inf -pi/15 -inf]';
         stateUB = [1.3963 inf pi/15 inf]';

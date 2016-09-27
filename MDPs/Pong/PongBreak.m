@@ -66,6 +66,9 @@ classdef PongBreak < MDP
         isAveraged = 0;
         gamma = 0.999;
 
+        % Finite actions
+        allactions = [1 2];
+
         % Bounds : state = [ballX, ballY, ballSpeed, ballVectorX, ballVectorY, paddleY, isBrick])
         stateLB = [0
             0

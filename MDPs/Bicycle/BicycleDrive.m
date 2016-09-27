@@ -18,6 +18,9 @@ classdef BicycleDrive < MDP
         isAveraged = 0;
         gamma = 0.98; % 0.98 Ernst, 0.99 Randlov
 
+        % Finite actions
+        allactions = [1 2 3 4 5];
+
         % Bounds : state = (theta, theta_dot, omega, omega_dot, psi, xf, yf, xb, yb)
         stateLB = [-1.3963 -inf -pi/15 -inf -pi -inf -inf -inf -inf]';
         stateUB = [1.3963 inf pi/15 inf pi inf inf inf inf]';
@@ -231,7 +234,7 @@ classdef BicycleDrive < MDP
             v2 = [obj.goal(1)-xb2; obj.goal(2)-yb2];
             psi_goal2 = acos(dot(v1,v2)./(matrixnorms(v1,2).*matrixnorms(v2,2)));
 
-            reward = - 0.1 * (psi_goal1 - psi_goal2);
+            reward = - real(0.1 * (psi_goal1 - psi_goal2));
         end
         
     end

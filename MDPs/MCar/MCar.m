@@ -11,6 +11,9 @@ classdef MCar < MDP
         g = 9.81;   % Gravity
         s = 5;      % Slope
 
+        % Finite actions
+        allactions = [1 2];
+
         % MDP variables
         dstate = 2;
         daction = 1;

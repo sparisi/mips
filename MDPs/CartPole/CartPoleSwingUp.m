@@ -15,6 +15,9 @@ classdef CartPoleSwingUp < MDP
         mu_c = 0.0005; % Coefficient of friction of cart on track
         mu_p = 0.000002; % Coefficient of friction of the pole's hinge
         
+        % Finite actions
+        allactions = [1 2];
+
         % MDP variables
         dstate = 4;
         daction = 1;

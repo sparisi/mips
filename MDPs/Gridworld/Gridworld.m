@@ -5,22 +5,13 @@ classdef Gridworld < MDP
         % Environment variables
         reward = [ ...
             0  0  0  0  0  9  0
-            0  0  0  0  0  0  0
+            1  0  0  0  0  0  0
             0  0  0  0  0  0  0
             0  0  0  0  0  0  0
            -9 -9  0  0 -9  0 -9
-            0  0  0  0  0  0  0
+            0  13  0  0  0  0  0
             0  0  0  0  0  0  0
             ] * 1e1;
-        terminal = logical([ ...
-            0  0  0  0  0  1  0
-            0  0  0  0  0  0  0
-            0  0  0  0  0  0  0
-            0  0  0  0  0  0  0
-            1  1  0  0  1  0  1
-            0  0  0  0  0  0  0
-            0  0  0  0  0  0  0
-            ]);
         isopen = [ ...
             1  1  1  1  1  1  1
             1  1  1  1  1  1  1
@@ -31,6 +22,10 @@ classdef Gridworld < MDP
             1  1  1  1  1  1  1
             ];
         
+        % Finite states and actions
+        allstates = allcomb([1 2 3 4 5 6 7], [1 2 3 4 5 6 7]);
+        allactions = [1 2 3 4];
+
         % MDP variables
         dstate = 2;
         daction = 1;
@@ -70,7 +65,8 @@ classdef Gridworld < MDP
             % Reward function
             reward = obj.reward(size(obj.reward,1)*(nextstate(2,:)-1) + nextstate(1,:));
 
-            absorb = obj.terminal(size(obj.terminal,1)*(nextstate(2,:)-1) + nextstate(1,:));
+            % Any reward or penalty cell is terminal
+            absorb = reward~=0;
             
             if obj.realtimeplot, obj.updateplot(nextstate), end
         end
@@ -95,15 +91,8 @@ classdef Gridworld < MDP
         end
         
         function updateplot(obj, state)
-            % Convert coordinates from cartesian to matrix
-            nrows = size(obj.reward);
-            convertY = -(-nrows:-1); % Cartesian coord -> Matrix coord
-            x = state(2); % (X,Y) -> (Y,X)
-            y = state(1);
-            state = [x; convertY(y)];
-            
-            obj.handleAgent.XData = state(1);
-            obj.handleAgent.YData = state(2);
+            [obj.handleAgent.XData, obj.handleAgent.YData] = ...
+                cart2mat(state(1),state(2),size(obj.reward,1));
             drawnow limitrate
         end
         
