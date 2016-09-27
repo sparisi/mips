@@ -11,7 +11,7 @@ function multisurf(f,xmin,xmax,ymin,ymax,n)
 %
 % =========================================================================
 % EXAMPLE
-% f = @(varargin)basis_krbf(7, [0 1; 0 1], varargin{:});
+% f = @(varargin)basis_krbf(7, [0 1; 0 1], 0, varargin{:});
 % multisurf(f,0,1,0,1)
 
 if nargin < 6, n = 50; end

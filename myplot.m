@@ -12,7 +12,7 @@ variable = 'mean(J_history)';
 variable = '-log(-mean(J_history))';
 
 %% Plot
-for name = filenames;
+for name = filenames
     counter = 1;
     dataMatrix = [];
     for trial = 1 : 999
