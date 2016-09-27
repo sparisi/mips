@@ -28,8 +28,7 @@ step = 0;
 
 % Initialize simulation
 simulator = @mdp.simulator;
-initial_state = mdp.initstate(totepisodes);
-state = initial_state;
+state = mdp.initstate(totepisodes);
 action = zeros(mdp.daction,totepisodes);
 
 % Keep track of the states which did not terminate

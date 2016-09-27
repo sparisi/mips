@@ -41,8 +41,7 @@ step = 0;
 
 % Initialize simulation
 simulator = @mdp.simulator;
-initial_state = mdp.initstate(episodes);
-state = initial_state;
+state = mdp.initstate(episodes);
 
 % Allocate memory
 ds.s = nan(nvar_state, episodes, 1);
