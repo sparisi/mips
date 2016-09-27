@@ -23,6 +23,10 @@ classdef Resource < MOMDP
             0 0 0 0 0
             0 0 0 0 0];
         
+        % Finite states and actions
+        allstates = allcomb([1 2 3 4 5], [1 2 3 4 5], [0 1], [0 1]);
+        allactions = [1 2 3 4];
+        
         % MDP variables
         dstate = 4;
         daction = 1;
@@ -136,21 +140,15 @@ classdef Resource < MOMDP
         end
         
         function updateplot(obj, state)
-            % Convert coordinates from cartesian to matrix
-            [nrows, ncols] = size(obj.gems);
-            convertY = -(-nrows:-1); % Cartesian coord -> Matrix coord
-            x = state(2); % (X,Y) -> (Y,X)
-            y = state(1);
-            
-            hasGold = flipud(obj.gold)'; % Cartesian coord -> Matrix coord
+            hasGold = flipud(obj.gold)';
             hasGems = flipud(obj.gems)';
-
-            obj.handleAgent{1}.XData = x;
-            obj.handleAgent{1}.YData = convertY(y);
+            [xs, ys] = cart2mat(state(1),state(2),size(obj.gems,1));
+            obj.handleAgent{1}.XData = xs;
+            obj.handleAgent{1}.YData = ys;
             
             if state(3) % Carrying gems
-                obj.handleAgent{2}.XData = x+0.3;
-                obj.handleAgent{2}.YData = convertY(y)+0.3;
+                obj.handleAgent{2}.XData = xs+0.3;
+                obj.handleAgent{2}.YData = ys+0.3;
                 obj.handleAgent{2}.MarkerSize = 5;
             else
                 [x,y] = find(hasGems);
@@ -160,8 +158,8 @@ classdef Resource < MOMDP
             end
             
             if state(4) % Carrying gold
-                obj.handleAgent{3}.XData = x+0.3;
-                obj.handleAgent{3}.YData = convertY(y)+0.1;
+                obj.handleAgent{3}.XData = xs+0.3;
+                obj.handleAgent{3}.YData = ys+0.1;
                 obj.handleAgent{3}.MarkerSize = 5;
             else
                 [x,y] = find(hasGold);
