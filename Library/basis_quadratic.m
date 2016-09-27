@@ -3,13 +3,13 @@ function Phi = basis_quadratic(dim, state)
 % It is analogous to BASIS_POLY, but faster.
 %
 %    INPUT
-%     - dim    : dimension of the state
-%     - state  : (optional) [D x N] matrix of N states of size D to evaluate
+%     - dim   : dimension of the state
+%     - state : (optional) [D x N] matrix of N states of size D to evaluate
 %
 %    OUTPUT
-%     - Phi    : if a state is provided as input, the function 
-%                returns the feature vectors representing it; 
-%                otherwise it returns the number of features
+%     - Phi   : if a state is provided as input, the function 
+%               returns the feature vectors representing it; 
+%               otherwise it returns the number of features
 
 D = 2 * dim + dim * (dim - 1) / 2;
 

@@ -9,7 +9,7 @@ dreward = mdp.dreward;
 gamma = mdp.gamma;
 daction = mdp.daction;
 
-bfs = @(varargin)basis_krbf(4,[-1 1;-3 3],varargin{:});
+bfs = @(varargin)basis_krbf(4,[-1 1;-3 3],0,varargin{:});
 bfs = @(varargin)basis_poly(1,mdp.dstate,0,varargin{:});
 
 A0 = zeros(daction,bfs()+1);

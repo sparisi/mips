@@ -1,4 +1,4 @@
-function Phi = basis_rrbf(n_centers, widths, range, state)
+function Phi = basis_rrbf(n_centers, widths, range, offset, state)
 % BASIS_RRBF Uniformly distributed Roooted Gaussian Radial Basis Functions.
 % Phi(i) = exp(-||state - centers(i)|| / widths(i))
 %
@@ -7,6 +7,7 @@ function Phi = basis_rrbf(n_centers, widths, range, state)
 %     - widths    : array of widths for each dimension
 %     - range     : [D x 2] matrix with min and max values for the
 %                   D-dimensional input state
+%     - offset    : 1 to add an additional constant of value 1, 0 otherwise
 %     - state     : (optional) [D x N] matrix of N states of size D to 
 %                   evaluate
 %
@@ -17,7 +18,7 @@ function Phi = basis_rrbf(n_centers, widths, range, state)
 %
 % =========================================================================
 % EXAMPLE
-% basis_rrbf(2, [0.3; 0.2], [0 1; 0 1], [0.2; 0.1])
+% basis_rrbf(2, [0.3; 0.2], [0 1; 0 1], 0, [0.2; 0.1])
 %     0.4346
 %     0.0663
 %     0.0106
@@ -39,8 +40,8 @@ if isempty(centers)
     centers = cell2mat( cellfun(@(v)v(:), d, 'UniformOutput',false) )';
 end
 
-if nargin == 3
-    Phi = size(centers,2);
+if nargin < 5
+    Phi = size(centers,2) + 1*(offset == 1);
 else
     if isrow(widths), widths = widths'; end
     B = 1./widths.^2;
@@ -49,6 +50,6 @@ else
     expterm = bsxfun(@times,distance,reshape(B',[1,size(B')]));
     Phi = exp(-sqrt(sum(expterm,3)))';
 %     Phi = Phi ./ sum(Phi);
+    if offset == 1, Phi = [ones(1,size(state,2)); Phi]; end
 end
 
-end

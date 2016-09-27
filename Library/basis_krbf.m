@@ -1,4 +1,4 @@
-function Phi = basis_krbf(n_centers, range, state)
+function Phi = basis_krbf(n_centers, range, offset, state)
 % BASIS_KRBF Kernel Radial Basis Functions. 
 % Phi = exp( -0.5 * (state - centers)' * B^-1 * (state - centers) ), 
 % where B is a diagonal matrix denoting the bandwiths of the kernels.
@@ -9,6 +9,7 @@ function Phi = basis_krbf(n_centers, range, state)
 %     - n_centers : number of centers (the same for all dimensions)
 %     - range     : [D x 2] matrix with min and max values for the
 %                   D-dimensional input state
+%     - offset    : 1 to add an additional constant of value 1, 0 otherwise
 %     - state     : (optional) [D x N] matrix of N states of size D to 
 %                   evaluate
 %
@@ -34,8 +35,8 @@ if isempty(centers)
     centers = cell2mat( cellfun(@(v)v(:), d, 'UniformOutput', false) )';
 end
 
-if nargin < 3
-    Phi = size(centers,2);
+if nargin < 4
+    Phi = size(centers,2) + 1*(offset == 1);
 else
     B = 0.5 ./ bands;
     distance = -bsxfun(@minus,state',reshape(centers,[1 size(centers)])).^2;
@@ -43,4 +44,5 @@ else
     expterm = bsxfun(@times,distance,reshape(B',[1,size(B')]));
     Phi = exp(sum(expterm,3))';
 %     Phi = Phi ./ sum(Phi);
+    if offset == 1, Phi = [ones(1,size(state,2)); Phi]; end
 end
