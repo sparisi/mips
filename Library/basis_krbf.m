@@ -1,6 +1,6 @@
 function Phi = basis_krbf(n_centers, range, offset, state)
 % BASIS_KRBF Kernel Radial Basis Functions. 
-% Phi = exp( -0.5 * (state - centers)' * B^-1 * (state - centers) ), 
+% Phi = exp( (state - centers)' * B * (state - centers) ), 
 % where B is a diagonal matrix denoting the bandwiths of the kernels.
 % Centers are uniformly placed in RANGE and bandwidths are automatically 
 % computed. See the code for more details.
@@ -18,12 +18,12 @@ function Phi = basis_krbf(n_centers, range, offset, state)
 %                   returns the feature vectors representing it; 
 %                   otherwise it returns the number of features
 
-persistent centers bands
+persistent centers B
 
 % Compute bandwidths and centers only once
 if isempty(centers)
     dim_state = size(range,1);
-    bands = diff(range,[],2).^2 / (2 * n_centers^2); % change the denominator for wider/narrower bandwidth
+    B = n_centers^2 ./ diff(range,[],2).^2; % change the numerator for wider/narrower bandwidth
     m = diff(range,[],2) / n_centers;
     
     c = cell(dim_state, 1);
@@ -38,7 +38,6 @@ end
 if nargin < 4
     Phi = size(centers,2) + 1*(offset == 1);
 else
-    B = 0.5 ./ bands;
     distance = -bsxfun(@minus,state',reshape(centers,[1 size(centers)])).^2;
     distance = permute(distance,[1 3 2]);
     expterm = bsxfun(@times,distance,reshape(B',[1,size(B')]));
