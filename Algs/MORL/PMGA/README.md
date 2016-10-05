@@ -7,7 +7,7 @@ Implementation of **P**areto-**M**anifold **G**radient **A**lgorithm as presente
 
 and 
 
-[PARISI, S; PIROTTA, M; RESTELLI, M. *Continuous Pareto Manifold Approximation*, Journal of Artificial Intelligence Research (JAIR), 2016](http://www.ausy.tu-darmstadt.de/uploads/Site/EditPublication/PARISI_JAIR_MORL.pdf)
+[PARISI, S; PIROTTA, M; RESTELLI, M. *Multi-objective Reinforcement Learning through Continuous Pareto Manifold Approximation*, Journal of Artificial Intelligence Research (JAIR), 2016](http://www.ausy.tu-darmstadt.de/uploads/Site/EditPublication/PARISI_JAIR_MORL.pdf)
 
 It requires the *Symbolic Toolbox*.
 

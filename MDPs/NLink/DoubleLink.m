@@ -8,6 +8,7 @@ classdef DoubleLink < MDP
         % Environment variables
         lengths = [1 1];
         masses = [1 1];
+        inertias = [1 1] .* ([1 1].^2 + 0.0001) ./ 3.0;
         friction_coeff = [2.5 2.5]'; % Viscous friction coefficients
 %         g = 9.81; % If 0, the problem becames a simpler planar reaching task
         g = 0;
@@ -78,7 +79,8 @@ classdef DoubleLink < MDP
         
         %% Dynamics
         function [gravity, coriolis, invM, friction] = getDynamicsMatrices(obj, state)
-            inertias = obj.masses .* (obj.lengths.^2 + 0.00001) ./ 3.0;
+            inertia1 = obj.inertias(1);
+            inertia2 = obj.inertias(1);
             m1 = obj.masses(1);
             m2 = obj.masses(2);
             l1 = obj.lengths(1);
@@ -96,10 +98,10 @@ classdef DoubleLink < MDP
 %             s12 = sin(q1 + q2);
             c12 = cos(q1 + q2);
             
-            M11 = m1 * lg1^2 + inertias(1) + m2 * (l1^2 + lg2^2 + 2 * l1 * lg2 * c2) + inertias(2);
-            M12 = m2 * (lg2^2 + l1 * lg2 * c2) + inertias(2);
+            M11 = m1 * lg1^2 + inertia1 + m2 * (l1^2 + lg2^2 + 2 * l1 * lg2 * c2) + inertia2;
+            M12 = m2 * (lg2^2 + l1 * lg2 * c2) + inertia2;
             M21 = M12;
-            M22 = repmat(m2 * lg2^2 + inertias(2), 1, size(state,2));
+            M22 = repmat(m2 * lg2^2 + inertia2, 1, size(state,2));
             invdetM = 1 ./ (M11 .* M22 - M12 .* M21);
             invM(1,1,:) = M22;
             invM(1,2,:) = -M21;

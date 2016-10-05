@@ -22,9 +22,11 @@ if D > N
     A = X'*XW;
 %    if rank(A) == N, lambda = 0; end
     THETA = XW / (A + lambda*eye(N)) * Y';
+%     THETA = XW * pinv(A) * Y';
     
 else
     A = XW*X';
 %    if rank(A) == D, lambda = 0; end
-    THETA = (A + lambda*eye(D)) \ (XW*Y');
+    THETA = (A + lambda*eye(D)) \ (XW * Y');
+%     THETA = pinv(A) * (XW * Y');
 end

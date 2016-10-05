@@ -74,7 +74,7 @@ classdef (Abstract) PolicyDiscrete < Policy
         function plotGreedy(obj, LB, UB)
         % Plot the most probable action for 2D states.
             nactions = length(obj.action_list);
-            step = 30;
+            step = 10;
             xnodes = linspace(LB(1),UB(1),step);
             ynodes = linspace(LB(2),UB(2),step);
             [X, Y] = meshgrid(xnodes,ynodes);
@@ -100,7 +100,7 @@ classdef (Abstract) PolicyDiscrete < Policy
         
         function plotQ(obj, LB, UB)
         % Plot Q-function for 2D states.
-            step = 30;
+            step = 10;
             x = linspace(LB(1),UB(1),step);
             y = linspace(LB(2),UB(2),step);
             [X, Y] = meshgrid(x,y);
@@ -110,7 +110,7 @@ classdef (Abstract) PolicyDiscrete < Policy
         
         function plotV(obj, LB, UB)
         % Plot V-function for 2D states.
-            step = 30;
+            step = 10;
             x = linspace(LB(1),UB(1),step);
             y = linspace(LB(2),UB(2),step);
             [X, Y] = meshgrid(x,y);

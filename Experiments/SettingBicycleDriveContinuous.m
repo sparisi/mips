@@ -10,11 +10,12 @@ gamma = mdp.gamma;
 daction = mdp.daction;
 
 bfs = @bicycledrive_basis_poly;
+% bfs = @(varargin) basis_poly(2,mdp.dstate,0,varargin{:});
 
 A0 = zeros(daction,bfs()+1);
-Sigma0 = [4 0; 0 0.04];
-policy = GaussianLinearDiag(bfs, daction, A0, Sigma0);
-% policy = GaussianLinearChol(bfs, daction, A0, Sigma0);
+Sigma0 = 10*[4 0; 0 0.04];
+% policy = GaussianLinearDiag(bfs, daction, A0, Sigma0);
+policy = GaussianLinearChol(bfs, daction, A0, Sigma0);
 
 
 %% ===================================================================== %%

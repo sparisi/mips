@@ -8,24 +8,24 @@ lrate = 0.1;
 %% Learning
 while true
 
-    [data, avgRew] = collect_episodes(mdp, N, steps_learn, policy_high, policy);
+    [data_iter, avgRew] = collect_episodes(mdp, N, steps_learn, policy_high, policy);
 
     % First, fill the pool to maintain the samples distribution
     if iter == 1
-        J = repmat(min(data.J,[],2),1,N_MAX);
-        Theta = policy_high.drawAction(N_MAX);
+        data.J = repmat(min(data_iter.J,[],2),1,N_MAX);
+        data.Theta = policy_high.drawAction(N_MAX);
     end
     
     % Enqueue the new samples and remove the old ones
-    J = [data.J, J(:, 1:N_MAX-N)];
-    Theta = [data.Theta, Theta(:, 1:N_MAX-N)];
+    data.J = [data_iter.J, data.J(:, 1:N_MAX-N)];
+    data.Theta = [data_iter.Theta, data.Theta(:, 1:N_MAX-N)];
     
     [grad, stepsize] = NESbase(policy_high, data, lrate);
 %     [grad, stepsize] = PGPEbase(policy_high, data, lrate);
 
-    J_history(:,iter) = data.J(:,robj);
+    J_history(:,iter) = data_iter.J(:,robj);
     fprintf( '%d) Avg Reward: %.4f, \tNorm: %.2f, \tEntropy: %.3f\n', ...
-        iter, avgRew(robj), norm(grad(:,robj)), policy_high.entropy(data.Theta) );
+        iter, avgRew(robj), norm(grad(:,robj)), policy_high.entropy(data_iter.Theta) );
 
     policy_high = policy_high.update(policy_high.theta + grad(:,robj)*stepsize(robj));
 

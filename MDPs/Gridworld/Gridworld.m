@@ -80,14 +80,23 @@ classdef Gridworld < MDP
             obj.handleEnv = figure(); hold all
             
             cells = obj.reward;
-            cells = flipud(cells);
-            h = image(cells); % Plot environment
-            colormap([1 0 0; 1 1 1; 0 1 0]);
-            
+            h = image(flipud(cells)); % Plot environment
+
             imggrid(h,'k',0.5); % Add grid
+
+            cells = flipud(cells)';
+            [rows,cols] = find(cells);
+            for i = 1 : length(rows) % Add value
+                text('position', [rows(i) cols(i)], ...
+                    'fontsize', 10, ...
+                    'string', num2str(cells(rows(i),cols(i))), ...
+                    'color', 'red', ...
+                    'horizontalalignment', 'center')
+            end
+            
             axis off
             
-            obj.handleAgent = plot(1,7,'bo','MarkerSize',8,'MarkerFaceColor','b');
+            obj.handleAgent = plot(1,7,'bo','MarkerSize',8,'MarkerFaceColor','w');
         end
         
         function updateplot(obj, state)
