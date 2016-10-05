@@ -225,7 +225,7 @@ classdef BicycleDriveContinuous < MDP
             v2 = [obj.goal(1)-xb2; obj.goal(2)-yb2];
             psi_goal2 = acos(dot(v1,v2)./(matrixnorms(v1,2).*matrixnorms(v2,2)));
 
-            reward = - 0.1 * (abs(psi_goal1) - abs(psi_goal2));
+            reward = 0.1 * (abs(psi_goal1) - abs(psi_goal2));
         end
         
     end
