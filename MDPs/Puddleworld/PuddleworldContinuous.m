@@ -41,7 +41,9 @@ classdef PuddleworldContinuous < MDP
         
         function [nextstate, reward, absorb] = simulator(obj, state, action)
             % Bound the action
+            idx = matrixnorms(action,2) == 0;
             action = bsxfun(@times,action,1./matrixnorms(action,2)) * obj.step;
+            action(:,idx) = 0;
 
             % Transition function
             nextstate = state + action + mymvnrnd([0;0],0.01^2*eye(2),size(state,2));
@@ -49,6 +51,7 @@ classdef PuddleworldContinuous < MDP
             
             % Distance from the nearest edge of the puddle + Time penalty
             reward = obj.puddlepenalty(nextstate) - 1;
+%             reward = obj.puddlepenalty(nextstate) - matrixnorms(bsxfun(@minus,nextstate,[1,1]'),2).^2;
             
             % Terminal condition
             absorb = sum(nextstate,1) >= 1.9;
