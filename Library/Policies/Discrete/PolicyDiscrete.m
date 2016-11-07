@@ -48,23 +48,6 @@ classdef (Abstract) PolicyDiscrete < Policy
             S = mean(S);
         end
         
-        %% Basis depending on the action
-        function phiSA = duplicatebasis(obj, Phi, Actions)
-            dphi = size(Phi,1);
-            nstates = size(Phi,2);
-            nactions = length(obj.action_list);
-            [found,~] = (ismember(Actions,obj.action_list));
-            assert(min(found) == 1);
-            assert(isrow(Actions))
-            assert(length(Actions) == nstates)
-
-            idx_start = (Actions-1)*dphi+1 + (0:nstates-1)*dphi*nactions; % Starting linear indices
-            idx = bsxfun(@plus,idx_start,(0:dphi-1)'); % All linear indices
-            phiSA = zeros(dphi*nactions,nstates); % Initialize output array with zeros
-            phiSA(idx) = Phi;
-            phiSA = phiSA(1:length(obj.theta),:); % Some policies do not have any explicit preference on the last action
-        end
-        
         %% Adds the constant feature 1 to the basis function
         function phi1 = basis1(obj, States)
             phi1 = [ones(1,size(States,2)); obj.basis(States)];
