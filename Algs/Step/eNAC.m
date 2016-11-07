@@ -8,27 +8,28 @@ function [grad_nat, stepsize] = eNAC(policy, data, gamma, lrate)
 % J Peters, S Vijayakumar, S Schaal
 % Natural Actor-Critic (2008)
 
-dlogpi = policy.dlogPidtheta(horzcat(data.s),horzcat(data.a));
-episodeslength = horzcat(data.length);
+dlogpi = policy.dlogPidtheta([data.s],[data.a]);
+episodeslength = [data.length];
+idx = cumsum(episodeslength);
 totepisodes = numel(data);
-dparams = policy.dparams;
 
 timesteps = cell2mat(arrayfun(@(x)1:x,episodeslength,'uni',0));
 allgamma = gamma.^(timesteps-1);
-sumdlog = cumsumidx(bsxfun(@times,dlogpi,allgamma),cumsum(episodeslength));
+
+sumdlog = cumsumidx(bsxfun(@times,dlogpi,allgamma),idx);
 sumdlog = [sumdlog; ones(1,totepisodes)];
 F = sumdlog * sumdlog';
-rewgamma = cumsumidx(bsxfun(@times,horzcat(data.r),allgamma),cumsum(episodeslength));
-g = sumdlog * rewgamma';
+sumrew = cumsumidx([data.gammar],idx);
+g = sumdlog * sumrew';
 
 F = F / totepisodes;
 g = g / totepisodes;
 
 rankF = rank(F);
-if rankF == dparams + 1
+if rankF == size(F,1) + 1
 	grad_nat = F \ g;
 else
-% 	warning('Fisher matrix is lower rank (%d instead of %d).', rankF, dparams+1);
+% 	warning('Fisher matrix is lower rank (%d instead of %d).', rankF, size(F,1) + 1);
 	grad_nat = pinv(F) * g;
 end
 

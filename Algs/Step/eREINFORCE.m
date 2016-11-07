@@ -10,19 +10,18 @@ function [grad, stepsize] = eREINFORCE(policy, data, gamma, lrate)
 % Simple Statistical Gradient-Following Algorithms for Connectionist 
 % Reinforcement Learning (1992)
 
-dlogpi = policy.dlogPidtheta(horzcat(data.s),horzcat(data.a));
-episodeslength = horzcat(data.length);
-totstep = sum(episodeslength);
+episodeslength = [data.length];
+totsteps = sum(episodeslength);
 totepisodes = numel(data);
+idx = cumsum(episodeslength);
 
-sumdlog = cumsumidx(dlogpi,cumsum(episodeslength));
-sumrew = cumsumidx(horzcat(data.gammar),cumsum(episodeslength));
+sumdlog = cumsumidx(policy.dlogPidtheta([data.s],[data.a]),idx);
+sumrew = cumsumidx([data.gammar],idx);
 
-grad = sum(bsxfun(@times,sumdlog,reshape(sumrew',[1 size(sumrew')])),2);
-grad = squeeze(grad);
+grad = sumdlog * sumrew';
 
 if gamma == 1
-    grad = grad / totstep;
+    grad = grad / totsteps;
 else
     grad = grad / totepisodes;
 end

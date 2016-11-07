@@ -9,23 +9,24 @@ function [grad, stepsize] = GPOMDPbase(policy, data, gamma, lrate)
 % J Baxter and P L Bartlett
 % Infinite-Horizon Policy-Gradient Estimation (2001)
 
-dlogpi = policy.dlogPidtheta(horzcat(data.s),horzcat(data.a));
-episodeslength = horzcat(data.length);
+dlogpi = policy.dlogPidtheta([data.s],[data.a]);
+episodeslength = [data.length];
 totstep = sum(episodeslength);
 totepisodes = numel(data);
 dreward = size(data(1).r,1);
 
 % Compute optimal baseline
-bnum = zeros(policy.dparams, max([data.length]), dreward);
-bden = zeros(policy.dparams, max([data.length]));
+bnum = zeros(policy.dparams, max(episodeslength), dreward);
+bden = zeros(policy.dparams, max(episodeslength));
 for i = 1 : totepisodes
     idx1 = sum(episodeslength(1:i-1))+1;
     idx2 = idx1 + episodeslength(i)-1;
     sumdlog2 = cumsum(dlogpi(:,idx1:idx2),2).^2;
     steps = data(i).length;
-    rewgamma = bsxfun(@times,gamma.^(0:steps-1),data(i).r);
+    gammar = data(i).gammar;
     bden(:,1:steps) = bden(:,1:steps) + sumdlog2;
-    bnum(:,1:steps,:) = bnum(:,1:steps,:) + bsxfun(@times,sumdlog2,reshape(rewgamma',[1 size(rewgamma')]));
+    bnum(:,1:steps,:) = bnum(:,1:steps,:) + ...
+        bsxfun(@times,sumdlog2,reshape(gammar',[1 size(gammar')]));
 end
 bden = repmat(bden,1,1,dreward);
 b = bnum ./ bden;
@@ -38,8 +39,8 @@ for i = 1 : totepisodes
     idx2 = idx1 + episodeslength(i)-1;
     sumdlog = cumsum(dlogpi(:,idx1:idx2),2);
     steps = data(i).length;
-    rewgamma = bsxfun(@times,gamma.^(0:steps-1),data(i).r);
-    grad = grad + squeeze(sum(bsxfun(@times, sumdlog, bsxfun(@plus,permute(rewgamma,[3 2 1]),-b(:,1:steps,:))),2));
+    gammar = data(i).gammar;
+    grad = grad + squeeze(sum(bsxfun(@times, sumdlog, bsxfun(@plus,permute(gammar,[3 2 1]),-b(:,1:steps,:))),2));
 end
     
 if gamma == 1

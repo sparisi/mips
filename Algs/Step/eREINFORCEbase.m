@@ -9,29 +9,27 @@ function [grad, stepsize] = eREINFORCEbase(policy, data, gamma, lrate)
 % Simple Statistical Gradient-Following Algorithms for Connectionist 
 % Reinforcement Learning (1992)
 
-dlogpi = policy.dlogPidtheta(horzcat(data.s),horzcat(data.a));
-episodeslength = horzcat(data.length);
-totstep = sum(episodeslength);
+episodeslength = [data.length];
+totsteps = sum(episodeslength);
 totepisodes = numel(data);
+idx = cumsum(episodeslength);
 
-sumdlog = cumsumidx(dlogpi,cumsum(episodeslength));
-sumrew = cumsumidx(horzcat(data.gammar),cumsum(episodeslength));
+sumdlog = cumsumidx(policy.dlogPidtheta([data.s],[data.a]),idx);
+sumrew = cumsumidx([data.gammar],idx);
 
 % Compute optimal baseline
 bden = sum(sumdlog.^2,2);
-bnum = sum(bsxfun(@times,sumdlog.^2,reshape(sumrew',[1 size(sumrew')])),2);
-bnum = squeeze(bnum);
-b = bsxfun(@times,bnum,1./bden);
-b(isnan(b)) = 0; % When 0 / 0
+bnum = sumdlog.^2 * sumrew';
+baseline = bsxfun(@times,bnum,1./bden);
+baseline(isnan(baseline)) = 0; % When 0 / 0
 
 % Compute gradient
-grad = sum( bsxfun( @times, sumdlog, ...
-    permute( bsxfun( @plus,reshape(sumrew,[1 size(sumrew)]),-b ), [1 3 2]) ...
-    ), 2);
-grad = squeeze(grad);
+bterm = bsxfun(@times,permute(sumdlog,[3 1 2]),baseline');
+bterm = sum(bterm,3);
+grad = sumdlog * sumrew' - bterm';
 
 if gamma == 1
-    grad = grad / totstep;
+    grad = grad / totsteps;
 else
     grad = grad / totepisodes;
 end

@@ -8,24 +8,17 @@ function [grad, stepsize] = GPOMDP(policy, data, gamma, lrate)
 % J Baxter and P L Bartlett
 % Infinite-Horizon Policy-Gradient Estimation (2001)
 
-dlogpi = policy.dlogPidtheta(horzcat(data.s),horzcat(data.a));
-episodeslength = horzcat(data.length);
-totstep = sum(episodeslength);
+episodeslength = [data.length];
+totsteps = sum(episodeslength);
 totepisodes = numel(data);
-dreward = size(data(1).r,1);
-reward = horzcat(data.r);
+idx = zeros(1,totsteps);
+idx(cumsum(episodeslength(1:end-1))+1) = 1;
 
-grad = zeros(policy.dparams,dreward);
-for i = 1 : totepisodes
-    idx1 = sum(episodeslength(1:i-1))+1;
-    idx2 = idx1 + episodeslength(i)-1;
-    sumdlogpi = cumsum(dlogpi(:,idx1:idx2),2);
-	discountedrew = bsxfun(@times,reward(:,idx1:idx2),gamma.^([1:data(i).length]-1));
-	grad = grad + sumdlogpi * discountedrew';
-end
-    
+sumdlog = cumsummove(policy.dlogPidtheta([data.s],[data.a]),idx);
+grad = sumdlog * [data.gammar]';
+
 if gamma == 1
-    grad = grad / totstep;
+    grad = grad / totsteps;
 else
     grad = grad / totepisodes;
 end
