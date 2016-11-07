@@ -12,6 +12,12 @@ function rw = metric_localutopia(r,w,u,au)
 %
 %    OUTPUT
 %     - rw : [N x 1] scalarized rewards matrix
+%
+% =========================================================================
+% REFERENCE
+% S Parisi, A Blank, T Viernicke, J Peters
+% Local-utopia Policy Selection for Multi-objective Reinforcement Learning
+% (2016)
 
 r = normalize_data(r,au,u);
 rw = bsxfun(@minus,r,w);

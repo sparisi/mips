@@ -49,7 +49,7 @@ else
     distance = permute(distance,[1 3 2]);
     expterm = bsxfun(@times,distance,reshape(B',[1,size(B')]));
     Phi = exp(-sqrt(sum(expterm,3)))';
-%     Phi = Phi ./ sum(Phi);
+%     Phi = bsxfun(@times, Phi, 1 ./ sum(Phi,1));
     if offset == 1, Phi = [ones(1,size(state,2)); Phi]; end
 end
 

@@ -36,12 +36,9 @@ gamma = mdp.gamma;
 isAveraged = mdp.isAveraged;
 
 % Initialize variables
+state = mdp.initstate(episodes);
 totrew = zeros(nvar_reward,episodes);
 step = 0;
-
-% Initialize simulation
-simulator = @mdp.simulator;
-state = mdp.initstate(episodes);
 
 % Allocate memory
 ds.s = nan(nvar_state, episodes, 1);
@@ -67,9 +64,9 @@ while ( (step < maxsteps) && sum(ongoing) > 0 )
     
     % Simulate one step of all running episodes at the same time
     if nargin < 5
-        [nextstate, reward, endsim] = feval(simulator, running_states, action);
+        [nextstate, reward, endsim] = mdp.simulator(running_states, action);
     else
-        [nextstate, reward, endsim] = feval(simulator, running_states, action, contexts(:,ongoing));
+        [nextstate, reward, endsim] = mdp.simulator(running_states, action, contexts(:,ongoing));
     end
     
     % Update the total reward
