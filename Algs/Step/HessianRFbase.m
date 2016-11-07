@@ -8,7 +8,8 @@ function h = HessianRFbase(policy, data, gamma)
 % =========================================================================
 % REFERENCE
 % S Parisi, M Pirotta, M Restelli
-% Continuous Pareto Manifold Approximation (2016)
+% Multi-objective Reinforcement Learning through Continuous Pareto Manifold 
+% Approximation (2016)
 
 actions = horzcat(data.a);
 states = horzcat(data.s);
