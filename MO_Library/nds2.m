@@ -1,9 +1,9 @@
 function R = nds2(P)
 % NDS2 Non-domination sorting. Duplicate solutions (same rows in P) are 
 % ignored for the dominance count and are assigned all the same rank.
-% This is a metric similar to NDS, but the crowding distance is the average 
-% normalized Euclidean distance between each solution and the solutions 
-% belonging to the same sub-front. 
+% The crowding distance is the average normalized Euclidean distance 
+% between each solution and the solutions belonging to the same sub-front. 
+% For the original sorting, please see NDS.
 %
 %    INPUT
 %     - P : [N x D] matrix, where N is the number of points and D is the
@@ -74,11 +74,10 @@ j = 0;
 % sub-fronts are identified and their rank is progressively increased.
 while ~isempty(tmp)
     
-    subfront = pareto(tmp);
+    [subfront, ~, idx_tmp] = pareto(tmp);
     
     % Indices (because of possible duplicates)
     idx_P = ismember(P, subfront, 'rows');
-    idx_tmp = ismember(tmp, subfront, 'rows');
     
     % Assign the rank
     rank(idx_P) = j;

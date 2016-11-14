@@ -45,21 +45,19 @@ function R = nds(P)
 % [Rs, idx] = sortrows(R);
 % Ps = P(idx,:);
 % 
-%                 Rs              |         Ps
+%                 Rs      | #dom. |         Ps
 %     -----------------------------------------------
-%     rank   crowd. dist.   #dom. |    Obj1      Obj2
-%     0          -Inf         0   |  0.6850    0.2048
-%     0          -Inf         0   |  0.3348    0.6344
-%     0       -2.0000         0   |  0.5135    0.3447
+%     rank   crowd. dist. |       |    Obj1      Obj2
+%     0          -Inf     |   0   |  0.6850    0.2048
+%     0          -Inf     |   0   |  0.3348    0.6344
+%     0       -2.0000     |   0   |  0.5135    0.3447
 %     -----------------------------------------------
-%     1          -Inf         1   |  0.0220    0.5690
-%     1          -Inf         2   |  0.3659    0.0754
-%     1       -1.3233         1   |  0.3037    0.4429
-%     1       -1.0746         1   |  0.1898    0.4758
+%     1          -Inf     |   1   |  0.0220    0.5690
+%     1          -Inf     |   2   |  0.3659    0.0754
+%     1       -1.3233     |   1   |  0.3037    0.4429
+%     1       -1.0746     |   1   |  0.1898    0.4758
 %     -----------------------------------------------
-%     2          -Inf         3   |  0.2649    0.2967
-%
-% (#dom column has been manually added)
+%     2          -Inf     |   3   |  0.2649    0.2967
 
 tmp = P;
 [n, d] = size(P);
@@ -72,11 +70,10 @@ j = 0;
 % sub-fronts are identified and their rank is progressively increased.
 while ~isempty(tmp)
     
-    subfront = pareto(tmp);
+    [subfront, ~, idx_tmp] = pareto(tmp);
     
     % Indices (because of possible duplicates)
     idx_P = ismember(P, subfront, 'rows');
-    idx_tmp = ismember(tmp, subfront, 'rows');
     
     % Assign the rank
     rank(idx_P) = j;
@@ -85,7 +82,9 @@ while ~isempty(tmp)
 
     % Assign the crowding distance
     subfront = P(idx_P,:); % Include duplicates for correct indexing
-    subfront = normalize_data(subfront,min(subfront),max(subfront)); % Normalize the objectives
+    minsub = min(subfront);
+    maxsub = max(subfront);
+    subfront = bsxfun(@times,bsxfun(@minus,subfront,minsub),1./(maxsub-minsub)); % Normalize the objectives
 
     avgdist(idx_P) = crowding_distance(subfront);
 
