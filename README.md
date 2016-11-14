@@ -13,12 +13,28 @@ Some utility functions are imported from File Exchange (original authors are alw
 
 Launch `INSTALL` to add the path of all folders.
 
-### Algs
+
+<details>
+<summary>**Algs**</summary>
+  <p>
 All the algorithms and solvers are located in this folder, as well as some script to run them. By using scripts, it is possible to interrupt and resume the learning process without losing any data.
 The only parameters that you might want to change are the learning rates and the number of rollouts per iteration.
 Also, a history of the results is usually kept. For example, `J_history` stores the average return at each iteration.
+  </p>
+</details>
 
-### Experiments
+
+<details>
+<summary>**BenchmarkOpt**</summary>
+  <p>
+Here there are some [test functions for optimization](https://en.wikipedia.org/wiki/Test_functions_for_optimization).
+  </p>
+</details>
+
+
+<details>
+<summary>**Experiments**</summary>
+  <p>
 This folder contains some scripts to set up experiments. Each script inizializes the MDP, the policies and the number of samples and episodes per learning iteration.
 After running a setup script, just run an algorithm script to start the learning.
 
@@ -31,8 +47,13 @@ show_simulation(mdp,policy.makeDeterministic,0.1,1000) % visualize learned polic
 
 Notice that, in the case of episodic (black box) RL, these scripts define both the *low level policy* (the one used by the agent) and the *high level policy* (the sampling distribution used to draw the low level policy parameters).
 In this setting, it is important to set the variable `makeDet`: if `true`, the low level policy is deterministic (e.g., the covariance of a Gaussian is zeroed and the high level policy only draws its mean).
+  </p>
+</details>
 
-### Library
+
+<details>
+  <summary>**Library**</summary>
+  <p>
 The folder contains some policies, generic basis functions, and functions for sampling and evaluation. The most important functions are
 
 - `collect_samples`: stores low level tuples `(s,a,r,s')` into a struct,
@@ -43,22 +64,39 @@ The folder contains some policies, generic basis functions, and functions for sa
 Policies are modeled as objects. Their most important method is `drawAction`, but depending on the class some additional properties might be mandatory.
 
 > **IMPORTANT!** All data is stored in **COLUMNS**, e.g., states are matrices `S x N`, where `S` is the size of one state and `N` is the number of states. Similarly, actions are matrices `A x N` and features are matrices `F x N`.
+  </p>
+  </details>
 
-### MDPs
+
+<details>
+<summary>**MDPs**</summary>
+  <p>
 Each MDP is modeled as an object (`MDP.m`) and requires some properties (dimension of state and action spaces, bounds, etc...) and methods (for simulating and plotting).  
 There are also some extension, that are *Contextual MDPs* (`CMDP.m`) and *Multi-objective MDPs* (`MOMDP.m`).  
 For MDPs sharing the same environment (e.g., Mountain Car with continuous or discrete actions, Cart-pole with or without swing-up, ...), there are common *Environment* (`Env`) classes.
 This classes have define common variables and the transition function, while the subclasses define the remainder functions (reward, action parsing, terminal conditions, ...).
 
 > **IMPORTANT!** To allow parallel execution of multiple episodes, `simulator` functions need to support vectorized operations, i.e., they need to deal with states and actions represented as `S x N` and `A x N` matrices, respectively.
+  </p>
+</details>
 
-### MO_Library
+
+<details>
+<summary>**MO_Library**</summary>
+  <p>
 This folder contains functions used in the multi-objective framework, e.g., hypervolume estimators and Pareto-optimality filters.
 
 > **IMPORTANT!** All frontiers are stored in **ROWS**, i.e., they are matrices `N x R`, where `N` is the number of points and `R` is the number of objectives.
+  </p>
+</details>
 
-### Utilities
+
+<details>
+<summary>**Utilities**</summary>
+  <p>
 Utility functions used for matrix operations, plotting and sampling are stored in this folder.
+  </p>
+</details>
 
 
 # Visualization
