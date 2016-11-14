@@ -1,15 +1,11 @@
-# Description
--------------
-
 **Mi**nimal **P**olicy **S**earch is a toolbox for Matlab providing the implementation of some of the most famous policy search algorithms, as well as some recent multi-objective methods and benchmark problems in reinforcement learning.
 
-Some algorithms require the *Optimization Toolbox*.
-
+Some algorithms require the *Optimization Toolbox*.  
 Some utility functions are imported from File Exchange (original authors are always acknowledged).
 
 
-# Code structure
-----------------
+## Summary
+----------
 
 Launch `INSTALL` to add the path of all folders.
 
@@ -74,7 +70,7 @@ Policies are modeled as objects. Their most important method is `drawAction`, bu
 Each MDP is modeled as an object (`MDP.m`) and requires some properties (dimension of state and action spaces, bounds, etc...) and methods (for simulating and plotting).  
 There are also some extension, that are *Contextual MDPs* (`CMDP.m`) and *Multi-objective MDPs* (`MOMDP.m`).  
 For MDPs sharing the same environment (e.g., Mountain Car with continuous or discrete actions, Cart-pole with or without swing-up, ...), there are common *Environment* (`Env`) classes.
-This classes have define common variables and the transition function, while the subclasses define the remainder functions (reward, action parsing, terminal conditions, ...).
+This classes define common variables and the transition function, while the subclasses define the remainder functions (reward, action parsing, terminal conditions, ...).
 
 > **IMPORTANT!** To allow parallel execution of multiple episodes, `simulator` functions need to support vectorized operations, i.e., they need to deal with states and actions represented as `S x N` and `A x N` matrices, respectively.
   </p>
@@ -99,28 +95,44 @@ Utility functions used for matrix operations, plotting and sampling are stored i
 </details>
 
 
-# Visualization
----------------
+## Visualization
+----------------
 
 Here is a list with examples of all ways of visualizing a particular data / animation. Please note that not all MDPs support an animation.
 
-### Real time data plotting
+<details>
+<summary>**Real time data plotting**</summary>
+  <p>
 During the learning, it is possible to plot in real time a desired data (e.g., the return `J`) by using `updateplot`. 
 
 ```
 updateplot('Return',iter,J,1)
 ```
+  </p>
+</details>  
 
-### Mean and std of data from multiple trials
+
+<details>
+<summary>**Mean and std of data from multiple trials**</summary>
+  <p>
 If you are interested on evaluating an algorithm on several trials you can use the function `shadedErrorBar`. For a complete example, please refer to `make_stdplot.m`.
+  </p>
+</details>  
 
-### Real time animation
+
+<details>
+<summary>**Real time animation**</summary>
+  <p>
 Launch `mdp.showplot` to initialize the plotting and an animation of the agent-environment interaction will be shown during the learning. To stop plotting use `mdp.closeplot`.
 
 > **IMPORTANT!** This is possible only if you are learning using one episode per iteration.
+  </p>
+</details>  
 
-### Offline animation
 
+<details>
+<summary>**Offline animation**</summary>
+  <p>
 - For step-based algorithms, you can directly use the built-in plotting function of the MDPs.
 As `collect_samples` returns a low-level dataset of the episodes, you just have to call `mdp.plotepisode`
 
@@ -141,8 +153,13 @@ If the MDP provides pixels rendering, you can enable it by adding an additional 
 ```
 show_simulation(mdp,policy,0.001,100,1)
 ```
+  </p>
+</details>  
 
-### Plot discrete policies
+
+<details>
+<summary>**Plot discrete policies**</summary>
+  <p>
 If the state space is 2-dimensional, you can plot the value functions learned by discrete policies and the action distribution over the states.
 
 ```
@@ -151,12 +168,16 @@ RUN_PG % run policy gradient (terminate by CTRL+C)
 policy.plotQ(mdp.stateLB,mdp.stateUB) % plot Q-function
 policy.plotV(mdp.stateLB,mdp.stateUB) % plot V-function
 policy.plotGreedy(mdp.stateLB,mdp.stateUB) % plot the action taken by zeroing the exploration
-```
+```  </p>
+</details>  
 
-### MOMDPs Pareto frontier
 
+<details>
+<summary>**MOMDPs Pareto frontier**</summary>
+  <p>
 To plot a set of points as a Pareto frontier of a MOMDP, use `MOMDP.plotfront`. You can use additional arguments like in the built-in `plot` to customize the plot. Please note that the points have to be passed as rows and that the function does not filter dominated points.
-
 ```
 MOMDP.plotfront([0.5 0.5; 1 0; 0 1], '--or', 'LineWidth', 2)
 ```
+  </p>
+</details>
