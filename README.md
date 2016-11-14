@@ -23,7 +23,7 @@ Also, a history of the results is usually kept. For example, `J_history` stores 
 <details>
 <summary>**BenchmarkOpt**</summary>
   <p>
-Here there are some [test functions for optimization](https://en.wikipedia.org/wiki/Test_functions_for_optimization).
+Here are some [test functions for optimization](https://en.wikipedia.org/wiki/Test_functions_for_optimization).
   </p>
 </details>
 
