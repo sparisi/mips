@@ -3,7 +3,7 @@ close all
 
 %% ===================================================================== %%
 %  ======================== LOW LEVEL SETTINGS =========================  %
-mdp = QuadLink; % Change mode, goal and gravity if necessary
+mdp = QuadLink;
 robj = 1;
 dreward = mdp.dreward;
 gamma = mdp.gamma;

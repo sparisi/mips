@@ -3,7 +3,7 @@ close all
 
 %% ===================================================================== %%
 %  ======================== LOW LEVEL SETTINGS =========================  %
-mdp = DoubleLink; % Change mode, goal and gravity if necessary
+mdp = DoubleLink;
 robj = 1;
 dreward = mdp.dreward;
 gamma = mdp.gamma;

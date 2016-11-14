@@ -3,7 +3,7 @@ close all
 
 %% ===================================================================== %%
 %  ======================== LOW LEVEL SETTINGS =========================  %
-dim = 5;
+dim = 2;
 mdp = LQR(dim);
 robj = 1;
 dreward = mdp.dreward;
@@ -16,12 +16,12 @@ A0 = zeros(dim,bfs()+1);
 Sigma0 = eye(dim);
 w0 = ones(dim,1);
 tau = ones(dim,1);
-% policy = GaussianLinearChol(bfs, dim, A0, Sigma0);
+policy = GaussianLinearChol(bfs, dim, A0, Sigma0);
 % policy = GaussianLinearDiag(bfs, dim, A0, Sigma0);
 % policy = GaussianLinearLogistic(bfs, dim, A0, w0, tau);
 % policy = GaussianLinearFixedvar(bfs, dim, A0, Sigma0);
 % policy = GaussianLinearFixedvarDiagmean(bfs, dim, A0(:,2:end), Sigma0);
-policy = GaussianLinearFixedvarDiagmean(bfs, dim, -0.5*eye(dim), Sigma0);
+% policy = GaussianLinearFixedvarDiagmean(bfs, dim, -0.5*eye(dim), Sigma0);
 
 
 %% ===================================================================== %%

@@ -3,7 +3,7 @@ close all
 
 %% ===================================================================== %%
 %  ======================== LOW LEVEL SETTINGS =========================  %
-mdp = CartPole;
+mdp = CartPoleDouble;
 robj = 1;
 dreward = mdp.dreward;
 gamma = mdp.gamma;
@@ -12,7 +12,6 @@ nactions = mdp.actionUB;
 bfs = @(varargin)basis_poly(2,mdp.dstate,0,varargin{:});
 
 policy = Gibbs(bfs, zeros((bfs()+1)*(nactions-1),1), mdp.actionLB:mdp.actionUB);
-policy = EGreedy(bfs, zeros((bfs()+1)*nactions,1), mdp.actionLB:mdp.actionUB,1);
 
 
 %% ===================================================================== %%
@@ -29,7 +28,7 @@ policy_high = GaussianConstantChol(n_params, mu0, Sigma0high);
 
 %% ===================================================================== %%
 %  ======================== LEARNING SETTINGS ==========================  %
-episodes_eval = 1;
+episodes_eval = 100;
 steps_eval = 10000;
-episodes_learn = 50;
+episodes_learn = 100;
 steps_learn = 1000;

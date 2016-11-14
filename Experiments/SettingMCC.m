@@ -10,10 +10,10 @@ gamma = mdp.gamma;
 daction = mdp.daction;
 
 bfs = @(varargin)basis_krbf(4,[-1 1;-3 3],0,varargin{:});
-bfs = @(varargin)basis_poly(1,mdp.dstate,0,varargin{:});
+% bfs = @(varargin)basis_poly(1,mdp.dstate,0,varargin{:});
 
 A0 = zeros(daction,bfs()+1);
-Sigma0 = 16;
+Sigma0 = 1000;
 % policy = GaussianLinearDiag(bfs, daction, A0, Sigma0);
 policy = GaussianLinearChol(bfs, daction, A0, Sigma0);
 
@@ -32,7 +32,7 @@ policy_high = GaussianConstantChol(n_params, mu0, Sigma0high);
 
 %% ===================================================================== %%
 %  ======================== LEARNING SETTINGS ==========================  %
-episodes_eval = 1000;
+episodes_eval = 1;
 steps_eval = 500;
 episodes_learn = 100;
-steps_learn = 500;
+steps_learn = 100;

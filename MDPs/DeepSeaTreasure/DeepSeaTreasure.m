@@ -32,10 +32,6 @@ classdef DeepSeaTreasure < MOMDP
             0   0   0   0   0   0   0   0   1   1
             0   0   0   0   0   0   0   0   0   1];
         
-        % Finite states and actions
-        allstates = allcomb([1 2 3 4 5 6 7 8 9 10 11], [1 2 3 4 5 6 7 8 9 10]);
-        allactions = [1 2 3 4];
-
         % MDP variables
         dstate = 2;
         daction = 1;
@@ -51,6 +47,11 @@ classdef DeepSeaTreasure < MOMDP
         rewardLB = [0 -inf]';
         rewardUB = [124 -1]';
         
+        % Finite states and actions
+        allstates = allcomb([1 2 3 4 5 6 7 8 9 10 11], [1 2 3 4 5 6 7 8 9 10]);
+        allactions = [0  0  -1  1
+                     -1 1   0  0]; % Left right up down
+
         % Multiobjective
         utopia = [124 -1];
         antiutopia = [0 -20];
@@ -59,7 +60,7 @@ classdef DeepSeaTreasure < MOMDP
     methods
         
         %% Simulator
-        function state = initstate(obj, n)
+        function state = init(obj, n)
             state = repmat([1; 1],1,n);
 
 %             [d1,d2] = size(obj.treasure);
@@ -70,16 +71,12 @@ classdef DeepSeaTreasure < MOMDP
 %             idx2 = ~logical(istreasure(d1*(S(2,:)-1) + S(1,:)));
 %             S = S(:, idx1 & idx2);
 %             state = S(:, randi(size(S,2),1,n));
-
-            if obj.realtimeplot, obj.showplot; obj.updateplot(state); end
         end
         
         function [nextstate, reward, absorb] = simulator(obj, state, action)
             nstates = size(state,2);
             
-            steps = [0  0  -1  1
-                     -1 1   0  0]; % action mapping (left right up down)
-            nextstate = state + steps(:,action);
+            nextstate = state + obj.allactions(:,action);
             
             % Bound the state
             nextstate = bsxfun(@max, bsxfun(@min,nextstate,obj.stateUB), obj.stateLB);

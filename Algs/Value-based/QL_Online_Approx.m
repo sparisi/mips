@@ -1,3 +1,5 @@
+% The Q-function is linearly approximated.
+
 clear all
 close all
 
@@ -11,7 +13,7 @@ mdp = MCar;
 robj = 1;
 gamma = mdp.gamma;
 gamma = min(gamma,0.999999);
-allactions = mdp.allactions;
+allactions = 1 : size(mdp.allactions,2);
 nactions = length(allactions);
 
 bfs = @(varargin)basis_krbf(7, [mdp.stateLB, mdp.stateUB], 1, varargin{:});
@@ -51,7 +53,6 @@ while iter < 10000000
         epsilon = max(0.1, epsilon * 0.9995);
         action = feval(policy_type,Qfun(state,theta),epsilon);
         [nextstate, reward, endsim] = mdp.simulator(state, action);
-        phi_nexts = bfs(nextstate);
         Qn = Qfun(nextstate,theta);
         Q = Qfun(state,theta);
 
@@ -78,5 +79,5 @@ end
 
 
 %% Show
-policy.drawAction = @(s)egreedy( Qfun(s,theta), 0 );
-show_simulation(mdp, policy, .01, 100)
+policy_eval.drawAction = @(s)egreedy( Qfun(s,theta), 0 );
+show_simulation(mdp, policy_eval, .01, 100)

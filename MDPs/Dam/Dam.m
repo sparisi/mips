@@ -66,7 +66,7 @@ classdef Dam < MOMDP
         end
         
         %% Simulator
-        function state = initstate(obj, n)
+        function state = init(obj, n)
             if ~obj.penalize
                 s_init = [9.6855361e+01, 5.8046026e+01, ...
                     1.1615767e+02, 2.0164311e+01, ...
@@ -79,7 +79,6 @@ classdef Dam < MOMDP
             else
                 state = myunifrnd(0,160,n);
             end
-            if obj.realtimeplot, obj.showplot; obj.updateplot(state); end
         end
         
         function [nextstate, reward, absorb] = simulator(obj, state, action)

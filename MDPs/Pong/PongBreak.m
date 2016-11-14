@@ -1,32 +1,7 @@
-classdef PongBreak < MDP
+classdef PongBreak < PongEnv
 % Pong with bricks to break (breakout / brick-breaker game).
-%
-% =========================================================================
-% Based on the implementation by David Buckingham.
-% http://www.mathworks.com/matlabcentral/fileexchange/31177-dave-s-matlab-pong
     
     properties(Constant)
-        MIN_BALL_SPEED = .8;
-        MAX_BALL_SPEED = 3;
-        BALL_ACCELERATION = 0.05;
-        PADDLE_SPEED = 1.3;
-        B_FACTOR = 1;
-        P_FACTOR = 2;
-        Y_FACTOR = 0.01;
-        
-        BALL_RADIUS = 1.5;
-        WALL_WIDTH = 3;
-        FIGURE_WIDTH = 800;
-        FIGURE_HEIGHT = 480;
-        PLOT_W = 150;
-        PLOT_H = 100;
-        GOAL_SIZE = PongBreak.PLOT_H;
-        GOAL_TOP = (PongBreak.PLOT_H + PongBreak.GOAL_SIZE) / 2;
-        GOAL_BOT = (PongBreak.PLOT_H - PongBreak.GOAL_SIZE) / 2;
-        PADDLE_H = 14;
-        PADDLE_W = 2;
-        PADDLE_X = 10;
-        
         BRICK_OFFSET = 10;
         BRICK_ROWS = 12;
         BRICK_COLS = 6;
@@ -37,23 +12,6 @@ classdef PongBreak < MDP
         BRICK_SPACING = 1;
         BRICK_W = (PongBreak.PLOT_W / 3 - 2 * PongBreak.BRICK_OFFSET - (PongBreak.BRICK_COLS - 1) * PongBreak.BRICK_SPACING) / PongBreak.BRICK_COLS / 2;
         BRICK_H = (PongBreak.PLOT_H - 2 * PongBreak.BRICK_OFFSET - (PongBreak.BRICK_ROWS - 1) * PongBreak.BRICK_SPACING) / PongBreak.BRICK_ROWS / 2;
-        
-        FIGURE_COLOR = [0, 0, 0];
-%         AXIS_COLOR = [.15, .15, .15];
-        AXIS_COLOR = [0 0 0];
-        CENTER_RADIUS = 15;
-        BALL_MARKER_SIZE = 10;
-%         BALL_COLOR = [.1, .7, .1];
-%         BALL_OUTLINE = [.7, 1, .7];
-        BALL_COLOR = [1 1 1];
-        BALL_OUTLINE = [1 1 1];
-        BALL_SHAPE = 'o';
-        PADDLE_LINE_WIDTH = 2;
-%         WALL_COLOR = [.3, .3, .8];
-%         PADDLE_COLOR = [1, .5, 0];
-        PADDLE_COLOR = [1 1 1];
-        WALL_COLOR = [1 1 1];
-        CENTERLINE_COLOR = PongBreak.PADDLE_COLOR .* .8;
     end
         
     properties
@@ -67,7 +25,7 @@ classdef PongBreak < MDP
         gamma = 0.999;
 
         % Finite actions
-        allactions = [1 2];
+        allactions = [-1 1];
 
         % Bounds : state = [ballX, ballY, ballSpeed, ballVectorX, ballVectorY, paddleY, isBrick])
         stateLB = [0
@@ -99,7 +57,7 @@ classdef PongBreak < MDP
             obj.bricksCoord = [X(:), Y(:)];
         end            
         
-        function state = initstate(obj, n)
+        function state = init(obj, n)
             % Random init ball direction
             ballVector = [1-(2*rand(1,n)); 1-(2*rand(1,n))];
             ballVector(1,:) = ballVector(1,:) .* ((rand(1,n) / obj.B_FACTOR) + 1);
@@ -113,8 +71,6 @@ classdef PongBreak < MDP
                 obj.PLOT_H / 2 * ones(1, n) % paddleY
                 ones(PongBreak.N_BRICKS, n)
                 ];
-
-            if obj.realtimeplot, obj.showplot; obj.updateplot(state); end
         end
         
         function [nextstate, reward, absorb] = simulator(obj, state, action)
@@ -129,8 +85,7 @@ classdef PongBreak < MDP
             isBrick = state(7:end,:);
 
             % Parse action
-            move = [-1  1];
-            paddleV = move(action);
+            paddleV = obj.allactions(action);
 
             % Move paddle
             paddleY = paddleY + obj.PADDLE_SPEED * paddleV;
@@ -151,11 +106,11 @@ classdef PongBreak < MDP
             tmpV(:,idx) = [ballVector(1,idx); -1 * (obj.Y_FACTOR + abs(ballVector(2,idx)))];
             idx = newY < obj.BALL_RADIUS; % Hit bottom wall
             tmpV(:,idx) = [ballVector(1,idx); (obj.Y_FACTOR + abs(ballVector(2,idx)))];
-            idx = newX < obj.PADDLE_X + obj.PADDLE_W + obj.BALL_RADIUS ... % Hit paddle right
-                & newX > obj.PADDLE_X - obj.PADDLE_W - obj.BALL_RADIUS ... % Hit paddle left
+            idx = newX < obj.PADDLE_X1 + obj.PADDLE_W + obj.BALL_RADIUS ... % Hit paddle right
+                & newX > obj.PADDLE_X1 - obj.PADDLE_W - obj.BALL_RADIUS ... % Hit paddle left
                 & newY < paddleY + obj.PADDLE_H + obj.BALL_RADIUS ... % Hit paddle top
                 & newY > paddleY - obj.PADDLE_H - obj.BALL_RADIUS; % Hit paddle bottom
-            tmpV(:,idx) = [(ballX(:,idx) - obj.PADDLE_X) * obj.P_FACTOR; newY(:,idx) - paddleY(:,idx)];
+            tmpV(:,idx) = [(ballX(:,idx) - obj.PADDLE_X1) * obj.P_FACTOR; newY(:,idx) - paddleY(:,idx)];
             
             % Check hit bricks
             reward = zeros(1,n);
@@ -233,7 +188,7 @@ classdef PongBreak < MDP
             set(obj.handleAgent{1}, 'MarkerSize', obj.BALL_MARKER_SIZE);
             
             obj.handleAgent{2} = rectangle('Position', ...
-                [obj.PADDLE_X - obj.PADDLE_W, obj.PLOT_H / 2 - obj.PADDLE_H, 2 * obj.PADDLE_W, 2 * obj.PADDLE_H], ...
+                [obj.PADDLE_X1 - obj.PADDLE_W, obj.PLOT_H / 2 - obj.PADDLE_H, 2 * obj.PADDLE_W, 2 * obj.PADDLE_H], ...
                 'FaceColor', obj.PADDLE_COLOR, ...
                 'EdgeColor', obj.PADDLE_COLOR, ...
                 'LineWidth', obj.PADDLE_LINE_WIDTH);
@@ -254,7 +209,7 @@ classdef PongBreak < MDP
             isBrick = state(7:end,:);
             set(obj.handleAgent{1}, 'XData', ballX, 'YData', ballY);
             set(obj.handleAgent{2}, 'Position', ...
-                [obj.PADDLE_X - obj.PADDLE_W, paddleY - obj.PADDLE_H, 2 * obj.PADDLE_W, 2 * obj.PADDLE_H]);
+                [obj.PADDLE_X1 - obj.PADDLE_W, paddleY - obj.PADDLE_H, 2 * obj.PADDLE_W, 2 * obj.PADDLE_H]);
             bricks = obj.handleAgent(3:end);
             cellfun(@(x) set(x, 'FaceColor', obj.AXIS_COLOR, 'EdgeColor', obj.AXIS_COLOR), ...
                 bricks(~isBrick));

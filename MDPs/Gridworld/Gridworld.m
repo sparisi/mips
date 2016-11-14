@@ -4,13 +4,13 @@ classdef Gridworld < MDP
     properties
         % Environment variables
         reward = [ ...
-            0  0  0  0  0  9  0
-            1  0  0  0  0  0  0
-            0  0  0  0  0  0  0
-            0  0  0  0  0  0  0
-           -9 -9  0  0 -9  0 -9
-            0  13  0  0  0  0  0
-            0  0  0  0  0  0  0
+            0   0   0   0   0   9   0
+            1   0   0   0   0   0   0
+            0   0   0   0   0   0   0
+            0   0   0   0   0   0   0
+            -9  -9  0   0   -9  0   -9
+            0   13 0   0   0   0   0
+            0   0   0   0   0   0   0
             ] * 1e1;
         isopen = [ ...
             1  1  1  1  1  1  1
@@ -24,7 +24,8 @@ classdef Gridworld < MDP
         
         % Finite states and actions
         allstates = allcomb([1 2 3 4 5 6 7], [1 2 3 4 5 6 7]);
-        allactions = [1 2 3 4];
+        allactions = [0  0  -1  1
+                     -1 1   0  0]; % Left right up down
 
         % MDP variables
         dstate = 2;
@@ -45,15 +46,12 @@ classdef Gridworld < MDP
     methods
         
         %% Simulator
-        function state = initstate(obj, n)
+        function state = init(obj, n)
             state = [randi(obj.stateUB(1),1,n); randi(obj.stateUB(2),1,n)];
-            if obj.realtimeplot, obj.showplot; obj.updateplot(state); end
         end
         
         function [nextstate, reward, absorb] = simulator(obj, state, action)
-            steps = [0  0  -1  1
-                     -1 1   0  0]; % action mapping (left right up down)
-            nextstate = state + steps(:,action);
+            nextstate = state + obj.allactions(:,action);
             
             % Bound the state
             nextstate = bsxfun(@max, bsxfun(@min,nextstate,obj.stateUB), obj.stateLB);

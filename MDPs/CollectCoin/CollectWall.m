@@ -30,7 +30,7 @@ classdef CollectWall < MDP
     methods
         
         %% Simulator
-        function state = initstate(obj, n)
+        function state = init(obj, n)
             agent = rand(2,n);
             if n == 1
                 while agent(2) > obj.hole_y-obj.radius_agent && agent(2) < obj.hole_y+obj.radius_agent 
@@ -44,7 +44,6 @@ classdef CollectWall < MDP
             hole_center = rand(1,n);
             has_coin = false(1,n);
             state = [agent; hole_center; has_coin];
-            if obj.realtimeplot, obj.showplot; obj.updateplot(state); end
         end
         
         function [nextstate, reward, absorb] = simulator(obj, state, action)

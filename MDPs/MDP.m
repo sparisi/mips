@@ -14,18 +14,14 @@ classdef (Abstract) MDP < handle
         dreward      % Number of rewards
         isAveraged   % Is the reward averaged?
         gamma        % Discount factor
-        
-        % Upper/Lower Bounds for a tuple (state, action, reward)
+
+        % Upper/lower bounds
         stateLB
         stateUB
-        actionLB
-        actionUB
         rewardLB
         rewardUB
-        
-        % For discrete MDPs, actions are encoded as integers (e.g., 1 ... 4
-        % for left, right, up, down).
-        % In this case, actionLB = 1 and actionUB = 4.
+        actionLB
+        actionUB
     end
     
     methods(Hidden = true)
@@ -34,8 +30,20 @@ classdef (Abstract) MDP < handle
     end
         
     methods
-        [nextstate, reward, absorb] = simulator(obj, state, action);
+        function state = initstate(obj,n)
+        % Return N initial states.
+            state = obj.init(n);
+            if obj.realtimeplot, obj.showplot; obj.updateplot(state); end
+        end
+            
+        function [nextstate, reward, absorb] = simulator(obj, state, action)
         % Defines the state transition function.
+            action = obj.parse(action);
+            nextstate = obj.transition(state,action);
+            reward = obj.reward(state,action,nextstate);
+            absorb = obj.isterminal(nextstate);
+            if obj.realtimeplot, obj.updateplot(nextstate); end
+        end
         
         function showplot(obj)
         % Initializes the plotting procedure.
@@ -54,7 +62,7 @@ classdef (Abstract) MDP < handle
         
         function plotepisode(obj, episode, pausetime)
         % Plots the state of the MDP during an episode.
-            if nargin == 2, pausetime = 0; end
+            if nargin == 2, pausetime = 0.001; end
             try close(obj.handleEnv), catch, end
             obj.initplot();
             obj.updateplot(episode.s(:,1));

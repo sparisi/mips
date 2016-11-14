@@ -2,13 +2,6 @@ classdef Chainwalk < MDP
     
     %% Properties
     properties
-        % Environment variables
-        reward_states = [10 41];
-
-        % Finite states and actions
-        allstates = 1:50;
-        allactions = [1 2];
-
         % MDP variables
         dstate = 1;
         daction = 1;
@@ -23,36 +16,40 @@ classdef Chainwalk < MDP
         actionUB = 2;
         rewardLB = 0;
         rewardUB = 1;
+
+        % Environment variables
+        reward_states = [10 41];
+
+        % Finite states and actions
+        allstates = 1:50;
+        allactions = [-1 1];
     end
     
     methods
         
         %% Simulator
-        function state = initstate(obj, n)
+        function state = init(obj, n)
             state = randi(obj.stateUB,1,n);
-            if obj.realtimeplot, obj.showplot; obj.updateplot(state); end
+        end
+
+        function action = parse(obj, action)
+            action = obj.allactions(:,action);
+            noise = rand(1,size(action,2));
+            action(noise < 0.1) = -action(noise < 0.1);
+        end
+
+        function nextstate = transition(obj, state, action)
+            nextstate = state + action;
+            nextstate = bsxfun(@max, bsxfun(@min,nextstate,obj.stateUB), obj.stateLB);
         end
         
-        function [nextstate, reward, absorb] = simulator(obj, state, action)
-            n = size(state,2);
-            
-            steps = [-1 1]; % action mapping (left right)
-            action = steps(:,action);
-            noise = rand(1,n);
-            action(noise < 0.1) = -action(noise < 0.1);
-            nextstate = state + action;
-            
-            % Bound the state
-            nextstate = bsxfun(@max, bsxfun(@min,nextstate,obj.stateUB), obj.stateLB);
-            
-            % Reward function
-            reward = zeros(1,n);
+        function reward = reward(obj, state, action, nextstate)
+            reward = zeros(1,size(state,2));
             reward(ismember(nextstate,obj.reward_states)) = 1;
-
-            % Infinite horizon
-            absorb = false(1,n);
-            
-            if obj.realtimeplot, obj.updateplot(nextstate), end
+        end
+        
+        function absorb = isterminal(obj, nextstate)
+            absorb = false(1,size(nextstate,2));
         end
         
     end

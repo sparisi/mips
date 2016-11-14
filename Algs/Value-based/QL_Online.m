@@ -16,7 +16,7 @@ simulator = @mdp.simulator;
 allstates = mdp.allstates;
 X = unique(allstates(:,1));
 Y = unique(allstates(:,2));
-allactions = mdp.allactions;
+allactions = 1 : size(mdp.allactions,2);
 nactions = length(allactions);
 
 data.s = nan(mdp.dstate, 0);
@@ -88,5 +88,5 @@ end
 
 
 %% Show
-policy.drawAction = @(s)egreedy( Q(find(ismember(allstates,s','rows')),:)', 0 );
-show_simulation(mdp, policy, 0.1, 1000)
+policy_eval.drawAction = @(s)egreedy( Q(find(ismember(allstates,s','rows')),:)', 0 );
+show_simulation(mdp, policy_eval, 0.1, 1000)

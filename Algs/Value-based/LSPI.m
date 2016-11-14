@@ -17,7 +17,7 @@ mdp = MCar;
 
 robj = 1;
 gamma = mdp.gamma;
-allactions = mdp.allactions;
+allactions = 1 : size(mdp.allactions,2);
 nactions = length(allactions);
 
 bfs = @(varargin)basis_krbf(7, [mdp.stateLB, mdp.stateUB], 1, varargin{:});
@@ -89,5 +89,5 @@ end
 
 
 %% Show
-policy.drawAction = @(s)egreedy( Qfun(s,theta), 0 );
-show_simulation(mdp, policy, .01, 100)
+policy_eval.drawAction = @(s)egreedy( Qfun(s,theta), 0 );
+show_simulation(mdp, policy_eval, .01, 100)

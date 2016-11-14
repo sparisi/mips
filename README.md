@@ -45,8 +45,10 @@ Policies are modeled as objects. Their most important method is `drawAction`, bu
 > **IMPORTANT!** All data is stored in **COLUMNS**, e.g., states are matrices `S x N`, where `S` is the size of one state and `N` is the number of states. Similarly, actions are matrices `A x N` and features are matrices `F x N`.
 
 ### MDPs
-Each MDP is modeled as an object (`MDP.m`) and requires some properties (dimension of state and action spaces, bounds, etc...) and methods (for simulating and plotting).
-There are also some extension, that are *Contextual MDPs* (`CMDP.m`) and *Multi-objective MDPs* (`MOMDP.m`).
+Each MDP is modeled as an object (`MDP.m`) and requires some properties (dimension of state and action spaces, bounds, etc...) and methods (for simulating and plotting).  
+There are also some extension, that are *Contextual MDPs* (`CMDP.m`) and *Multi-objective MDPs* (`MOMDP.m`).  
+For MDPs sharing the same environment (e.g., Mountain Car with continuous or discrete actions, Cart-pole with or without swing-up, ...), there are common *Environment* (`Env`) classes.
+This classes have define common variables and the transition function, while the subclasses define the remainder functions (reward, action parsing, terminal conditions, ...).
 
 > **IMPORTANT!** To allow parallel execution of multiple episodes, `simulator` functions need to support vectorized operations, i.e., they need to deal with states and actions represented as `S x N` and `A x N` matrices, respectively.
 
@@ -108,9 +110,9 @@ If the state space is 2-dimensional, you can plot the value functions learned by
 ```
 SettingDeep % deep sea treasure setup
 RUN_PG % run policy gradient (terminate by CTRL+C)
-policy.plotQ([1,11],[1,10]) % plot Q-function
-policy.plotV([1,11],[1,10]) % plot V-function
-policy.plotGreedy([1,11],[1,10]) % plot the action taken by zeroing the exploration
+policy.plotQ(mdp.stateLB,mdp.stateUB) % plot Q-function
+policy.plotV(mdp.stateLB,mdp.stateUB) % plot V-function
+policy.plotGreedy(mdp.stateLB,mdp.stateUB) % plot the action taken by zeroing the exploration
 ```
 
 ### MOMDPs Pareto frontier

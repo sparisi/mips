@@ -1,5 +1,5 @@
-classdef CartPoleSwingUp < CartPoleEnv
-% Cart-pole with discrete actions.
+classdef CartPoleSwingUpContinuous < CartPoleEnv
+% Cart-pole with continuous actions.
 % The goal is to balance the pole starting from a random position.
 
     properties
@@ -13,13 +13,10 @@ classdef CartPoleSwingUp < CartPoleEnv
         % Bounds : state = [x xd theta thetad])
         stateLB = [-3, -inf, -pi, -inf]';
         stateUB = [3, inf, pi, inf]';
-        actionLB = 1;
-        actionUB = 2;
+        actionLB = -CartPoleEnv.force;
+        actionUB = CartPoleEnv.force;
         rewardLB = -1;
         rewardUB = 0;
-
-        % Finite actions
-        allactions = [-CartPoleEnv.force CartPoleEnv.force];
     end
     
     methods
@@ -28,7 +25,7 @@ classdef CartPoleSwingUp < CartPoleEnv
         end
         
         function action = parse(obj, action)
-            action = obj.allactions(action);
+            action = max(min(action,obj.actionUB),obj.actionLB);
         end
             
         function reward = reward(obj, state, action, nextstate)

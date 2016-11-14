@@ -3,16 +3,18 @@ close all
 
 %% ===================================================================== %%
 %  ======================== LOW LEVEL SETTINGS =========================  %
-mdp = CartPoleDouble;
+mdp = CartPoleSwingUpContinuous;
 robj = 1;
 dreward = mdp.dreward;
 gamma = mdp.gamma;
-nactions = mdp.actionUB;
+daction = mdp.daction;
 
 bfs = @(varargin)basis_poly(2,mdp.dstate,0,varargin{:});
 
-policy = Gibbs(bfs, zeros((bfs()+1)*(nactions-1),1), mdp.actionLB:mdp.actionUB);
-policy = EGreedy(bfs, zeros((bfs()+1)*nactions,1), mdp.actionLB:mdp.actionUB, 1);
+A0 = zeros(daction,bfs()+1);
+Sigma0 = 50^2;
+% policy = GaussianLinearDiag(bfs, daction, A0, Sigma0);
+policy = GaussianLinearChol(bfs, daction, A0, Sigma0);
 
 
 %% ===================================================================== %%
@@ -29,7 +31,7 @@ policy_high = GaussianConstantChol(n_params, mu0, Sigma0high);
 
 %% ===================================================================== %%
 %  ======================== LEARNING SETTINGS ==========================  %
-episodes_eval = 100;
+episodes_eval = 500;
 steps_eval = 10000;
-episodes_learn = 100;
+episodes_learn = 500;
 steps_learn = 1000;

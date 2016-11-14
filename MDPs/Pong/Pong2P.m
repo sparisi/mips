@@ -1,51 +1,7 @@
-classdef Pong2P < MDP
+classdef Pong2P < PongEnv
 % 2-player pong.
-%
-% =========================================================================
-% Based on the implementation by David Buckingham.
-% http://www.mathworks.com/matlabcentral/fileexchange/31177-dave-s-matlab-pong
-    
-    properties(Constant)
-        MIN_BALL_SPEED = .8;
-        MAX_BALL_SPEED = 3;
-        BALL_ACCELERATION = 0.05;
-        PADDLE_SPEED = 1.3;
-        B_FACTOR = 1;
-        P_FACTOR = 2;
-        Y_FACTOR = 0.01;
-        
-        BALL_RADIUS = 1.5;
-        WALL_WIDTH = 3;
-        FIGURE_WIDTH = 800;
-        FIGURE_HEIGHT = 480;
-        PLOT_W = 150;
-        PLOT_H = 100;
-        GOAL_SIZE = Pong2P.PLOT_H;
-        GOAL_TOP = (Pong2P.PLOT_H + Pong2P.GOAL_SIZE) / 2;
-        GOAL_BOT = (Pong2P.PLOT_H - Pong2P.GOAL_SIZE) / 2;
-        PADDLE_H = 14;
-        PADDLE_W = 2;
-        OFFSET = 10;
-        PADDLE_X1 = Pong2P.OFFSET;
-        PADDLE_X2 = Pong2P.PLOT_W - Pong2P.OFFSET;
-        
-        FIGURE_COLOR = [0, 0, 0];
-%         AXIS_COLOR = [.15, .15, .15];
-        AXIS_COLOR = [0 0 0];
-        CENTER_RADIUS = 15;
-        BALL_MARKER_SIZE = 10;
-%         BALL_COLOR = [.1, .7, .1];
-%         BALL_OUTLINE = [.7, 1, .7];
-        BALL_COLOR = [1 1 1];
-        BALL_OUTLINE = [1 1 1];
-        BALL_SHAPE = 'o';
-        PADDLE_LINE_WIDTH = 2;
-%         WALL_COLOR = [.3, .3, .8];
-%         PADDLE_COLOR = [1, .5, 0];
-        PADDLE_COLOR = [1 1 1];
-        WALL_COLOR = [1 1 1];
-        CENTERLINE_COLOR = Pong2P.PADDLE_COLOR .* .8;
-    end
+% The goal is to play as long as possible (the agent controls both
+% players).
         
     properties
         % MDP variables
@@ -56,23 +12,24 @@ classdef Pong2P < MDP
         gamma = 0.999;
 
         % Finite actions
-        allactions = [1 2 3 4];
+        allactions = [-1  1 -1 1
+                      -1 -1  1 1];
 
         % Bounds : state = [ballX, ballY, ballSpeed, ballVectorX, ballVectorY, paddle1Y, paddle2Y])
         stateLB = [0
             0
-            Pong2P.MIN_BALL_SPEED % Speed of the ball, it increases when a player hits it
+            PongEnv.MIN_BALL_SPEED % Speed of the ball, it increases when a player hits it
             0 % ballVector has norm 1 and represents the ball speed direction
             0
             0
             0];
-        stateUB = [Pong2P.PLOT_W - Pong2P.BALL_RADIUS
-            Pong2P.PLOT_H - Pong2P.BALL_RADIUS
-            Pong2P.MAX_BALL_SPEED
+        stateUB = [PongEnv.PLOT_W - PongEnv.BALL_RADIUS
+            PongEnv.PLOT_H - PongEnv.BALL_RADIUS
+            PongEnv.MAX_BALL_SPEED
             1
             1
-            Pong2P.PLOT_H - Pong2P.PADDLE_H
-            Pong2P.PLOT_H - Pong2P.PADDLE_H];
+            PongEnv.PLOT_H - PongEnv.PADDLE_H
+            PongEnv.PLOT_H - PongEnv.PADDLE_H];
         actionLB = 1;
         actionUB = 4;
         rewardLB = -1;
@@ -81,7 +38,7 @@ classdef Pong2P < MDP
     
     methods
 
-        function state = initstate(obj, n)
+        function state = init(obj, n)
             % Random init ball direction
             ballVector = [1-(2*rand(1,n)); 1-(2*rand(1,n))];
             ballVector(1,:) = ballVector(1,:) .* ((rand(1,n) / obj.B_FACTOR) + 1);
@@ -95,8 +52,6 @@ classdef Pong2P < MDP
                 obj.PLOT_H / 2 * ones(1, n) % paddle1Y
                 obj.PLOT_H / 2 * ones(1, n) % paddle2Y
                 ];
-
-            if obj.realtimeplot, obj.showplot; obj.updateplot(state); end
         end
         
         function [nextstate, reward, absorb] = simulator(obj, state, action)
@@ -111,10 +66,8 @@ classdef Pong2P < MDP
             paddle2Y = state(7,:);
 
             % Parse action
-            move = [-1  1 -1 1
-                    -1 -1  1 1];
-            paddle1V = move(1,action);
-            paddle2V = move(2,action);
+            paddle1V = obj.allactions(1,action);
+            paddle2V = obj.allactions(2,action);
 
             % Move paddles
             paddle1Y = paddle1Y + obj.PADDLE_SPEED * paddle1V;

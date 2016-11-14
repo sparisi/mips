@@ -25,7 +25,8 @@ classdef Resource < MOMDP
         
         % Finite states and actions
         allstates = allcomb([1 2 3 4 5], [1 2 3 4 5], [0 1], [0 1]);
-        allactions = [1 2 3 4];
+        allactions = [0  0  -1  1
+                     -1 1   0  0]; % Left right up down
         
         % MDP variables
         dstate = 4;
@@ -50,17 +51,13 @@ classdef Resource < MOMDP
     methods
         
         %% Simulator
-        function state = initstate(obj, n)
+        function state = init(obj, n)
             state = repmat([5 3 0 0]',1,n);
-            if obj.realtimeplot, obj.showplot; obj.updateplot(state); end
         end
         
         function [nextstate, reward, absorb] = simulator(obj, state, action)
-            steps = [0  0  -1  1
-                     -1 1   0  0]; % action mapping (left right up down)
-                 
             nextstate = state;
-            nextstate(1:2,:) = state(1:2,:) + steps(:,action);
+            nextstate(1:2,:) = state(1:2,:) + obj.allactions(:,action);
             
             % Bound the state
             nextstate = bsxfun(@max, bsxfun(@min,nextstate,obj.stateUB), obj.stateLB);

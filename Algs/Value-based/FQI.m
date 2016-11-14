@@ -18,7 +18,7 @@ gamma = min(gamma,0.999999);
 allstates = mdp.allstates;
 X = unique(allstates(:,1));
 Y = unique(allstates(:,2));
-allactions = mdp.allactions;
+allactions = 1 : size(mdp.allactions,2);
 nactions = length(allactions);
 
 episodes = 10000;
@@ -54,5 +54,5 @@ end
 
 
 %% Show
-policy.drawAction = @(s)egreedy( Q(find(ismember(allstates,s','rows')),:)', 0 );
-show_simulation(mdp, policy, 0.1, 100)
+policy_eval.drawAction = @(s)egreedy( Q(find(ismember(allstates,s','rows')),:)', 0 );
+show_simulation(mdp, policy_eval, 0.1, 100)

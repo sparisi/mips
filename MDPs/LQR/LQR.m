@@ -77,7 +77,7 @@ classdef LQR < MOMDP
         end
         
         %% Simulator
-        function state = initstate(obj, n)
+        function state = init(obj, n)
             state = repmat(obj.x0,1,n);
         end
         

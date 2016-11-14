@@ -13,7 +13,6 @@ bfs = @deep_basis_poly;
 % bfs = @(varargin)basis_krbf(11, [mdp.stateLB, mdp.stateUB], 0, varargin{:});
 
 policy = Gibbs(bfs, zeros((bfs()+1)*(nactions-1),1), mdp.actionLB:mdp.actionUB);
-% policy = EGreedy(bfs, zeros((bfs()+1)*nactions,1), mdp.actionLB:mdp.actionUB, 1);
 
 
 %% ===================================================================== %%

@@ -3,23 +3,23 @@ close all
 
 %% ===================================================================== %%
 %  ======================== LOW LEVEL SETTINGS =========================  %
-mdp = PuddleworldMO;
+mdp = CartPole;
 robj = 1;
 dreward = mdp.dreward;
 gamma = mdp.gamma;
 nactions = mdp.actionUB;
 
-bfs = @(varargin)basis_krbf(4,[0 1; 0 1],0,varargin{:});
+bfs = @(varargin)basis_poly(2,mdp.dstate,0,varargin{:});
 
 policy = Gibbs(bfs, zeros((bfs()+1)*(nactions-1),1), mdp.actionLB:mdp.actionUB);
 
 
 %% ===================================================================== %%
 %  ======================= HIGH LEVEL SETTINGS =========================  %
-makeDet = 1; % 1 to learn deterministic low level policies
+makeDet = 0; % 1 to learn deterministic low level policies
 n_params = policy.dparams;
 mu0 = policy.theta(1:n_params);
-Sigma0high = 10 * eye(n_params);
+Sigma0high = 100 * eye(n_params);
 Sigma0high = Sigma0high + diag(abs(mu0)).^2;
 Sigma0high = nearestSPD(Sigma0high);
 policy_high = GaussianConstantChol(n_params, mu0, Sigma0high);
@@ -28,7 +28,7 @@ policy_high = GaussianConstantChol(n_params, mu0, Sigma0high);
 
 %% ===================================================================== %%
 %  ======================== LEARNING SETTINGS ==========================  %
-episodes_eval = 500;
-steps_eval = 100;
-episodes_learn = 500;
-steps_learn = 100;
+episodes_eval = 1;
+steps_eval = 10000;
+episodes_learn = 50;
+steps_learn = 1000;
