@@ -4,8 +4,8 @@ Some algorithms require the *Optimization Toolbox*.
 Some utility functions are imported from File Exchange (original authors are always acknowledged).
 
 
+<br>
 ## Summary
-----------
 
 Launch `INSTALL` to add the path of all folders.
 
@@ -95,8 +95,9 @@ Utility functions used for matrix operations, plotting and sampling are stored i
 </details>
 
 
+<br>
 ## Visualization
-----------------
+
 
 Here is a list with examples of all ways of visualizing a particular data / animation. Please note that not all MDPs support an animation.
 
