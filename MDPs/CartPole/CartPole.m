@@ -33,7 +33,7 @@ classdef CartPole < CartPoleEnv
         end
             
         function reward = reward(obj, state, action, nextstate)
-            reward = zeros(1,size(state,2));
+            reward = zeros(1,size(nextstate,2));
             reward(obj.isterminal(nextstate)) = -1;
         end
         

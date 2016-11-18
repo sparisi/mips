@@ -1,4 +1,4 @@
-classdef Chainwalk < MDP
+classdef ChainwalkContinuous < MDP
     
     %% Properties
     properties
@@ -12,17 +12,15 @@ classdef Chainwalk < MDP
         % Bounds
         stateLB = 1;
         stateUB = 50;
-        actionLB = 1;
-        actionUB = 2;
+        actionLB = -1;
+        actionUB = 1;
+%         actionLB = -inf;
+%         actionUB = inf;
         rewardLB = 0;
         rewardUB = 1;
 
         % Environment variables
         reward_states = [10 41];
-
-        % Finite states and actions
-        allstates = 1:50;
-        allactions = [-1 1];
     end
     
     methods
@@ -33,8 +31,8 @@ classdef Chainwalk < MDP
         end
 
         function action = parse(obj, action)
-            action = obj.allactions(:,action);
-            noise = rand(1,size(action,2));
+            action = min(max(action,obj.actionLB),obj.actionUB);
+            noise = rand(size(action));
             action(noise < 0.1) = -action(noise < 0.1);
         end
 
@@ -44,8 +42,7 @@ classdef Chainwalk < MDP
         end
         
         function reward = reward(obj, state, action, nextstate)
-            reward = zeros(1,size(state,2));
-            reward(ismember(nextstate,obj.reward_states)) = 1;
+            reward = -min(abs(bsxfun(@minus,nextstate,obj.reward_states'))).^2;
         end
         
         function absorb = isterminal(obj, nextstate)
@@ -61,10 +58,10 @@ classdef Chainwalk < MDP
             obj.handleEnv = figure(); hold all
             axis off
             
-            plot(obj.allstates,ones(1,obj.stateUB),...
-                'ob','MarkerSize',10,'MarkerEdgeColor','b','LineWidth',2)
+            plot([obj.stateLB obj.stateUB],[1 1],...
+                '-b','MarkerSize',10,'MarkerEdgeColor','b','LineWidth',2,'MarkerFaceColor','b')
             plot(obj.reward_states,ones(length(obj.reward_states)),...
-                'og','MarkerSize',10,'MarkerEdgeColor','g','LineWidth',2)
+                'og','MarkerSize',10,'MarkerEdgeColor','g','LineWidth',2,'MarkerFaceColor','g')
             obj.handleAgent = plot(1,1,...
                 'ro','MarkerSize',8,'MarkerFaceColor','r');
         end

@@ -32,6 +32,7 @@ classdef (Abstract) MDP < handle
     methods
         function state = initstate(obj,n)
         % Return N initial states.
+            if nargin == 1, n = 1; end
             state = obj.init(n);
             if obj.realtimeplot, obj.showplot; obj.updateplot(state); end
         end
