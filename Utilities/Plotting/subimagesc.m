@@ -1,4 +1,4 @@
-function subimagesc(name, X, Y, Z)
+function subimagesc(name, X, Y, Z, addcolorbar)
 % SUBIMAGESC Plots multiple imagesc on the same figure using subplot.
 %
 %    INPUT
@@ -16,12 +16,14 @@ ncols = ceil(nplots/nrows);
 fig = findobj('type','figure','name',name);
 
 if isempty(fig)
+    if nargin == 4, addcolorbar = 0; end
     figure('Name',name);
     for i = nplots : -1 : 1
         subplot(nrows,ncols,i,'align')
         imagesc('XData',X,'YData',Y,'CData',reshape(Z(i,:),n,m))
         axis([min(X) max(X) min(Y) max(Y)])
         if nplots > 1, title(num2str(i)), end
+        if addcolorbar, colorbar, end
     end
 else
     axes = findobj(fig,'type','axes');

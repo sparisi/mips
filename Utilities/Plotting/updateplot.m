@@ -39,6 +39,7 @@ if isempty(fig)
     
     hold off
     title(name)
+    legend show
     return
 end
 
