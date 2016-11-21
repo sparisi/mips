@@ -51,4 +51,4 @@ end
 
 %% Show
 policy_eval.drawAction = @(s)egreedy( Q(find(ismember(allstates,s','rows')),:)', 0 );
-show_simulation(mdp, policy_eval, 0.1, 1000)
+show_simulation(mdp, policy_eval, 1000, 0.1)

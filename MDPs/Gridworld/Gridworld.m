@@ -39,8 +39,8 @@ classdef Gridworld < MDP
         stateUB = [7 7]';
         actionLB = 1;
         actionUB = 4;
-        rewardLB = 0;
-        rewardUB = 2;
+        rewardLB = -90;
+        rewardUB = 130;
     end
     
     methods

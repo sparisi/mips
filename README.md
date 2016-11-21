@@ -38,7 +38,7 @@ After running a setup script, just run an algorithm script to start the learning
 SettingMC % mountain car setup
 RUN_PG % run policy gradient (terminate by CTRL+C)
 plot(J_history) % plot average return
-show_simulation(mdp,policy.makeDeterministic,0.1,1000) % visualize learned policy (see below)
+show_simulation(mdp,policy.makeDeterministic,1000,0.1) % visualize learned policy (see below)
 ```
 
 Notice that, in the case of episodic (black box) RL, these scripts define both the *low level policy* (the one used by the agent) and the *high level policy* (the sampling distribution used to draw the low level policy parameters).
@@ -145,14 +145,14 @@ mdp.plotepisode(data(1),0.001)
 - For episode-based algorithms, the low-level dataset is not returned. In this case, you can call `show_simulation`, which executes only one episode and shows an animation. This visualization can be used also in step-based algorithms.
 
 ```
-show_simulation(mdp,policy,0.001,100)
-show_simulation(mdp,policy.update(policy_high.drawAction(1)),0.001,100)
+show_simulation(mdp,policy,100,0.001)
+show_simulation(mdp,policy.update(policy_high.drawAction(1)),100,0.001)
 ```
 
 If the MDP provides pixels rendering, you can enable it by adding an additional argument to the function call
 
 ```
-show_simulation(mdp,policy,0.001,100,1)
+show_simulation(mdp,policy,100,0.001,1)
 ```
   </p>
 </details>  

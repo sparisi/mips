@@ -1,7 +1,7 @@
 function y = cumsummove(x, idx)
-% CUMSUMMOVE Perform a cumulative sum over some windows, defined by some 
-% indices. The sum is performed along the second dimension.
-% 
+% CUMSUMMOVE Perform a cumulative sum over index windows. The sum is 
+% performed along the second dimension.
+%
 % =========================================================================
 % EXAMPLE
 % x = [1 2 3 4 5 6]; idx = [0 0 1 0 1 0]; --> y = [1 3 3 7 5 11]

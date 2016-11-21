@@ -80,4 +80,4 @@ end
 
 %% Show
 policy_eval.drawAction = @(s)egreedy( Qfun(s,theta), 0 );
-show_simulation(mdp, policy_eval, .01, 100)
+show_simulation(mdp, policy_eval, 100, 0.01)

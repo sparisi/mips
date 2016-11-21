@@ -1,4 +1,4 @@
-function [J, ds] = show_simulation(mdp, policy, pausetime, steps, render)
+function [J, ds] = show_simulation(mdp, policy, steps, pausetime, render)
 % SHOW_SIMULATION Runs an episode and shows what happened during its 
 % execution with an animation.
 %
@@ -17,6 +17,7 @@ mdp.closeplot
 [ds, J] = collect_samples(mdp, 1, steps, policy);
 
 if nargin < 5, render = 0; end
+if nargin < 4 || isempty(pausetime), pausetime = 0.01; end
 
 if ~render
     mdp.plotepisode(ds, pausetime)
