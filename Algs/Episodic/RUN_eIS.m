@@ -48,4 +48,6 @@ end
 
 %%
 plothistory(J_history)
-show_simulation(mdp,policy.update(policy_high.makeDeterministic.drawAction),0.01,1000)
+show_simulation(mdp, ...
+    policy.update(policy_high.makeDeterministic.drawAction), ...
+    1000, 0.01)

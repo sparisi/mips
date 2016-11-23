@@ -46,4 +46,4 @@ end
 %% See best learned policy
 [value, idx] = max(current_J(robj,:));
 best_policy = current_population(idx);
-show_simulation(mdp, best_policy, 0.1, 1000);
+show_simulation(mdp, best_policy, 1000, 0.1);
