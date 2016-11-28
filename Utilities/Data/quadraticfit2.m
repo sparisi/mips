@@ -10,6 +10,7 @@ function [model, nmse] = quadraticfit2(X1, X2, Y, varargin)
 %     - Y           : [1 x N] vector
 %     - weights     : (optional) [1 x N] vector of samples weights
 %     - standardize : (optional) flag to standardize X1, X2 and Y
+%     - lambda      : (optional) L2-norm regularizer
 %
 %    OUTPUT
 %     - model       : struct with fields R1, R2, Rc, r1, r2, r0, dim 
@@ -22,9 +23,9 @@ function [model, nmse] = quadraticfit2(X1, X2, Y, varargin)
 [d1, N] = size(X1);
 [d2, N] = size(X2);
 
-options = {'weights', 'standardize'};
-defaults = {ones(1,N), 0};
-[W, standardize] = internal.stats.parseArgs(options, defaults, varargin{:});
+options = {'weights', 'standardize', 'lambda'};
+defaults = {ones(1,N), 0, 1e-5};
+[W, standardize, lambda] = internal.stats.parseArgs(options, defaults, varargin{:});
 
 D = d1*(d1+1)/2 + d2*(d2+1)/2 + d1*d2 + d1 + d2 + 1; % Number of parameters of the quadratic model
 
@@ -49,7 +50,7 @@ PhiC = 2 * reshape(PhiC,[d1*d2,N]);
 Phi = [Phi1; Phi2; PhiC];
 
 %% Get parameters by linear regression on pairs (Phi, Y) and extract model
-params = linear_regression(Phi, Yn, 'weights', W, 'lambda', 1e-5); % Tune lambda
+params = linear_regression(Phi, Yn, 'weights', W, 'lambda', lambda);
 assert(~any(isnan(params)), 'Model fitting failed.')
 
 % r0 = params(1,:);
@@ -90,7 +91,7 @@ R1 = U * V * U';
 quadYn = sum( (X1n'*R1)' .* X1n, 1 );
 Phi1(2+d1:end,:) = []; % Remove quadratic features in X1
 Phi = [Phi1; Phi2; PhiC];
-params = linear_regression(Phi, Yn - quadYn, 'weights', W);
+params = linear_regression(Phi, Yn - quadYn, 'weights', W, 'lambda', lambda);
 
 r0 = params(1,:);
 idx = 2;

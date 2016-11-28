@@ -7,6 +7,7 @@ function [model, nmse] = quadraticfit(X, Y, varargin)
 %     - Y           : [1 x N] vector
 %     - weights     : (optional) [1 x N] vector of samples weights
 %     - standardize : (optional) flag to standardize X and Y
+%     - lambda      : (optional) L2-norm regularizer
 %
 %    OUTPUT
 %     - model       : struct with fields R, r, r0, dim (number of 
@@ -16,9 +17,9 @@ function [model, nmse] = quadraticfit(X, Y, varargin)
 
 [d, N] = size(X);
 
-options = {'weights', 'standardize'};
-defaults = {ones(1,N), 0};
-[W, standardize] = internal.stats.parseArgs(options, defaults, varargin{:});
+options = {'weights', 'standardize', 'lambda'};
+defaults = {ones(1,N), 0, 1e-3, };
+[W, standardize, lambda] = internal.stats.parseArgs(options, defaults, varargin{:});
 
 D = d*(d+1)/2 + d + 1; % Number of parameters of the quadratic model
 
@@ -38,7 +39,7 @@ end
 Phi = basis_quadratic(d,Xn);
 
 % Get parameters by linear regression on pairs (Phi, Y)
-params = linear_regression(Phi, Yn, 'weights', W);
+params = linear_regression(Phi, Yn, 'weights', W, 'lambda', lambda);
 assert(~any(isnan(params)), 'Model fitting failed.')
 
 % Extract model params
@@ -57,7 +58,7 @@ R = U * V * U';
 % Re-learn r and r0
 quadYn = sum( (Xn'*R)' .* Xn, 1 );
 linearPhi = basis_poly(1, d, 1, Xn);
-params = linear_regression(linearPhi, Yn - quadYn, 'weights', W);
+params = linear_regression(linearPhi, Yn - quadYn, 'weights', W, 'lambda', lambda);
 r0 = params(1);
 r = params(2:end);
 
