@@ -30,7 +30,7 @@ grad = grad / N;
 if ismethod(policy_high,'fisher')
     F = policy_high.fisher;
 else
-    F = bsxfun(@times, dlogPidtheta * dlogPidtheta', W);
+    F = dlogPidtheta * bsxfun(@times, dlogPidtheta, W)';
     F = F / N;
 end
 

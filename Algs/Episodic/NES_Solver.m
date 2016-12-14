@@ -51,7 +51,7 @@ classdef NES_Solver < handle
             if ismethod(policy,'fisher')
                 F = policy.fisher;
             else
-                F = bsxfun(@times, dlogPidtheta * dlogPidtheta', W);
+                F = dlogPidtheta * bsxfun(@times, dlogPidtheta, W)';
                 F = F / N;
             end
             
