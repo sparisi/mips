@@ -6,6 +6,8 @@ function fig = plothistory(sample_history, fig)
 %     - sample_history : [N x ITER] matrix, where N is the number of 
 %                        samples collected per iteration and ITER is the 
 %                        number of iterations
+%     - fig            : (optional) handle of the figure where the plot
+%                        will be drawn
 
 if nargin == 1, fig = figure; end
 figure(fig), hold all

@@ -13,6 +13,7 @@ variable = '-log(-mean(J_history))';
 
 %% Plot
 for name = filenames
+    
     counter = 1;
     dataMatrix = [];
     for trial = 1 : 999
@@ -33,7 +34,11 @@ for name = filenames
             std(dataMatrix), ...
             { 'LineWidth', 2, 'DisplayName', name{:} }, ...
             0.1 );
-        legend('-DynamicLegend');
+        h(end+1) = tmp.mainLine;
     end
     
 end
+
+legend(h,name)
+
+leg.Position = [0.2 0.7 0 0];
