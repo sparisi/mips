@@ -53,38 +53,38 @@ Phi = [Phi1; Phi2; PhiC];
 params = linear_regression(Phi, Yn, 'weights', W, 'lambda', lambda);
 assert(~any(isnan(params)), 'Model fitting failed.')
 
-% r0 = params(1,:);
+r0 = params(1,:);
 idx = 2;
-% 
-% r1 = params(idx:d1+idx-1);
+
+r1 = params(idx:d1+idx-1);
 idx = idx + d1;
 
 R1 = params(idx:idx+d1*(d1+1)/2-1);
-% idx = idx + d1*(d1+1)/2;
+idx = idx + d1*(d1+1)/2;
 
 AQuadratic = zeros(d1);
 ind = logical(tril(ones(d1)));
 AQuadratic(ind) = R1;
 R1 = (AQuadratic + AQuadratic') / 2;
 
-% r2 = params(idx:idx+d2-1);
-% idx = idx + d2;
-% 
-% R2 = params(idx:idx+d2*(d2+1)/2-1);
-% idx = idx+d2*(d2+1)/2;
-%
-% AQuadratic = zeros(d2);
-% ind = logical(tril(ones(d2)));
-% AQuadratic(ind) = R2;
-% R2 = (AQuadratic + AQuadratic') / 2;
-% 
-% Rc = params(idx:end);
-% Rc = reshape(Rc,d1,d2);
+r2 = params(idx:idx+d2-1);
+idx = idx + d2;
+
+R2 = params(idx:idx+d2*(d2+1)/2-1);
+idx = idx+d2*(d2+1)/2;
+
+AQuadratic = zeros(d2);
+ind = logical(tril(ones(d2)));
+AQuadratic(ind) = R2;
+R2 = (AQuadratic + AQuadratic') / 2;
+
+Rc = params(idx:end);
+Rc = reshape(Rc,d1,d2);
 
 %% Enforce R1 to be negative definite
 % R1 = -nearestSPD(-R1);
 [U, V] = eig(R1);
-V(V > 0) = -1e-8;
+V(V > 0) = 0;
 R1 = U * V * U';
 
 % Re-learn the other components
@@ -149,9 +149,9 @@ model.eval = @(X1,X2) sum( (X1'*R1)' .* X1, 1 ) + ...
     r0';
 
 % Save also the equivalent formulation
-% [ X1, X2, 1 ] [ R1      R2      0.5r1 ] [ X1 ]
-%               [ R2'     Rc      0.5r2 ] [ X2 ]
-%               [ 0.5r1'  0.5r2'  r0    ] [ 1  ]
+%                   [ R1      R2      0.5r1 ] [ X1 ]
+% Y = [ X1, X2, 1 ] [ R2'     Rc      0.5r2 ] [ X2 ]
+%                   [ 0.5r1'  0.5r2'  r0    ] [ 1  ]
 model.H = [ [ [R1 Rc; Rc' R2] [0.5*r1; 0.5*r2] ] ; [ 0.5*r1' 0.5*r2' r0 ] ];
 
 if nargout > 1
