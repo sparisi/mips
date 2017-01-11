@@ -6,7 +6,7 @@ classdef GmmConstant < Policy
 % As the number of components is variable (up to GMAX), this class does not
 % implement the properties THETA and DPARAMS.
     
-    properties(GetAccess = 'public', SetAccess = 'private')
+    properties(GetAccess = 'public', SetAccess = 'protected')
         mu    % means
         Sigma % covariances
         p     % mixing proportions
@@ -50,7 +50,7 @@ classdef GmmConstant < Policy
             components = mymnrnd(obj.p,n); % Select the Gaussians for drawing the samples
             action = zeros(obj.daction,n);
             count = 1;
-            for i = 1 : length(obj.p);
+            for i = 1 : length(obj.p)
                 n = sum(components==i);
                 action(:,count:count+n-1) = mymvnrnd(obj.mu(i,:)',obj.Sigma(:,:,i),n);
                 count = count + n;
@@ -66,7 +66,7 @@ classdef GmmConstant < Policy
             end
         end
 
-        %% ENTROPY
+        %% Entropy
         function S = entropy(obj, Actions)
             prob_list = obj.evaluate(Actions);
             idx = isinf(prob_list) | isnan(prob_list) | prob_list == 0;
@@ -85,7 +85,7 @@ classdef GmmConstant < Policy
 
         %% Change stochasticity
         function obj = makeDeterministic(obj)
-            obj.Sigma = obj.Sigma * 1e-100;
+            obj.Sigma = obj.Sigma * 1e-8;
         end
         
         function obj = randomize(obj, factor)
