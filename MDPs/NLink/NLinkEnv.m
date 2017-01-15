@@ -25,8 +25,10 @@ classdef NLinkEnv < MDP
             
         function reward = reward_joint(obj, action, nextstate)
             distance = abs(angdiff(nextstate(1:2:end,:),obj.q_des,'rad'));
-            reward = -matrixnorms(distance,2).^2 ...
-                - 0.05 * sum(abs(action),1); % Penalty on the action
+            penalty_dist = -matrixnorms(distance,2).^2;
+%             penalty_dist = exp( -matrixnorms(distance,2).^2 );
+            penalty_action = - 0.05 * sum(abs(action),1);
+            reward = penalty_dist + penalty_action;
         end
     end        
 
@@ -51,13 +53,13 @@ classdef NLinkEnv < MDP
         function updateplot(obj, state)
             r = 0.1;
             X = obj.getJointsInTaskSpace(state);
-            X = [ zeros(4,1); X ];
+            X = [ zeros(4,size(X,2)); X ];
             X(4:4:end,:) = []; % Remove velocities
             X(3:3:end,:) = [];
             for i = 1 : 2 : size(X,1) - 2
-                obj.handleAgent{i}.XData = [X(i,:) X(i+2,:)];
-                obj.handleAgent{i}.YData = [X(i+1,:), X(i+3,:)];
-                obj.handleAgent{i+1}.Position = [X(i+2,:)-r,X(i+3,:)-r,2*r,2*r];
+                obj.handleAgent{i}.XData = [X(i,1) X(i+2,1)];
+                obj.handleAgent{i}.YData = [X(i+1,1), X(i+3,1)];
+                obj.handleAgent{i+1}.Position = [X(i+2,1)-r,X(i+3,1)-r,2*r,2*r];
             end
             drawnow limitrate
         end
