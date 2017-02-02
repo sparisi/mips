@@ -12,7 +12,7 @@ classdef Tanh < Layer
         
         function [dX, dW] = backward(obj, dY)
             dW = [];
-            dX = (1 - obj.Y) .* dY;
+            dX = (1 - obj.Y.^2) .* dY;
         end
         
     end

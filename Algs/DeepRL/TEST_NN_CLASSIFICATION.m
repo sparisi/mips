@@ -40,7 +40,7 @@ t = 1;
 %% Learn
 while true
     
-    mb = randperm(size(train_in,1),batchsize); 
+    mb = randperm(train_n,batchsize); 
     X = train_in(mb,:);
     T = train_out(mb,:);
     
