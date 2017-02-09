@@ -4,6 +4,7 @@ close all
 N = 100;
 N_MAX = N * 1;
 N_eval = 1;
+MAX_ITER = 1000;
 
 dim = 30; f = @(x)zdt3(x); constrain = @(x)max(min(1,x),0);
 truefront = load('zdt3_front.dat');
@@ -59,6 +60,7 @@ for i = 1 : size(W,1)
 
         % Eval samples
         X_eval = sampling.makeDeterministic.drawAction(N_eval);
+        X_eval = constrain(X_eval);
         Y_eval = f(X_eval);
         avgY = mean(Y_eval,2);
 
@@ -66,6 +68,7 @@ for i = 1 : size(W,1)
         if iter == 1
             Y = repmat(min(Y_iter,[],2),1,N_MAX);
             X = sampling.drawAction(N_MAX);
+            X = constrain(X);
         end
 
         % Enqueue the new samples and remove the old ones
@@ -76,12 +79,12 @@ for i = 1 : size(W,1)
         [sampling, div] = solver.step(Y,X,sampling);
 
         % fprintf( ['%d / %d) Iter: %d, Avg Value: %.4f, ' divStr ': %.2f, Entropy: %.4f \n'], ...
-        %     i, size(W,1), iter, avgY, div, policy_high.entropy );
+        %     i, size(W,1), iter, avgY, div, sampling.entropy );
 
         iter = iter + 1;
 
-        if div < 0.1, fprintf(' - %d', iter), break, end
-        if iter >= 2e2, fprintf(' - MAX ITER REACHED!'), break, end
+        if div < 0.1, fprintf(' - %d\n', iter), break, end
+        if iter >= MAX_ITER, fprintf(' - MAX ITER REACHED!\n'), break, end
 
     end
 
@@ -95,5 +98,5 @@ for i = 1 : length(front_pol)
 end
 f = pareto(front);
 figure, hold all
-plot(truefront(:,1),truefront(:,2),'o');
-plot(f(:,1),f(:,2),'+');
+MOMDP.plotfront(truefront,'o');
+MOMDP.plotfront(front,'+');

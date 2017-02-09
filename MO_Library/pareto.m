@@ -5,8 +5,8 @@ function [s, p, idxs] = pareto(s, p)
 %    INPUT
 %     - S    : [N x D] matrix, where N is the number of points and D is the
 %              number of elements (objectives) of each point.
-%     - P    : (optional) [N x D] matrix containing the policies that 
-%              generated S
+%     - P    : (optional) [N x T] matrix containing the policies/parameters
+%              that generated S
 %
 %    OUTPUT
 %     - S    : Pareto-filtered S
@@ -28,7 +28,7 @@ while i >= 1
     indices = sum( bsxfun( @ge, s(i,:), s ), 2 ) == dim;
     indices(i) = false;
     s(indices,:) = [];
-    p(indices) = [];
+    p(indices,:) = [];
     idxs(indices) = [];
     i = i - 1 - (old_size - size(s,1)) + sum(indices(i:end));
 end
