@@ -54,14 +54,21 @@ else
 end
 
 %% Check density
-point = policy.drawAction(1);
+n = 10;
+point = policy.drawAction(n);
 tmpmu = mu';
 tmpmu = tmpmu(:);
-V1 = double(subs(gmm_sym, [MU; SIGMA; ALPHA; x], [tmpmu; sigma(:); p(:); point]));
+V1sym = subs(gmm_sym, [MU; SIGMA; ALPHA], [tmpmu; sigma(:); p(:)]);
+for i = 1 : n
+    V1(:,i) = double(subs(V1sym, x, point(:,i)));
+end
 V2 = policy.evaluate(point);
-assert(abs(V1-V2)<1e-6)
+assert(all(abs(V1-V2)<1e-6))
 
 %% Check gradient
-G1 = double(subs(grad_full, [MU; SIGMA; ALPHA; x], [tmpmu; sigma(:); p(:); point]));
+G1sym = subs(grad_full, [MU; SIGMA; ALPHA], [tmpmu; sigma(:); p(:)]);
+for i = 1 : n
+    G1(:,i) = double(subs(G1sym, x, point(:,i)));
+end
 G2 = policy.dlogPidtheta(point);
-assert(max(abs(G1-G2))<1e-6)
+assert(all(all(abs(G1-G2)<1e-6)))

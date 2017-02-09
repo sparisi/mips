@@ -48,53 +48,52 @@ classdef GmmGibbsConstant < GmmConstant
 
         %% Derivative of the logarithm of the policy
         function dlogpdt = dlogPidtheta(obj, action)
-            [k,d] = size(obj.mu);
-
-            prob = obj.evaluate(action);
-            dlogpdt_mu    = zeros(k*d,1);
-            dlogpdt_sigma = zeros(k*d*d,1);
-            dlogpdt_mixc  = zeros(k,1);
+            [k,d]         = size(obj.mu);
+            [d,n]         = size(action);
+            dlogpdt_mu    = zeros(k*d,n);
+            dlogpdt_sigma = zeros(k*d*d,n);
+            dlogpdt_mixc  = zeros(k,n);
             
-            exponential = exp(obj.p-max(obj.p));
+            prob          = obj.evaluate(action);
+            exponential   = exp(obj.p-max(obj.p));
 
-            mix_coef_den = sum(exponential);
-            mix_coef = exponential / mix_coef_den;
+            mix_coef_den  = sum(exponential);
+            mix_coef      = exponential / mix_coef_den;
             
             for i = 1 : k
                 idx  = (i-1)*d;
                 mu_i = obj.mu(i,:)';
                 C_i  = obj.Sigma(:,:,i);
-                dens = mvnpdf(action, mu_i, C_i);
+                diff = bsxfun(@minus, action, mu_i);
+                dens = mvnpdf(action', mu_i', C_i)';
                 
                 % Compute gradient w.r.t. mean
-                grad_mu = C_i \ (action - mu_i);
-                dlogpdt_mu(1+idx:idx+d,1) = dens * grad_mu * mix_coef(i);
+                grad_mu = C_i \ diff;
+                dlogpdt_mu(1+idx:idx+d,:) = bsxfun(@times, grad_mu, dens) * mix_coef(i);
                 
                 % Compute gradient w.r.t. covariance
                 tmp = inv(C_i)';
-                A = -0.5 * tmp;
-                B =  0.5 * tmp * (action - mu_i) * (action - mu_i)' * tmp;
+                A = -0.5 * tmp(:);
+                B =  0.5 * mtimescolumn(tmp*diff, tmp*diff);
                 grad_C = A + B;
-                dlogpdt_sigma(1+idx*d:idx*d+d^2,1) = dens * grad_C(:) * mix_coef(i);
+                dlogpdt_sigma(1+idx*d:idx*d+d^2,:) = bsxfun(@times, grad_C, dens) * mix_coef(i);
                 
                 % Compute gradient w.r.t. mixing coefficients
-                dlogpdt_mixc(i) = 0;
                 for j = 1 : k
                     mu_j = obj.mu(j,:)';
                     C_j  = obj.Sigma(:,:,j);
-                    dens_j = mvnpdf(action, mu_j, C_j);
+                    dens_j = mvnpdf(action', mu_j', C_j)';
                     if (i == j)
-                        dlogpdt_mixc(i) = dlogpdt_mixc(i) + dens_j * ...
+                        dlogpdt_mixc(i,:) = dlogpdt_mixc(i,:) + dens_j * ...
                             exp(obj.p(i)-max(obj.p)) * (mix_coef_den - exp(obj.p(i)-max(obj.p))) / mix_coef_den^2;
                     else
-                        dlogpdt_mixc(i) = dlogpdt_mixc(i) - dens_j * ...
+                        dlogpdt_mixc(i,:) = dlogpdt_mixc(i,:) - dens_j * ...
                             exp(obj.p(i)-max(obj.p)) * exp(obj.p(j)-max(obj.p)) / mix_coef_den^2;
                     end
                 end
             end
-            
             dlogpdt = [dlogpdt_mu; dlogpdt_sigma; dlogpdt_mixc];
-            dlogpdt = dlogpdt / prob;
+            dlogpdt = bsxfun(@rdivide, dlogpdt, prob);
         end
         
         %% Gradient update
