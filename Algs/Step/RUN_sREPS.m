@@ -1,47 +1,49 @@
-% Reward-Weighted Regression.
+% Step-based REPS.
 %
 % =========================================================================
 % REFERENCE
-% J Peters, S Schaal
-% Reinforcement Learning by Reward-weighted Regression for Operational 
-% Space Control (2007)
+% J Peters, K Muelling, Y Altun
+% Relative Entropy Policy Search (2010)
+
+solver = sREPS_Solver(1,bfs);
 
 N_MAX = episodes_learn * steps_learn * 2;
 Phi = [];
-R = [];
+PhiN = [];
+Q = [];
 Action = [];
 iter = 1;
 
 %% Learning
-while iter < 200
+while iter < 500
     
     [ds, J] = collect_samples(mdp, episodes_learn, steps_learn, policy);
     S = policy.entropy(horzcat(ds.s));
     Phi_iter = policy.basis1(horzcat(ds.s));
+    PhiN_iter = policy.basis1(horzcat(ds.nexts));
     Action_iter = horzcat(ds.a);
-    R_iter = horzcat(ds.Q);
-    R_iter = R_iter(robj,:);
+    Q_iter = horzcat(ds.Q);
+    Q_iter = Q_iter(robj,:);
 
-    R = [R_iter, R];
+    Q = [Q_iter, Q];
     Phi = [Phi_iter, Phi];
+    PhiN = [PhiN_iter, PhiN];
     Action = [Action_iter, Action];
-    R = R(:, 1:min(N_MAX,end));
+    Q = Q(:, 1:min(N_MAX,end));
     Phi = Phi(:, 1:min(N_MAX,end));
+    PhiN = PhiN(:, 1:min(N_MAX,end));
     Action = Action(:, 1:min(N_MAX,end));
-    
-    R = R_iter; % Do not re-use previous samples
+        
+    Q = Q_iter; % Do not re-use previous samples
     Phi = Phi_iter;
+    PhiN = PhiN_iter;
     Action = Action_iter;
 
-    weights = (R - min(R)) / (max(R) - min(R)); % simple normalization in [0,1]
-    
-    weights = (R - max(R)) / (max(R) - min(R)); weights = exp(10*weights);
+    [policy, divKL] = solver.step(Q, Action, Phi, PhiN, policy);
 
     J = evaluate_policies(mdp, episodes_eval, steps_eval, policy.makeDeterministic);
     J_history(iter) = J(robj);
-    fprintf('%d ) Entropy: %.2f, J: %.4f\n', iter, S, J(robj))
-    
-    policy = policy.weightedMLUpdate(weights, Action, Phi);
+    fprintf('%d ) Entropy: %.2f, KL: %.2f, J: %.4f\n', iter, S, divKL, J(robj))
     
     iter = iter + 1;
 
