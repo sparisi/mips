@@ -135,7 +135,7 @@ classdef sREPS_Solver < handle
             % gradient wrt eta
             gd = obj.epsilon + log(sumWeights/n) - sumWeightsV / (eta * sumWeights);
             % hessian
-            h = ( sumWeightsVSquare * sumWeights - sumWeightsV^2 ) / ( eta^3 * sumWeightsV^2 );
+            h = ( sumWeightsVSquare * sumWeights - sumWeightsV^2 ) / ( eta^3 * sumWeights^2 );
         end
         
         function [g, gd, h] = dual_theta(obj, theta, eta, J, Phi, PhiN, W)
@@ -148,16 +148,16 @@ classdef sREPS_Solver < handle
             maxBerror = max(berror);
             weights = W .* exp( ( berror - maxBerror ) / eta ); % numerical trick
             sumWeights = sum(weights);
-            sumWeightsPhi = ( weights * bsxfun(@plus, mean(PhiN,2), - Phi)' )';
-            sumPhiWeights = (bsxfun(@plus, mean(PhiN,2), - Phi) * weights');
-            sumPhiWeightsPhi = bsxfun(@plus, mean(PhiN,2), - Phi) * bsxfun( @times, weights', bsxfun(@plus, mean(PhiN,2), - Phi)' );
+            PhiDiff = bsxfun(@plus, mean(PhiN,2), - Phi);
+            sumPhiWeights = (PhiDiff * weights');
+            sumPhiWeightsPhi = PhiDiff * bsxfun( @times, weights', PhiDiff' );
             
             % dual function
             g = eta * obj.epsilon + eta * log(sumWeights/n) + maxBerror;
             % gradient wrt theta
-            gd = sumWeightsPhi / sumWeights;
+            gd = sumPhiWeights / sumWeights;
             % hessian
-            h = ( sumPhiWeightsPhi * sumWeights - sumPhiWeights * sumWeightsPhi') / sumWeights^2 / eta;
+            h = ( sumPhiWeightsPhi * sumWeights - sumPhiWeights * sumPhiWeights') / sumWeights^2 / eta;
         end
 
     end
