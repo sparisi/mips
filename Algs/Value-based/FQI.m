@@ -21,10 +21,10 @@ Y = unique(allstates(:,2));
 allactions = 1 : size(mdp.allactions,2);
 nactions = length(allactions);
 
-episodes = 10000;
+maxepisodes = 10000;
 maxsteps = 100;
 policy.drawAction = @(s)myunidrnd(mdp.actionLB,mdp.actionUB,size(s,2));
-data = collect_samples2(mdp, episodes, maxsteps, policy);
+data = collect_samples2(mdp, maxepisodes, maxsteps, policy);
 
 
 %% Learn
@@ -54,5 +54,5 @@ end
 
 
 %% Show
-policy_eval.drawAction = @(s)egreedy( Q(find(ismember(allstates,s','rows')),:)', 0 );
+policy_eval.drawAction = @(s)egreedy( Q(ismember(allstates,s','rows'),:)', 0 );
 show_simulation(mdp, policy_eval, 100, 0.1)

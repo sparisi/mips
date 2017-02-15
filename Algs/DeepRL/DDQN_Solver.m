@@ -1,12 +1,10 @@
-classdef DQN_Solver < handle
-% Deep Q-Learning Network.
+classdef DDQN_Solver < handle
+% Deep Double Q-Learning Network.
 %
 % =========================================================================
 % REFERENCE
-% V Mnih, K Kavukcuoglu, D Silver, A A Rusu, J Veness, M G Bellemare, 
-% A Graves, M Riedmiller, A K Fidjeland, G Ostrovski, S Petersen, C Beattie, 
-% A Sadik, I Antonoglou, H King, D Kumaran, D Wierstra, S Legg, D Hassabis
-% Human-level control through deep reinforcement learning (2015)
+% H van Hasselt, A Guez, D Silver
+% Deep Reinforcement Learning with Double Q-learning (2015)
 
     properties
 
@@ -39,7 +37,7 @@ classdef DQN_Solver < handle
     methods
 
         %% Constructor
-        function obj = DQN_Solver(nnQ, optimQ, dimA, dimO)
+        function obj = DDQN_Solver(nnQ, optimQ, dimA, dimO)
             obj.optimQ      = optimQ;
             obj.dimA        = dimA;
             obj.data.o      = NaN(obj.dsize,dimO); % Observations
@@ -123,15 +121,17 @@ classdef DQN_Solver < handle
         function L = step(obj)
             mb = randperm(min(obj.t,obj.dsize),obj.bsize); % Random minibatches
             
-            O_next  = obj.data.o_next(mb,:);              % bsize x dimO
-            O       = obj.data.o(mb,:);                   % bsize x dimO
-            Ai      = ind2vec(obj.data.a(mb,:),obj.dimA); % bsize x dimA
-            R       = obj.data.r(mb,:);                   % bsize x 1
-            Term    = obj.data.term(mb,:);                % bsize x 1
+            O_next = obj.data.o_next(mb,:);              % bsize x dimO
+            O      = obj.data.o(mb,:);                   % bsize x dimO
+            Ai     = ind2vec(obj.data.a(mb,:),obj.dimA); % bsize x dimA
+            R      = obj.data.r(mb,:);                   % bsize x 1
+            Term   = obj.data.term(mb,:);                % bsize x 1
 
             % Compute targets via Bellman equation with target network
-            QT_next = obj.nnQt.forward(O_next);
-            T       = R + obj.gamma .* max(QT_next,[],2) .* ~Term;
+            QT_next     = obj.nnQt.forward(O_next);
+            Q_next      = obj.nnQ.forward(O_next);
+            [~, A_next] = max(Q_next,[],2);
+            T           = R + obj.gamma .* sum(QT_next .* ind2vec(A_next,obj.dimA),2) .* ~Term;
             
             % Compute error, loss and gradient
             Q  = obj.nnQ.forwardfull(O);

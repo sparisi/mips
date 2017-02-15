@@ -106,21 +106,21 @@ classdef DDPG_Solver < handle
         function L = step(obj)
             mb = randperm(min(obj.t,obj.dsize),obj.bsize); % Random minibatches
             
-            O_next = obj.data.o_next(mb,:); % bsize x dimO
-            O      = obj.data.o(mb,:);      % bsize x dimO
-            A      = obj.data.a(mb,:);      % bsize x dimA
-            R      = obj.data.r(mb,:);      % bsize x 1
-            Term   = obj.data.term(mb,:);   % bsize x 1
+            O_next  = obj.data.o_next(mb,:); % bsize x dimO
+            O       = obj.data.o(mb,:);      % bsize x dimO
+            A       = obj.data.a(mb,:);      % bsize x dimA
+            R       = obj.data.r(mb,:);      % bsize x 1
+            Term    = obj.data.term(mb,:);   % bsize x 1
             
             % Compute targets via Bellman equation with target network
-            A_next = forward(obj.nnPt,O_next);
-            Q_next = forward(obj.nnQt,[A_next O_next]);
-            T = R + obj.gamma .* Q_next .* ~Term;
+            A_next  = forward(obj.nnPt,O_next);
+            QT_next = forward(obj.nnQt,[A_next O_next]);
+            T       = R + obj.gamma .* QT_next .* ~Term;
             
             % Compute error, loss and gradients
-            Q = forwardfull(obj.nnQ,[A O]);
-            E = Q - T;
-            L = mean(E.^2);
+            Q  = forwardfull(obj.nnQ,[A O]);
+            E  = Q - T;
+            L  = mean(E.^2);
             dL = 2 / obj.bsize * E;
 
             % Critic update (Q-networks)

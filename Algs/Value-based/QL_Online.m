@@ -1,13 +1,14 @@
 % Online Q-learning.
 % To update the table of Q-values, only the current single sample is used.
 % All previous data is used just to for the evaluation.
-% Data is always collected using a random policy.
 
 clear all
 close all
 
+rng(2)
+
 mdp = Gridworld;
-mdp = DeepSeaTreasure;
+% mdp = DeepSeaTreasure;
 % mdp = Resource;
 
 robj = 1;
@@ -34,11 +35,11 @@ policy.drawAction = @(s)myunidrnd(mdp.actionLB,mdp.actionUB,size(s,2));
 
 
 %% Collect data and learn
-episodes = 10000;
+maxepisodes = 10000;
 maxsteps = 100;
 iter = 1;
 
-for episode = 1 : episodes
+for episode = 1 : maxepisodes
     
     step = 0;
     state = mdp.initstate(1);
@@ -73,14 +74,18 @@ for episode = 1 : episodes
         
         % Evaluation and plotting
         E = data.r(robj,:) + gamma * max(Q(idx_sn,:),[],2)' .* ~data.endsim - Q(linidx);
-        updateplot('Error',iter,mean(E.^2),1)
-        [V, opt] = max(Q,[],2);
-        subimagesc('Q-function',X,Y,Q')
-        subimagesc('V-function',X,Y,V')
-        subimagesc('Action',X,Y,opt')
-        if iter == 1, autolayout, end
+        E_history(iter) = mean(E.^2);
+%         updateplot('Error',iter,mean(E.^2),1)
+%         [V, opt] = max(Q,[],2);
+%         subimagesc('Q-function',X,Y,Q')
+%         subimagesc('V-function',X,Y,V')
+%         subimagesc('Action',X,Y,opt')
+%         if iter == 1, autolayout, end
         
         iter = iter + 1;
+
+        % Update policy as well
+        policy.drawAction = @(s)egreedy( Q(ismember(allstates,s','rows'),:)', 0.1 );
         
     end
     
@@ -88,5 +93,5 @@ end
 
 
 %% Show
-policy_eval.drawAction = @(s)egreedy( Q(find(ismember(allstates,s','rows')),:)', 0 );
+policy_eval.drawAction = @(s)egreedy( Q(ismember(allstates,s','rows'),:)', 0 );
 show_simulation(mdp, policy_eval, 1000, 0.1)

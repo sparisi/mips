@@ -6,7 +6,7 @@ clear all
 close all
 
 mdp = Gridworld;
-mdp = DeepSeaTreasure;
+% mdp = DeepSeaTreasure;
 % mdp = Resource;
 
 robj = 1;
@@ -17,10 +17,10 @@ Y = unique(allstates(:,2));
 allactions = 1 : size(mdp.allactions,2);
 nactions = length(allactions);
 
-episodes = 10000;
+maxepisodes = 10000;
 maxsteps = 100;
 policy.drawAction = @(s)myunidrnd(mdp.actionLB,mdp.actionUB,size(s,2));
-data = collect_samples2(mdp, episodes, maxsteps, policy);
+data = collect_samples2(mdp, maxepisodes, maxsteps, policy);
 
 
 %% Learn
@@ -35,6 +35,7 @@ iter = 1;
 
 while iter < 10000
     E = data.r(robj,:) + gamma * max(Q(idx_sn,:),[],2)' .* ~data.endsim - Q(linidx)';
+    E_history(iter) = mean(E.^2);
     Q(linidx) = Q(linidx) + lrate * E';
     
     % Plot
@@ -50,5 +51,5 @@ end
 
 
 %% Show
-policy_eval.drawAction = @(s)egreedy( Q(find(ismember(allstates,s','rows')),:)', 0 );
+policy_eval.drawAction = @(s)egreedy( Q(ismember(allstates,s','rows'),:)', 0 );
 show_simulation(mdp, policy_eval, 1000, 0.1)
