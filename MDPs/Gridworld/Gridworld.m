@@ -22,6 +22,10 @@ classdef Gridworld < MDP
             1  1  1  1  1  1  1
             ];
         
+        probT = [0.8, 0.15, 0.05]; % 70% chance to do the correct action
+                                 % 20% to do a random action
+                                 % 10% to stay in the same state
+        
         % Finite states and actions
         allstates = allcomb([1 2 3 4 5 6 7], [1 2 3 4 5 6 7]);
         allactions = [0  0  -1  1
@@ -51,7 +55,13 @@ classdef Gridworld < MDP
         end
         
         function [nextstate, reward, absorb] = simulator(obj, state, action)
+            r = rand(1,size(state,2));
+            wrong = r >= obj.probT(1) & r < (obj.probT(1) + obj.probT(2));
+            stay = r >= (obj.probT(1) + obj.probT(2));
+            action(wrong) = randi(obj.actionUB,1,sum(wrong));
+            
             nextstate = state + obj.allactions(:,action);
+            nextstate(:,stay) = state(:,stay);
             
             % Bound the state
             nextstate = bsxfun(@max, bsxfun(@min,nextstate,obj.stateUB), obj.stateLB);
