@@ -70,6 +70,7 @@ classdef (Abstract) MDP < handle
             for i = 1 : size(episode.nexts,2)
                 pause(pausetime)
                 obj.updateplot(episode.nexts(:,i))
+                title(strrep(mat2str(episode.r(:,i)'), ' ', ', '))
             end
         end
     end

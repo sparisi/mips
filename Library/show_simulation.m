@@ -26,6 +26,8 @@ else
     fig = findobj('type','figure','name','Pixels Animation');
     if isempty(fig), fig = figure(); fig.Name = 'Pixels Animation'; end
     for i = 1 : size(pixels,3)
-        clf, image(pixels(:,:,i),'CDataMapping','scaled'), drawnow limitrate, pause(pausetime)
+        clf, image(pixels(:,:,i),'CDataMapping','scaled'), drawnow limitrate
+        title(strrep(mat2str(ds.r(:,i)'), ' ', ', '))
+        pause(pausetime)
     end
 end

@@ -19,7 +19,7 @@ function [data, J] = collect_samples(mdp, episodes, maxsteps, policy, contexts)
 %                   * r      : immediate reward
 %                   * gammar : discounted immediate reward, gamma^(t-1)*r
 %                   * Q      : approximation of the Q function, that is
-%                              Q(s_t,a_t) = sum_(h=t)^T gamma^(h-1)*r(s_t,a_t)
+%                              Q(s_t,a_t) = sum_(h=t)^T gamma^(h-1)*r(s_h,a_h)
 %                   * length : length of the episode
 %     - J        : returns averaged over all the episodes
 

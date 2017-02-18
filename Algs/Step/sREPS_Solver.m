@@ -25,15 +25,15 @@ classdef sREPS_Solver < handle
         end
         
         %% PERFORM AN OPTIMIZATION STEP
-        function [policy, divKL] = step(obj, J, Actions, Phi, PhiN, policy, W)
-            if nargin < 7, W = ones(1, size(J,2)); end % IS weights
-            [d, divKL] = obj.optimize(J, Phi, PhiN, W);
+        function [policy, divKL] = step(obj, Q, Actions, Phi, PhiN, policy, W)
+            if nargin < 7, W = ones(1, size(Q,2)); end % IS weights
+            [d, divKL] = obj.optimize(Q, Phi, PhiN, W);
             policy = policy.weightedMLUpdate(d, Actions, Phi);
         end
         
         %% CORE
-        function [d, divKL] = optimize(obj, J, Phi, PhiN, W)
-            if nargin < 5, W = ones(1, size(J,2)); end % IS weights
+        function [d, divKL] = optimize(obj, Q, Phi, PhiN, W)
+            if nargin < 5, W = ones(1, size(Q,2)); end % IS weights
             
             [dphi, N] = size(Phi);
             
@@ -66,11 +66,11 @@ classdef sREPS_Solver < handle
             % Iteratively solve fmincon for eta and theta separately
             for i = 1 : maxIter
                 if ~validKL || numStepsNoKL < 5
-                    eta = fmincon(@(eta)obj.dual_eta(eta,theta,J,Phi,PhiN,W), ...
+                    eta = fmincon(@(eta)obj.dual_eta(eta,theta,Q,Phi,PhiN,W), ...
                         eta, [], [], [], [], lowerBound_eta, upperBound_eta, [], options);
                     
                     % Numerical trick
-                    berror = J - theta' * Phi + theta' * mean(PhiN,2);
+                    berror = Q - theta' * Phi + theta' * mean(PhiN,2);
                     maxBerror = max(berror);
                     
                     % Compute the weights
@@ -89,11 +89,11 @@ classdef sREPS_Solver < handle
                 end
                 
                 if ~validSF
-                    theta = fmincon(@(theta)obj.dual_theta(theta,eta,J,Phi,PhiN,W), ...
+                    theta = fmincon(@(theta)obj.dual_theta(theta,eta,Q,Phi,PhiN,W), ...
                         theta, [], [], [], [], lowerBound_theta, upperBound_theta, [], options);
                     
                     % Numerical trick
-                    berror = J - theta' * Phi + theta' * mean(PhiN,2);
+                    berror = Q - theta' * Phi + theta' * mean(PhiN,2);
                     maxBerror = max(berror);
                     
                     % Compute the weights
@@ -117,13 +117,13 @@ classdef sREPS_Solver < handle
         end
         
         %% DUAL FUNCTIONS
-        function [g, gd, h] = dual_eta(obj, eta, theta, J, Phi, PhiN, W)
-            if nargin < 7, W = ones(1, size(J,2)); end % IS weights
+        function [g, gd, h] = dual_eta(obj, eta, theta, Q, Phi, PhiN, W)
+            if nargin < 7, W = ones(1, size(Q,2)); end % IS weights
 
             V = theta' * Phi;
             VNavg = theta' * mean(PhiN,2);
             n = sum(W);
-            berror = J - V + VNavg;
+            berror = Q - V + VNavg;
             maxBerror = max(berror);
             weights = W .* exp( ( berror - maxBerror ) / eta ); % numerical trick
             sumWeights = sum(weights);
@@ -138,13 +138,13 @@ classdef sREPS_Solver < handle
             h = ( sumWeightsVSquare * sumWeights - sumWeightsV^2 ) / ( eta^3 * sumWeights^2 );
         end
         
-        function [g, gd, h] = dual_theta(obj, theta, eta, J, Phi, PhiN, W)
-            if nargin < 7, W = ones(1, size(J,2)); end % IS weights
+        function [g, gd, h] = dual_theta(obj, theta, eta, Q, Phi, PhiN, W)
+            if nargin < 7, W = ones(1, size(Q,2)); end % IS weights
 
             V = theta' * Phi;
             VNavg = theta' * mean(PhiN,2);
             n = sum(W);
-            berror = J - V + VNavg;
+            berror = Q - V + VNavg;
             maxBerror = max(berror);
             weights = W .* exp( ( berror - maxBerror ) / eta ); % numerical trick
             sumWeights = sum(weights);
