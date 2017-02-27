@@ -21,8 +21,8 @@ XW = bsxfun(@times, X, W);
 if D > N
     A = X'*XW;
 %    if rank(A) == N, lambda = 0; end
-    THETA = XW / (A + lambda*eye(N)) * Y';
-%     THETA = XW * pinv(A) * Y';
+    THETA = XW * ( (A + lambda*eye(N)) \ Y' );
+%     THETA = XW * ( pinv(A) * Y' );
     
 else
     A = XW*X';
