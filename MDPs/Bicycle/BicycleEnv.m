@@ -37,7 +37,7 @@ classdef (Abstract) BicycleEnv < MDP
             d = action(2,:); % Displacement
             
             theta     = state(1,:);
-            theta_dot = state(1,:);
+            theta_dot = state(2,:);
             omega     = state(3,:);
             omega_dot = state(4,:);
             
