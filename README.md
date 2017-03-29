@@ -4,14 +4,13 @@ Some algorithms require the *Optimization Toolbox*.
 Some utility functions are imported from File Exchange (original authors are always acknowledged).
 
 
-<br>
 ## Summary
 
 Launch `INSTALL` to add the path of all folders.
 
 
 <details>
-<summary>**Algs**</summary>
+<summary><b>Algs</b></summary>
   <p>
 All the algorithms and solvers are located in this folder, as well as some script to run them. By using scripts, it is possible to interrupt and resume the learning process without losing any data.
 The only parameters that you might want to change are the learning rates and the number of rollouts per iteration.
@@ -21,15 +20,15 @@ Also, a history of the results is usually kept. For example, `J_history` stores 
 
 
 <details>
-<summary>**BenchmarkOpt**</summary>
+<summary><b>BenchmarkOpt</b></summary>
   <p>
-Here are some [test functions for optimization](https://en.wikipedia.org/wiki/Test_functions_for_optimization).
+  Here are some <a href="https://en.wikipedia.org/wiki/Test_functions_for_optimization">test functions for optimization</a>.
   </p>
 </details>
 
 
 <details>
-<summary>**Experiments**</summary>
+<summary><b>Experiments</b></summary>
   <p>
 This folder contains some scripts to set up experiments. Each script inizializes the MDP, the policies and the number of samples and episodes per learning iteration.
 After running a setup script, just run an algorithm script to start the learning.
@@ -48,7 +47,7 @@ In this setting, it is important to set the variable `makeDet`: if `true`, the l
 
 
 <details>
-  <summary>**Library**</summary>
+  <summary><b>Library</b></summary>
   <p>
 The folder contains some policies, generic basis functions, and functions for sampling and evaluation. The most important functions are
 
@@ -65,7 +64,7 @@ Policies are modeled as objects. Their most important method is `drawAction`, bu
 
 
 <details>
-<summary>**MDPs**</summary>
+<summary><b>MDPs</b></summary>
   <p>
 Each MDP is modeled as an object (`MDP.m`) and requires some properties (dimension of state and action spaces, bounds, etc...) and methods (for simulating and plotting).  
 There are also some extension, that are *Contextual MDPs* (`CMDP.m`) and *Multi-objective MDPs* (`MOMDP.m`).  
@@ -78,7 +77,7 @@ This classes define common variables and the transition function, while the subc
 
 
 <details>
-<summary>**MO_Library**</summary>
+<summary><b>MO_Library</b></summary>
   <p>
 This folder contains functions used in the multi-objective framework, e.g., hypervolume estimators and Pareto-optimality filters.
 
@@ -88,21 +87,20 @@ This folder contains functions used in the multi-objective framework, e.g., hype
 
 
 <details>
-<summary>**Utilities**</summary>
+<summary><b>Utilities</b></summary>
   <p>
 Utility functions used for matrix operations, plotting and sampling are stored in this folder.
   </p>
 </details>
 
 
-<br>
 ## How to make plots and show animations
 
 
 Here is a list with examples of all ways of visualizing a particular data / animation. Please note that not all MDPs support an animation.
 
 <details>
-<summary>**Real time data plotting**</summary>
+<summary><b>Real time data plotting</b></summary>
   <p>
 During the learning, it is possible to plot in real time a desired data (e.g., the return `J`) by using `updateplot`. 
 
@@ -114,7 +112,7 @@ updateplot('Return',iter,J,1)
 
 
 <details>
-<summary>**Mean and std of data from multiple trials**</summary>
+<summary><b>Mean and std of data from multiple trials</b></summary>
   <p>
 If you are interested on evaluating an algorithm on several trials you can use the function `shadedErrorBar`. For a complete example, please refer to `make_stdplot.m`.
   </p>
@@ -122,7 +120,7 @@ If you are interested on evaluating an algorithm on several trials you can use t
 
 
 <details>
-<summary>**Real time animation**</summary>
+<summary><b>Real time animation</b></summary>
   <p>
 Launch `mdp.showplot` to initialize the plotting and an animation of the agent-environment interaction will be shown during the learning. To stop plotting use `mdp.closeplot`.
 
@@ -132,8 +130,9 @@ Launch `mdp.showplot` to initialize the plotting and an animation of the agent-e
 
 
 <details>
-<summary>**Offline animation**</summary>
+<summary><b>Offline animation</b></summary>
   <p>
+
 - For step-based algorithms, you can directly use the built-in plotting function of the MDPs.
 As `collect_samples` returns a low-level dataset of the episodes, you just have to call `mdp.plotepisode`
 
@@ -159,7 +158,7 @@ show_simulation(mdp,policy,100,0.001,1)
 
 
 <details>
-<summary>**Plot discrete policies**</summary>
+<summary><b>Plot discrete policies</b></summary>
   <p>
 If the state space is 2-dimensional, you can plot the value functions learned by discrete policies and the action distribution over the states.
 
@@ -175,7 +174,7 @@ policy.plotGreedy(mdp.stateLB,mdp.stateUB) % plot the action taken by zeroing th
 
 
 <details>
-<summary>**MOMDPs Pareto frontier**</summary>
+<summary><b>MOMDPs Pareto frontier</b></summary>
   <p>
 To plot a set of points as a Pareto frontier of a MOMDP, use `MOMDP.plotfront`. You can use additional arguments like in the built-in `plot` to customize the plot. Please note that the points have to be passed as rows and that the function does not filter dominated points.
 
