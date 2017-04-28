@@ -1,4 +1,4 @@
-function W = standardIS(target, samplers, Actions)
+function W = standardIS(target, samplers, Actions, States)
 % STANDARDIS Computes importance sampling weights. Each sample ACTIONS(i) 
 % is drawn from the distribution SAMPLERS(i).
 %
@@ -7,6 +7,8 @@ function W = standardIS(target, samplers, Actions)
 %     - samplers : the distributions used for sampling
 %     - Actions  : [D x N] matrix of parameters (D is the size of the
 %                  parameters)
+%     - States   : (optional) [S x N] matrix of states (S is the size of 
+%                  the state)
 %
 %    OUTPUT
 %     - W        : [1 x N] importance sampling weights
@@ -18,9 +20,18 @@ function W = standardIS(target, samplers, Actions)
 
 N = size(Actions,2);
 q = zeros(N, 1);
-p = target.evaluate(Actions)';
-for i = 1 : N
-    q(i) = samplers(i).evaluate(Actions(:,i));
+
+if nargin == 4
+    p = target.evaluate(Actions,States)';
+    for i = 1 : N
+        q(i) = samplers(i).evaluate(Actions(:,i),States(:,i));
+    end
+else
+    p = target.evaluate(Actions)';
+    for i = 1 : N
+        q(i) = samplers(i).evaluate(Actions(:,i));
+    end
 end
+
 W = p ./ q;
 W = W';

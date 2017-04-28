@@ -29,7 +29,7 @@ while true
     Policies = [repmat(policy_high,1,N), Policies(:, 1:N_MAX-N)];
     
     % Compute IS weights
-%     W = mixtureIS(policy_high, Policies, Theta, N);
+%     W = mixtureIS(policy_high, Policies, N, Theta);
 
     % Eval current policy
 %     [data, avgRew] = collect_episodes(mdp, episodes_eval, steps_eval, policy_high.makeDeterministic, policy);

@@ -73,7 +73,7 @@ while iter <= MAXITER
     Policies = [repmat(policy_high,1,N), Policies(:, 1:N_MAX-N)];
     
     % Compute IS weights
-    W = mixtureIS(policy_high, Policies, Theta, N);
+    W = mixtureIS(policy_high, Policies, N, Theta);
 %     W = ones(1,N_MAX);
 
     % Scalarize samples
