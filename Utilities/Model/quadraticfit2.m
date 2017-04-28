@@ -149,8 +149,8 @@ model.eval = @(X1,X2) sum( (X1'*R1)' .* X1, 1 ) + ...
     r0';
 
 % Save also the equivalent formulation
-%                   [ R1      R2      0.5r1 ] [ X1 ]
-% Y = [ X1, X2, 1 ] [ R2'     Rc      0.5r2 ] [ X2 ]
+%                   [ R1      Rc      0.5r1 ] [ X1 ]
+% Y = [ X1, X2, 1 ] [ Rc'     R2      0.5r2 ] [ X2 ]
 %                   [ 0.5r1'  0.5r2'  r0    ] [ 1  ]
 model.H = [ [ [R1 Rc; Rc' R2] [0.5*r1; 0.5*r2] ] ; [ 0.5*r1' 0.5*r2' r0 ] ];
 

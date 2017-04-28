@@ -1,15 +1,15 @@
-function [model, nmse] = quadraticfit2_apg(X1, X2, Y, H, varargin)
+function [model, nmse] = quadraticfit2_prox(X1, X2, Y, H, varargin)
 % QUADRATICFIT2 Learns a quadratic model to fit input-output pairs 
 % (X1, X2, Y)
 % Y = X1'*R1*X1 + X2'*R2*X2 + 2*X1'*Rc*X2 + X1'*r1 + X2'*r2 + r0 
 % (R1 is symmetric and negative definite). 
-% The model is learned through accelerated proximal gradient (APG).
+% The model is learned through proximal gradient.
 %
 % Equivalent formulation:
 % Y = [ X1, X2, 1 ] H [ X1, X2, 1 ]'
 % where
-%     [ R1      R2      0.5r1 ]
-% H = [ R2'     Rc      0.5r2 ]
+%     [ R1      Rc      0.5r1 ]
+% H = [ Rc'     R2      0.5r2 ]
 %     [ 0.5r1'  0.5r2'  r0    ]
 %
 %    INPUT
@@ -22,8 +22,9 @@ function [model, nmse] = quadraticfit2_apg(X1, X2, Y, H, varargin)
 %     - lambda_l1   : (optional) L1-norm regularizer
 %     - lambda_l2   : (optional) L2-norm regularizer
 %     - lambda_nn   : (optional) Nuclear norm regularizer
-%     - lrate       : (optional) APG learning rate
-%     - maxiter     : (optional) APG maximum number of iterations
+%     - lrate       : (optional) Proximal gradient learning rate
+%     - maxiter     : (optional) Proximal gradient maximum number of 
+%                     iterations
 %
 %    OUTPUT
 %     - model       : struct with fields R1, R2, Rc, r1, r2, r0, dim 
@@ -36,12 +37,16 @@ function [model, nmse] = quadraticfit2_apg(X1, X2, Y, H, varargin)
 [d1, N] = size(X1);
 [d2, N] = size(X2);
 
-options = {'weights', 'standardize', ...
-    'lambda_l1', 'lambda_l2', 'lambda_nn', ...
-    'lrate', 'maxiter'};
-defaults = {ones(1,N), 0, 0, 0, 0, 0.001, 300};
-[W, standardize, lambda_l1, lambda_l2, lambda_nn, lrate, maxiter] = ...
-    internal.stats.parseArgs(options, defaults, varargin{:});
+p = inputParser;
+p.KeepUnmatched = true;
+addOptional(p, 'weights', ones(1,N));
+addOptional(p, 'standardize', 0);
+addOptional(p, 'lambda_l2', 0.001);
+parse(p,varargin{:});
+
+standardize = p.Results.standardize;
+W = p.Results.weights;
+lambda_l2 = p.Results.lambda_l2;
 
 D = d1*(d1+1)/2 + d2*(d2+1)/2 + d1*d2 + d1 + d2 + 1; % Number of parameters of the quadratic model
 
@@ -105,9 +110,7 @@ if isempty(H)
 end
 
 %% Perform APG
-H = apg(X1n, X2n, Yn, H, ...
-    'lrate', lrate, 'maxiter', maxiter, ...
-    'lambda_l1', lambda_l1, 'lambda_l2', lambda_l2, 'lambda_nn', lambda_nn);
+H = proxgrad(X1n, X2n, Yn, H, varargin{:});
 R1 = H(1:d1, 1:d1);
 R2 = H(d1+1:d1+d2, d1+1:d1+d2);
 Rc = H(1:d1, d1+1:d1+d2);
