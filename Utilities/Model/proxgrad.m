@@ -34,25 +34,25 @@ if nargout == 3, mse(1) = mean((sum((X'*H)'.*X)-Y).^2); end
 
 for i = 1 : maxiter
     
+    H_prev = H;
+    
     % Gradient step
     G_error = (bsxfun(@times, sum((X'*H)'.*X,1)-Y, X) * X') / N; % Error derivative
     G_fro = lambda_l2 * H; % Frobenius norm derivative
     G = G_error + G_fro;
     G = (G+G')/2; % Enforce symmetry
     fnorm = norm(G,'fro'); % Frobenius norm to normalize the gradient
+    
     H = H - lrate/fnorm*G;
     
     % Nuclear norm proximal operator on R2
     if lambda_nn > 0
-        R2 = H(d1+1:d1+d2, d1+1:d1+d2);
-        [U,S,V] = svd(R2);
-        H(d1+1:d1+d2, d1+1:d1+d2) = U * max(S - lambda_nn * eye(size(S)), 0) * V';
+        H(d1+1:d1+d2, d1+1:d1+d2) = proximal_nn(H(d1+1:d1+d2, d1+1:d1+d2), lambda_nn);
     end
     
     % L1-norm proximal operator on R2
     if lambda_nn > 0
-        R2 = H(d1+1:d1+d2, d1+1:d1+d2);
-        H(d1+1:d1+d2, d1+1:d1+d2) = max(abs(R2) - lambda_l1, 0) .* sign(R2);
+        H(d1+1:d1+d2, d1+1:d1+d2) = proximal_l1(H(d1+1:d1+d2, d1+1:d1+d2), lambda_l1);
     end
     
     % Enforce R1 to be negative definite
@@ -61,9 +61,8 @@ for i = 1 : maxiter
     V(V>0) = -1e-8;
     H(1:d1,1:d1) = U * V * U';
 
-    % Terminal conditions
-    if fnorm < 1e-8, break, end
-    if nnz(H(d1+1:d1+d2, d1+1:d1+d2)) == 0, break, end
+    % Terminal condition
+    if 1/(lrate/fnorm) * norm((H - H_prev)) < 0.001, break, end
     
 end
 

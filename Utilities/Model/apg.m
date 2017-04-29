@@ -1,12 +1,18 @@
 function [H, i, mse] = apg(X1, X2, Y, H, varargin)
-% APG Accelerated Proximal Gradient. Learns a model 
-% Y = [ X1, X2, 1 ] H [ X1, X2, 1 ]'
+% APG Accelerated Proximal Gradient Method with Non-Monotonic Backtracking. 
+% Learns a model Y = [ X1, X2, 1 ] H [ X1, X2, 1 ]'
 % where
 %     [ R1      Rc      0.5r1 ]
 % H = [ Rc'     R2      0.5r2 ]
 %     [ 0.5r1'  0.5r2'  r0    ]
 % It also performs regularization on R2. The regularization can be based on
 % l1-norm or nuclear norm.
+%
+% =========================================================================
+% REFERENCE
+% N Ito, A Takeda, K Toh
+% A Unified Formulation and Fast Accelerated Proximal Gradient Method for 
+% Classification (2017)
 
 [d1, N] = size(X1);
 [d2, N] = size(X2);
@@ -18,68 +24,96 @@ addOptional(p, 'lambda_nn', 0);
 addOptional(p, 'lambda_l1', 0);
 addOptional(p, 'lambda_l2', 0);
 addOptional(p, 'maxiter', 300);
-addOptional(p, 'lrate', 0.00001);
 parse(p,varargin{:});
 
 lambda_l2 = p.Results.lambda_l2;
 lambda_l1 = p.Results.lambda_l1;
 lambda_nn = p.Results.lambda_nn;
 maxiter = p.Results.maxiter;
-lrate = p.Results.lrate;
 
 assert(~(lambda_nn > 0 && lambda_l1 > 0), ...
     'Cannot perform both nuclear norm and l1-norm regularization.')
 
-t = 1; % Extrapolation parameters
-t_prev = t;
-H_prev = H;
-
 if nargout == 3, mse(1) = mean((sum((X'*H)'.*X)-Y).^2); end
+
+t = 1;
+t_prev = 0;
+alpha = H;
+alpha_prev = alpha;
+beta = H;
+eta_u = 10;
+eta_d = 10;
+L = 1;
+L_prev = L;
+epsilon = 0.001;
+
+F = @(H) func(X,Y,H,lambda_l2,lambda_l1,lambda_nn,d1,d2);
+Q = @(H,H_ex,L) approx(X,Y,H,H_ex,lambda_l2,lambda_l1,lambda_nn,L,d1,d2);
+T = @(H,L) prox(X,Y,H,lambda_l2,lambda_l1,lambda_nn,L,d1,d2);
 
 for i = 1 : maxiter
     
-    H_ex = H + (t_prev-1)/t * (H-H_prev); % Extrapolated solution
+    alpha_prev_prev = alpha_prev;
+    alpha_prev = alpha;
     
-    % Gradient update
-    G_error = (bsxfun(@times, sum((X'*H_ex)'.*X,1)-Y, X) * X') / N; % Error derivative
-    G_fro = lambda_l2 * H_ex; % Frobenius norm derivative
-    G = G_error + G_fro;
-    G = (G+G')/2; % Enforce symmetry
-    fnorm = norm(G,'fro'); % Frobenius norm to normalize the gradient
-    H_ex = H_ex - lrate/fnorm*G;
+    [alpha, fnorm] = T(beta,L);
     
-    % Nuclear norm proximal operator on R2
-    if lambda_nn > 0
-        R2 = H_ex(d1+1:d1+d2, d1+1:d1+d2);
-        [U,S,V] = svd(R2);
-        H_ex(d1+1:d1+d2, d1+1:d1+d2) = U * max(S - lambda_nn * eye(size(S)), 0) * V';
+    while true
+        if F(alpha) <= Q(alpha,beta,L), break, end
+        L = eta_u * L;
+        t = (1 + sqrt(1+4*(L/L_prev)*t_prev^2))/2;
+        beta = alpha_prev + (t_prev-1)/t * (alpha_prev - alpha_prev_prev);
+        [alpha, fnorm] = T(beta,L);
     end
     
-    % L1-norm proximal operator on R2
-    if lambda_l1 ~= 0
-        R2 = H_ex(d1+1:d1+d2, d1+1:d1+d2);
-        H_ex(d1+1:d1+d2, d1+1:d1+d2) = max(abs(R2) - lambda_l1, 0) .* sign(R2);
-    end
-
-    % Enforce R1 to be negative definite
-    R1 = H_ex(1:d1,1:d1);
-    [U,V] = eig(R1);
-    V(V>0) = -1e-8;
-    H_ex(1:d1,1:d1) = U * V * U';
-
-    % Terminal conditions
-    if fnorm < 1e-8, break, end
-    if norm(H_ex-H_prev,'fro') < 1e-8, break, end
-    if nnz(H_ex(d1+1:d1+d2, d1+1:d1+d2)) == 0, break, end
+    if L * fnorm * norm(T(alpha,L) - alpha) < epsilon, break, end
     
-    % Update
-    H_prev = H;
+    L_prev = L;
+    L = L / eta_d;
     t_prev = t;
-    H = H_ex;
-    t = (1 + sqrt(1+2*t^2))/2;
-    
+    t = (1 + sqrt(1+4*(L/L_prev)*t^2)) / 2;
+    beta = alpha + (t_prev-1)/t * (alpha - alpha_prev);
 end
 
-H = H_ex;
+H = alpha;
+
+% Enforce R1 to be negative definite
+R1 = H(1:d1,1:d1);
+[U,V] = eig(R1);
+V(V>0) = -1e-8;
+H(1:d1,1:d1) = U * V * U';
 
 if nargout == 3, mse(2) = mean((sum((X'*H)'.*X)-Y).^2); end
+
+
+%%
+function F = func(X,Y,H,lambda_l2,lambda_l1,lambda_nn,d1,d2)
+
+R2 = H(d1+1:d1+d2, d1+1:d1+d2);
+F = mean((sum((X'*H)'.*X)-Y).^2) + lambda_l2 * norm(H,'fro')^2 + ...
+        lambda_nn * trace(sqrt(R2'*R2)) + lambda_l1 * norm(R2,1);
+    
+%%
+function Q = approx(X,Y,H,H_ex,lambda_l2,lambda_l1,lambda_nn,L,d1,d2)
+
+R2 = H(d1+1:d1+d2, d1+1:d1+d2);
+dF_ex = (bsxfun(@times, sum((X'*H_ex)'.*X,1)-Y, X) * X') / length(Y) + lambda_l2 * H_ex;
+Q = mean((sum((X'*H_ex)'.*X)-Y).^2) + lambda_l2 * norm(H_ex,'fro')^2 + ...
+    dot(dF_ex(:), H(:) - H_ex(:)) + L/2 * norm(H(:)-H_ex(:))^2 + ...
+    lambda_nn * trace(sqrt(R2'*R2)) + lambda_l1 * norm(R2,1);
+
+%%
+function [H, fnorm] = prox(X,Y,H,lambda_l2,lambda_l1,lambda_nn,L,d1,d2)
+
+G = (bsxfun(@times, sum((X'*H)'.*X,1)-Y, X) * X') / length(Y) + lambda_l2 * H;
+G = (G+G')/2;
+fnorm = norm(G,'fro');
+H = H - 1/L/fnorm*G;
+
+if lambda_nn > 0
+    H(d1+1:d1+d2, d1+1:d1+d2) = proximal_nn(H(d1+1:d1+d2, d1+1:d1+d2), lambda_nn);
+end
+
+if lambda_l1 > 0
+    H(d1+1:d1+d2, d1+1:d1+d2) = proximal_l1(H(d1+1:d1+d2, d1+1:d1+d2), lambda_l1);
+end
