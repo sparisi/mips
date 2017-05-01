@@ -6,10 +6,13 @@ reset(symengine)
 
 dim = 2;
 
-mdp = Dam(dim); bfs = @dam_basis_rbf; mu0 = [50, -50, 0, 0, 50]; sigma0 = 150^2;
-% mdp = LQR(dim); bfs = @(varargin)basis_poly(1,dim,0,varargin{:}); mu0 = -0.5*eye(dim); sigma0 = eye(dim);
+% mdp = Dam(dim); bfs = @dam_basis_rbf; mu0 = [50, -50, 0, 0, 50]; sigma0 = 150^2;
+% [theta, rho, t, D_t_theta, D_rho_theta] = feval(['params_' lower(class(mdp))], [], mdp);
+% policy = GaussianLinearDiag(bfs, mdp.daction, mu0, sigma0);
 
-policy = GaussianLinearDiag(bfs, mdp.daction, mu0, sigma0);
+mdp = LQR(dim); bfs = @(varargin)basis_poly(1,dim,0,varargin{:}); mu0 = -0.5*eye(dim); sigma0 = eye(dim);
+[theta, rho, t, D_t_theta, D_rho_theta] = feval(['params_' lower(class(mdp))], 'P1', mdp);
+policy = GaussianLinearFixedvarDiagmean(bfs, mdp.daction, mu0, sigma0);
 
 utopia = mdp.utopia;
 antiutopia = mdp.antiutopia;
@@ -20,7 +23,6 @@ ind_type = {'mix2', [1,1]}; % MIX2: beta1 * I_AU / I_U - beta2
 % ind_type = {'mix3', 1}; % MIX3: I_AU * (1 - lambda * I_U)
 [ind_handle, ind_d_handle] = parse_indicator_handle(ind_type{1},ind_type{2},utopia,antiutopia);
 
-[theta, rho, t, D_t_theta, D_rho_theta] = feval(['params_' lower(class(mdp))], [], mdp);
 dim_rho = length(rho);
 dim_t = length(t);
 dim_theta = length(theta);
