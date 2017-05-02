@@ -73,5 +73,4 @@ for i = 1 : maxiter
     
 end
 
-i
 if nargout == 3, mse(2) = mean((sum((X'*H)'.*X)-Y).^2); end

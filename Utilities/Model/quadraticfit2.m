@@ -1,16 +1,32 @@
-function [model, nmse] = quadraticfit2(X1, X2, Y, varargin)
+function [model, nmse] = quadraticfit2(X1, X2, Y, H, varargin)
 % QUADRATICFIT2 Learns a quadratic model to fit input-output pairs 
-% (X1, X2, Y):
+% (X1, X2, Y)
 % Y = X1'*R1*X1 + X2'*R2*X2 + 2*X1'*Rc*X2 + X1'*r1 + X2'*r2 + r0 
 % (R1 is symmetric and negative definite). 
+% The model is learned through proximal gradient.
+%
+% Equivalent formulation:
+% Y = [ X1, X2, 1 ] H [ X1, X2, 1 ]'
+% where
+%     [ R1      Rc      0.5r1 ]
+% H = [ Rc'     R2      0.5r2 ]
+%     [ 0.5r1'  0.5r2'  r0    ]
 %
 %    INPUT
 %     - X1          : [d1 x N] matrix, where N is the number of samples
 %     - X2          : [d2 x N] matrix, where N is the number of samples
 %     - Y           : [1 x N] vector
+%     - H           : (optional) initial solution
 %     - weights     : (optional) [1 x N] vector of samples weights
 %     - standardize : (optional) flag to standardize X1, X2 and Y
-%     - lambda      : (optional) L2-norm regularizer
+%     - lambda_l1   : (optional) L1-norm regularizer
+%     - lambda_l2   : (optional) L2-norm regularizer
+%     - lambda_nn   : (optional) Nuclear norm regularizer
+%     - lrate       : (optional) Proximal gradient learning rate
+%     - maxiter     : (optional) Proximal gradient maximum number of 
+%                     iterations
+%     - alg         : (optional) Name of the proximal gradient algorithm.
+%                      Options are: proxgrad, fista, apg.
 %
 %    OUTPUT
 %     - model       : struct with fields R1, R2, Rc, r1, r2, r0, dim 
@@ -23,9 +39,18 @@ function [model, nmse] = quadraticfit2(X1, X2, Y, varargin)
 [d1, N] = size(X1);
 [d2, N] = size(X2);
 
-options = {'weights', 'standardize', 'lambda'};
-defaults = {ones(1,N), 0, 1e-5};
-[W, standardize, lambda] = internal.stats.parseArgs(options, defaults, varargin{:});
+p = inputParser;
+p.KeepUnmatched = true;
+addOptional(p, 'weights', ones(1,N));
+addOptional(p, 'standardize', 0);
+addOptional(p, 'lambda_l2', 0.001);
+addOptional(p, 'alg', 'proxgrad');
+parse(p,varargin{:});
+
+standardize = p.Results.standardize;
+W = p.Results.weights;
+lambda_l2 = p.Results.lambda_l2;
+alg_name = p.Results.alg;
 
 D = d1*(d1+1)/2 + d2*(d2+1)/2 + d1*d2 + d1 + d2 + 1; % Number of parameters of the quadratic model
 
@@ -39,78 +64,63 @@ else
     Yn = Y;
 end
 
-%% Generate features vector for linear regression
-Phi1 = basis_quadratic(d1,X1n); % Linear and quadratic features in X1
-Phi2 = basis_quadratic(d2,X2n); % Linear and quadratic features in X2
-Phi2(1,:) = []; % The bias is already in Phi1
-PhiC = bsxfun(@times, X1n, permute(X2n,[3 2 1])); % Cross features
-PhiC = permute(PhiC,[1 3 2]);
-PhiC = 2 * reshape(PhiC,[d1*d2,N]);
+%% Find initial solution by linear regression
+if isempty(H)
+    
+    % Generate features vector for linear regression
+    Phi1 = basis_quadratic(d1,X1n); % Linear and quadratic features in X1
+    Phi2 = basis_quadratic(d2,X2n); % Linear and quadratic features in X2
+    Phi2(1,:) = []; % The bias is already in Phi1
+    PhiC = bsxfun(@times, X1n, permute(X2n,[3 2 1])); % Cross features
+    PhiC = permute(PhiC,[1 3 2]);
+    PhiC = 2 * reshape(PhiC,[d1*d2,N]);
+    
+    Phi = [Phi1; Phi2; PhiC];
+    
+    % Get parameters by linear regression on pairs (Phi, Y) and extract model
+    params = linear_regression(Phi, Yn, 'weights', W, 'lambda', lambda_l2);
+    assert(~any(isnan(params)), 'Model fitting failed.')
+    
+    r0 = params(1,:);
+    idx = 2;
+    
+    r1 = params(idx:d1+idx-1);
+    idx = idx + d1;
+    
+    R1 = params(idx:idx+d1*(d1+1)/2-1);
+    idx = idx + d1*(d1+1)/2;
+    
+    AQuadratic = zeros(d1);
+    ind = logical(tril(ones(d1)));
+    AQuadratic(ind) = R1;
+    R1 = (AQuadratic + AQuadratic') / 2;
+    
+    r2 = params(idx:idx+d2-1);
+    idx = idx + d2;
+    
+    R2 = params(idx:idx+d2*(d2+1)/2-1);
+    idx = idx+d2*(d2+1)/2;
+    
+    AQuadratic = zeros(d2);
+    ind = logical(tril(ones(d2)));
+    AQuadratic(ind) = R2;
+    R2 = (AQuadratic + AQuadratic') / 2;
+    
+    Rc = params(idx:end);
+    Rc = reshape(Rc,d1,d2);
+    
+    H = [ [ [R1 Rc; Rc' R2] [0.5*r1; 0.5*r2] ] ; [ 0.5*r1' 0.5*r2' r0 ] ];
 
-Phi = [Phi1; Phi2; PhiC];
+end
 
-%% Get parameters by linear regression on pairs (Phi, Y) and extract model
-params = linear_regression(Phi, Yn, 'weights', W, 'lambda', lambda);
-assert(~any(isnan(params)), 'Model fitting failed.')
-
-r0 = params(1,:);
-idx = 2;
-
-r1 = params(idx:d1+idx-1);
-idx = idx + d1;
-
-R1 = params(idx:idx+d1*(d1+1)/2-1);
-idx = idx + d1*(d1+1)/2;
-
-AQuadratic = zeros(d1);
-ind = logical(tril(ones(d1)));
-AQuadratic(ind) = R1;
-R1 = (AQuadratic + AQuadratic') / 2;
-
-r2 = params(idx:idx+d2-1);
-idx = idx + d2;
-
-R2 = params(idx:idx+d2*(d2+1)/2-1);
-idx = idx+d2*(d2+1)/2;
-
-AQuadratic = zeros(d2);
-ind = logical(tril(ones(d2)));
-AQuadratic(ind) = R2;
-R2 = (AQuadratic + AQuadratic') / 2;
-
-Rc = params(idx:end);
-Rc = reshape(Rc,d1,d2);
-
-%% Enforce R1 to be negative definite
-% R1 = -nearestSPD(-R1);
-[U, V] = eig(R1);
-V(V > 0) = 0;
-R1 = U * V * U';
-
-% Re-learn the other components
-quadYn = sum( (X1n'*R1)' .* X1n, 1 );
-Phi1(2+d1:end,:) = []; % Remove quadratic features in X1
-Phi = [Phi1; Phi2; PhiC];
-params = linear_regression(Phi, Yn - quadYn, 'weights', W, 'lambda', lambda);
-
-r0 = params(1,:);
-idx = 2;
-
-r1 = params(idx:d1+idx-1);
-idx = idx + d1;
-
-r2 = params(idx:idx+d2-1);
-idx = idx + d2;
-
-R2 = params(idx:idx+d2*(d2+1)/2-1);
-idx = idx+d2*(d2+1)/2;
-AQuadratic = zeros(d2);
-ind = logical(tril(ones(d2)));
-AQuadratic(ind) = R2;
-R2 = (AQuadratic + AQuadratic') / 2;
-
-Rc = params(idx:end);
-Rc = reshape(Rc,d1,d2);
+%% Perform APG
+H = feval(alg_name, X1n, X2n, Yn, H, varargin{:});
+R1 = H(1:d1, 1:d1);
+R2 = H(d1+1:d1+d2, d1+1:d1+d2);
+Rc = H(1:d1, d1+1:d1+d2);
+r1 = 2 * H(1:d1, end);
+r2 = 2 * H(d1+1:end-1, end);
+r0 = H(end,end);
 
 %% De-standardize
 if standardize
@@ -131,6 +141,7 @@ if standardize
         r0) + Ymu;
     r1 = newr1;
     r2 = newr2;
+	H = [ [ [R1 Rc; Rc' R2] [0.5*r1; 0.5*r2] ] ; [ 0.5*r1' 0.5*r2' r0 ] ];
 end
 
 %% Save model
@@ -141,18 +152,13 @@ model.Rc = Rc;
 model.r1 = r1;
 model.r2 = r2;
 model.r0 = r0;
+model.H = H;
 model.eval = @(X1,X2) sum( (X1'*R1)' .* X1, 1 ) + ...
     2 * sum( (X1'*Rc)' .* X2, 1 ) + ...
     sum( (X2'*R2)' .* X2, 1 ) + ...
     (X1'*r1)' + ...
     (X2'*r2)' + ...
     r0';
-
-% Save also the equivalent formulation
-%                   [ R1      Rc      0.5r1 ] [ X1 ]
-% Y = [ X1, X2, 1 ] [ Rc'     R2      0.5r2 ] [ X2 ]
-%                   [ 0.5r1'  0.5r2'  r0    ] [ 1  ]
-model.H = [ [ [R1 Rc; Rc' R2] [0.5*r1; 0.5*r2] ] ; [ 0.5*r1' 0.5*r2' r0 ] ];
 
 if nargout > 1
     nmse = mean( ( Y - model.eval(X1,X2) ).^2 ) / mean( Y.^2 );
