@@ -2,8 +2,8 @@ clear
 
 rng(10)
 
-N = 15;
-N_MAX = N * 10;
+N = 1500;
+N_MAX = N * 1;
 N_eval = 1;
 robj = 1;
 
@@ -11,14 +11,15 @@ dim = 15;
 mu0 = zeros(dim,1);
 sigma0 = 100 * eye(dim);
 sampling = GaussianConstantChol(dim, mu0, sigma0);
+sampling = GmmConstant(mu0,sigma0,4);
 
-solver = MORE_Solver(0.9,0.99,-75,sampling); divStr = 'KL Div';
+% solver = MORE_Solver(0.9,0.99,-75,sampling); divStr = 'KL Div';
 % solver = NES_Solver(0.1); divStr = 'Norm';
-% solver = REPS_Solver(0.9); divStr = 'KL Div';
+solver = REPS_Solver(0.9); divStr = 'KL Div';
 
 f = @(x)rosenbrock(x);
 f = @(x)rastrigin(x);
-f = @(x)noisysphere(x); N_eval = 1000;
+% f = @(x)noisysphere(x); N_eval = 1000;
 
 iter = 1;
 
@@ -50,7 +51,7 @@ while iter < 150
     
     J_history(:,iter) = Y_eval;
     fprintf( ['Iter: %d, Avg Value: %.4f, ' divStr ': %.2f, Entropy: %.4f \n'], ...
-        iter, avgY, div, sampling.entropy );
+        iter, avgY, div, sampling.entropy(X) );
     
 %     if div < 0.1, break, end
     
