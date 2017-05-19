@@ -20,8 +20,12 @@ switch type
         K = K.^param;
         
     case 'gauss'
-        dist = L2_distance(X',Y');
-        K = exp(-dist.^2 ./ (2*param.^2));
+        dist_sq = L2_distance_sq(X',Y');
+        K = exp(-dist_sq ./ (2*param.^2));
+        
+    case 'epanechnikov'
+        dist_sq = L2_distance_sq(X',Y');
+        K = max(0, 1 - exp(-dist_sq ./ (2*param.^2)));
         
     otherwise
         error('Unknown kernel.')
