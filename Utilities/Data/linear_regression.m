@@ -13,20 +13,24 @@ function THETA = linear_regression(X, Y, varargin)
 [D, N] = size(X);
 
 options = {'weights', 'lambda'};
-defaults = {ones(1,N), 1e-3};
+defaults = {ones(1,N), NaN};
 [W, lambda] = internal.stats.parseArgs(options, defaults, varargin{:});
 
 XW = bsxfun(@times, X, W);
 
 if D > N
     A = X'*XW;
-%    if rank(A) == N, lambda = 0; end
-    THETA = XW * ( (A + lambda*eye(N)) \ Y' );
-%     THETA = XW * ( pinv(A) * Y' );
+    if isnan(lambda) % If lambda is not specified, use pinv
+        THETA = XW * ( pinv(A) * Y' );
+    else
+        THETA = XW * ( (A + lambda*eye(N)) \ Y' );
+    end
     
 else
     A = XW*X';
-%    if rank(A) == D, lambda = 0; end
-    THETA = (A + lambda*eye(D)) \ (XW * Y');
-%     THETA = pinv(A) * (XW * Y');
+    if isnan(lambda) % If lambda is not specified, use pinv
+        THETA = pinv(A) * (XW * Y');
+    else
+        THETA = (A + lambda*eye(D)) \ (XW * Y');
+    end
 end

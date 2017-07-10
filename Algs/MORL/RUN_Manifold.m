@@ -1,6 +1,6 @@
 % REFERENCE
 % S Parisi, M Pirotta, J Peters
-% Manifold-based Multi-objective Policy Search with Sample Reuse (2016)
+% Manifold-based Multi-objective Policy Search with Sample Reuse (2017)
 
 N = 10;
 N_MAX = N * 5;
