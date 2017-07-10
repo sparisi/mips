@@ -15,6 +15,8 @@ classdef Network < handle
        
        function update(obj, W)
            if ~isrow(W), W = W'; end
+           assert(isrow(W), 'W must be a vector, not a matrix.')
+           assert(length(W) == length(obj.W), 'Wrong length.')
            obj.W = W;
        end
        

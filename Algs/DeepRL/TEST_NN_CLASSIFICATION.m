@@ -33,22 +33,23 @@ nn = Network([ ...
 optim = RMSprop(length(nn.W));
 optim.alpha = 0.00025;
 
+loss = @(y,t) mse(y,t);
+loss = @(y,t) ce(y,t);
+
 batchsize = 512;
 
 t = 1;
 
 %% Learn
-while true
+while t < 1000
     
     mb = randperm(train_n,batchsize); 
     X = train_in(mb,:);
     T = train_out(mb,:);
     
     Y = nn.forwardfull(X);
-    E = T - Y;
-    L = mean(mean(E.^2));
-    dL = - E / batchsize;
-    dW = nn.backward(dL);
+    [L, dL] = loss(Y,T);
+    dW = nn.backward(dL / batchsize);
 %     nn.update(optim.step(nn.W, dW)); % Use a gradient optimizer
     nn.update(nn.W - 0.2*dW); % No gradient optimizer
     t = t + 1;
@@ -58,7 +59,7 @@ while true
     [~, Y_test_labels] = max(Y_test,[],2);
     misclass_test = sum(test_labels ~= Y_test_labels) / length(Y_test_labels) * 100;
     
-    updateplot('Loss', {t}, {L}, 1)
+    updateplot('Loss', {t}, {mean(L)}, 1)
     updateplot('Misclassification Error (Percentage)', {t}, {misclass_test}, 1)
 %     updateplot('Gradient Norm', {t}, {norm(dW)}, 1)
 %     updateplot('Network Parameters', {t}, nn.W)

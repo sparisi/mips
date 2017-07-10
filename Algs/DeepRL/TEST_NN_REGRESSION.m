@@ -19,34 +19,35 @@ optim = RMSprop(length(nn.W));
 optim = ADAM(length(nn.W));
 optim.alpha = 0.00025;
 
+loss = @(y,t) mse(y,t);
+
+batchsize = 32;
+
 t = 1;
 
 %% Prepare dataset
 rng(3)
 N = 100;
-batchsize = 32;
 X = myunifrnd(-100*ones(dimX,1), 100*ones(dimX,1), N);
-X = normalize_data(X);
+X = normalize_data(X')';
 % X = rand(dimX,N);
 T = f(X); % Target
 
 %% Learn
-while true
+while t < 1000
     
     mb = randperm(N,batchsize);
     
     Y = nn.forwardfull(X(:,mb)')';
-    E = T(:,mb) - Y;
-    dL = - E / batchsize;
-    dW = nn.backward(dL');
+    [~, dL] = loss(Y,T(:,mb));
+    dW = nn.backward(dL' / batchsize);
 %     nn.update(optim.step(nn.W, dW));
     nn.update(nn.W - 0.01*dW);
     t = t + 1;
     
     Y_eval = nn.forward(X')';
-    E_eval = mean((T - Y_eval).^2, 2); % ./ mean( Y.^2, 2 );
-    L_eval = mean(E_eval);
-    updateplot('Loss', t, L_eval, 1)
+    L_eval = loss(Y_eval,T);
+    updateplot('Loss', t, mean(L_eval), 1)
 %     updateplot('Network Parameters', t, nn.W)
 %     updateplot('Gradient Norm', t, norm(dW), 1)
     if t == 2, autolayout, end

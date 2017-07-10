@@ -20,7 +20,7 @@ optimQ.epsilon = 0.01;
 
 %% Learner
 learner = DQN_Solver(nnQ,optimQ,dimA,dimO); % Single DQN
-learner = DDQN_Solver(nnQ,optimQ,dimA,dimO); % Double DQN
+% learner = DDQN_Solver(nnQ,optimQ,dimA,dimO); % Double DQN
 learner.mdp = mdp;
 learner.gamma = mdp.gamma;
 learner.preprocessS = preprocessS;

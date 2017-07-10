@@ -14,8 +14,8 @@ function pn = normalize_data(p,minp,maxp)
 %     - pn   : [N x D] matrix of normalized points
 
 if nargin == 1
-    minp = min(p);
-    maxp = max(p);
+    minp = min(p,[],1);
+    maxp = max(p,[],1);
 end
 
 % checkmin = bsxfun(@ge,p,minp);
