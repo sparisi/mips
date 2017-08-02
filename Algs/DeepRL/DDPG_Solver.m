@@ -14,7 +14,7 @@ classdef DDPG_Solver < handle
         bsize = 32;         % Minibatch size
         dsize = 1e6;        % Database size
         gamma = 0.99;       % Discount factor
-        maxsteps = 1e3;     % Max steps per episodes
+        maxsteps = 1e3;     % Max steps per episode
         tau = 1e-2          % Update coefficient for the target networks
         sigma = 0.05        % Noise on the action (std)
         noise_decay = 0.99; % Decay of the exploration during an episode

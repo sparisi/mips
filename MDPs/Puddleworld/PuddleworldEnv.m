@@ -80,7 +80,7 @@ classdef PuddleworldEnv < MDP
             axis square
 
             % Agent
-            obj.handleAgent = plot(0.1,0.2,'ko','MarkerSize',12,'MarkerFaceColor','b');
+            obj.handleAgent = plot(-0.1,-0.2,'ko','MarkerSize',12,'MarkerFaceColor','b');
         end
         
         function updateplot(obj, state)

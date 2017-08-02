@@ -73,6 +73,31 @@ classdef (Abstract) MDP < handle
                 title(strrep(mat2str(episode.r(:,i)'), ' ', ', '))
             end
         end
+        
+        function plot_trajectories(obj, policy, episodes, steps)
+            if nargin < 4 || isempty(steps), steps = 50; end
+            if nargin < 3 || isempty(episodes), episodes = 10; end
+
+            obj.closeplot
+            ds = collect_samples(obj, episodes, steps, policy);
+            obj.showplot
+            hold all
+            
+            if length(obj.stateUB) == 2
+                for i = 1 : numel(ds)
+                    s = [ds(i).s, ds(i).nexts(:,end)]';
+                    plot(s(:,1),s(:,2),'o-')
+                end
+            elseif length(obj.stateUB) == 3
+                for i = 1 : numel(ds)
+                    s = [ds(i).s, ds(i).nexts(:,end)]';
+                    plot3(s(:,1),s(:,2),s(:,3),'o-')
+                end
+            else
+                error('Cannot plot trajectories for more than 3 dimensions.')
+            end
+        end        
+        
     end
     
 end

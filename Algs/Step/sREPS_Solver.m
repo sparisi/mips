@@ -14,6 +14,8 @@ classdef sREPS_Solver < handle
     properties
         epsilon % KL divergence bound
         basis   % Basis function to approximate the value function
+        eta     % Lagrangian
+        theta   % Lagrangian
     end
     
     methods
@@ -22,6 +24,8 @@ classdef sREPS_Solver < handle
         function obj = sREPS_Solver(epsilon, bfs)
             obj.epsilon = epsilon;
             obj.basis = bfs;
+            obj.eta = 1;
+            obj.theta = ones(bfs()+1,1);
         end
         
         %% PERFORM AN OPTIMIZATION STEP
@@ -34,8 +38,6 @@ classdef sREPS_Solver < handle
         %% CORE
         function [d, divKL] = optimize(obj, Q, Phi, PhiN, W)
             if nargin < 5, W = ones(1, size(Q,2)); end % IS weights
-            
-            [dphi, N] = size(Phi);
             
             % Optimization problem settings
             options = optimset('Algorithm', 'interior-point', ...
@@ -51,12 +53,10 @@ classdef sREPS_Solver < handle
 %                 'MaxFunEvals', 10 * 5, ...
 %                 'TolX', 10^-8, 'TolFun', 10^-12, 'MaxIter', 10);
 
-            lowerBound_theta = -ones(dphi, 1) * 1e8;
-            upperBound_theta = ones(dphi, 1) * 1e8;
+            lowerBound_theta = -ones(size(Phi,1), 1) * 1e8;
+            upperBound_theta = ones(size(Phi,1), 1) * 1e8;
             lowerBound_eta = 1e-8;
             upperBound_eta = 1e8;
-            theta = ones(dphi,1);
-            eta = 1;
             
             maxIter = 100;
             validKL = false;
@@ -66,15 +66,15 @@ classdef sREPS_Solver < handle
             % Iteratively solve fmincon for eta and theta separately
             for i = 1 : maxIter
                 if ~validKL || numStepsNoKL < 5
-                    eta = fmincon(@(eta)obj.dual_eta(eta,theta,Q,Phi,PhiN,W), ...
-                        eta, [], [], [], [], lowerBound_eta, upperBound_eta, [], options);
+                    obj.eta = fmincon(@(eta)obj.dual_eta(eta,obj.theta,Q,Phi,PhiN,W), ...
+                        obj.eta, [], [], [], [], lowerBound_eta, upperBound_eta, [], options);
                     
                     % Numerical trick
-                    berror = Q - theta' * Phi + theta' * mean(PhiN,2);
+                    berror = Q - obj.theta' * Phi + obj.theta' * mean(PhiN,2);
                     maxBerror = max(berror);
                     
                     % Compute the weights
-                    d = W .* exp( (berror - maxBerror) / eta );
+                    d = W .* exp( (berror - maxBerror) / obj.eta );
                     
                     % Check conditions
                     qWeighting = W;
@@ -89,15 +89,16 @@ classdef sREPS_Solver < handle
                 end
                 
                 if ~validSF
-                    theta = fmincon(@(theta)obj.dual_theta(theta,eta,Q,Phi,PhiN,W), ...
-                        theta, [], [], [], [], lowerBound_theta, upperBound_theta, [], options);
+                    obj.theta = fmincon(@(theta)obj.dual_theta(theta,obj.eta,Q,Phi,PhiN,W), ...
+                        obj.theta, [], [], [], [], lowerBound_theta, upperBound_theta, [], options);
                     
-                    % Numerical trick
-                    berror = Q - theta' * Phi + theta' * mean(PhiN,2);
+                    % Numerical trick% 
+                    berror = Q - obj.theta' * Phi + obj.theta' * mean(PhiN,2);
+
                     maxBerror = max(berror);
                     
                     % Compute the weights
-                    d = W .* exp( (berror - maxBerror) / eta );
+                    d = W .* exp( (berror - maxBerror) / obj.eta );
                     
                     % Check conditions
                     qWeighting = W;
@@ -121,7 +122,8 @@ classdef sREPS_Solver < handle
             if nargin < 7, W = ones(1, size(Q,2)); end % IS weights
 
             V = theta' * Phi;
-            VNavg = theta' * mean(PhiN,2);
+            VNavg = theta' * mean(PhiN,2);            
+
             n = sum(W);
             berror = Q - V + VNavg;
             maxBerror = max(berror);
@@ -148,9 +150,9 @@ classdef sREPS_Solver < handle
             maxBerror = max(berror);
             weights = W .* exp( ( berror - maxBerror ) / eta ); % numerical trick
             sumWeights = sum(weights);
-            PhiDiff = bsxfun(@plus, mean(PhiN,2), - Phi);
-            sumPhiWeights = (PhiDiff * weights');
-            sumPhiWeightsPhi = PhiDiff * bsxfun( @times, weights', PhiDiff' );
+            bErrDeriv = bsxfun(@plus, mean(PhiN,2), - Phi);
+            sumPhiWeights = (bErrDeriv * weights');
+            sumPhiWeightsPhi = bErrDeriv * bsxfun( @times, weights', bErrDeriv' );
             
             % dual function
             g = eta * obj.epsilon + eta * log(sumWeights/n) + maxBerror;

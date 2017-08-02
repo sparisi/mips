@@ -42,7 +42,10 @@ classdef ChainwalkContinuous < MDP
         end
         
         function reward = reward(obj, state, action, nextstate)
-            reward = -min(abs(bsxfun(@minus,nextstate,obj.reward_states'))).^2;
+            dist = abs(bsxfun(@minus,nextstate,obj.reward_states'));
+%             reward = zeros(1,size(state,2));
+%             reward(min(dist,[],1)<=1) = 1;
+            reward = -min(dist,[],1);
         end
         
         function absorb = isterminal(obj, nextstate)

@@ -24,9 +24,11 @@ classdef PuddleworldContinuous < PuddleworldEnv
         end
         
         function action = parse(obj, action)
-            idx = matrixnorms(action,2) == 0;
-            action = bsxfun(@times,action,1./matrixnorms(action,2)) * obj.step;
-            action(:,idx) = 0;
+%             idx = matrixnorms(action,2) == 0;
+%             action = bsxfun(@times,action,1./matrixnorms(action,2)) * obj.step;
+%             action(:,idx) = 0;
+            bounded_action = min(max(action,obj.actionLB),obj.actionUB);
+            action = bounded_action;
         end
             
         function reward = reward(obj, state, action, nextstate)

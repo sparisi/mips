@@ -15,7 +15,7 @@ classdef DQN_Solver < handle
         dsize    = 1e5;  % Database size
         minsize  = 1e4;  % Warm up time (number of random samples to collect before learning)
         gamma    = 0.99; % Discount factor
-        maxsteps = 1e3;  % Max steps per episodes
+        maxsteps = 1e3;  % Max steps per episode
         epsilon  = 1;    % Parameter of the e-greedy policy
         tau      = 0.1;  % Soft update of the target network
 
