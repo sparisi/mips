@@ -13,6 +13,7 @@ classdef REPS_Solver < handle
 
     properties
         epsilon % KL divergence bound
+        eta     % Lagrangian
     end
     
     methods
@@ -20,6 +21,7 @@ classdef REPS_Solver < handle
         %% CLASS CONSTRUCTOR
         function obj = REPS_Solver(epsilon)
             obj.epsilon = epsilon;
+            obj.eta = 1;
         end
         
         %% PERFORM AN OPTIMIZATION STEP
@@ -44,11 +46,11 @@ classdef REPS_Solver < handle
             lowerBound = 1e-8; % eta > 0
             upperBound = 1e8; % eta < inf
             eta0 = 1;
-            eta = fmincon(@(eta)obj.dual(eta,J,W), ...
+            obj.eta = fmincon(@(eta)obj.dual(eta,J,W), ...
                 eta0, [], [], [], [], lowerBound, upperBound, [], options);
             
             % Compute weights for weighted ML update
-            d = W .* exp( (J - max(J)) / eta );
+            d = W .* exp( (J - max(J)) / obj.eta );
 
             % Compute KL divergence
             qWeighting = W;

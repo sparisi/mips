@@ -44,14 +44,14 @@ classdef sREPS_Solver < handle
                 'GradObj', 'on', ...
                 'Display', 'off', ...
                 'MaxFunEvals', 10 * 5, ...
-                'TolX', 10^-8, 'TolFun', 10^-12, 'MaxIter', 10);
+                'TolX', 10^-8, 'TolFun', 10^-12, 'MaxIter', 50);
             
 %             options = optimset('Algorithm', 'trust-region-reflective', ...
 %                 'GradObj', 'on', ...
 %                 'Hessian', 'user-supplied', ...
 %                 'Display', 'off', ...
 %                 'MaxFunEvals', 10 * 5, ...
-%                 'TolX', 10^-8, 'TolFun', 10^-12, 'MaxIter', 10);
+%                 'TolX', 10^-8, 'TolFun', 10^-12, 'MaxIter', 50);
 
             lowerBound_theta = -ones(size(Phi,1), 1) * 1e8;
             upperBound_theta = ones(size(Phi,1), 1) * 1e8;
@@ -160,6 +160,17 @@ classdef sREPS_Solver < handle
             gd = sumPhiWeights / sumWeights;
             % hessian
             h = ( sumPhiWeightsPhi * sumWeights - sumPhiWeights * sumPhiWeights') / sumWeights^2 / eta;
+        end
+        
+        %% PLOTTING
+        function plotV(obj, stateLB, stateUB)
+            n = 30;
+            x = linspace(stateLB(1),stateUB(1),n);
+            y = linspace(stateLB(2),stateUB(2),n);
+            [X, Y] = meshgrid(x,y);
+            s = [X(:), Y(:)]';
+            V = obj.theta'*[ones(1,size(s,2)); obj.basis(s)];
+            subimagesc('V-function',x,y,V)
         end
 
     end
