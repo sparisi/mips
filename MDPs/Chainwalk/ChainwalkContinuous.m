@@ -33,7 +33,7 @@ classdef ChainwalkContinuous < MDP
         function action = parse(obj, action)
             action = min(max(action,obj.actionLB),obj.actionUB);
             noise = rand(size(action));
-%             action(noise < 0.1) = -action(noise < 0.1);
+            action(noise < 0.1) = -action(noise < 0.1);
         end
 
         function nextstate = transition(obj, state, action)
@@ -42,7 +42,7 @@ classdef ChainwalkContinuous < MDP
         end
         
         function reward = reward(obj, state, action, nextstate)
-            dist = abs(bsxfun(@minus,state,obj.reward_states'));
+            dist = abs(bsxfun(@minus,nextstate,obj.reward_states'));
 %             reward = zeros(1,size(state,2));
 %             reward(min(dist,[],1)<=1) = 1;
             reward = -min(dist,[],1);

@@ -43,7 +43,7 @@ classdef ChainwalkContinuousMulti < MDP
         function action = parse(obj, action)
             action = bsxfun(@min, bsxfun(@max, action, obj.actionLB), obj.actionUB);
             noise = rand(size(action));
-%             action(noise < 0.1) = -action(noise < 0.1);
+            action(noise < 0.1) = -action(noise < 0.1);
         end
 
         function nextstate = transition(obj, state, action)
@@ -52,7 +52,7 @@ classdef ChainwalkContinuousMulti < MDP
         end
         
         function reward = reward(obj, state, action, nextstate)
-            reward = -min(sqrt(sum(bsxfun(@minus,state',permute(obj.reward_states,[3 1 2])).^2,2)),[],3)';
+            reward = -min(sqrt(sum(bsxfun(@minus,nextstate',permute(obj.reward_states,[3 1 2])).^2,2)),[],3)';
         end
         
         function absorb = isterminal(obj, nextstate)
