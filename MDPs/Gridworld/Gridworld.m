@@ -22,9 +22,14 @@ classdef Gridworld < MDP
             1  1  1  1  1  1  1
             ];
         
-        probT = [0.8, 0.15, 0.05]; % 70% chance to do the correct action
-                                 % 20% to do a random action
-                                 % 10% to stay in the same state
+        probT = [1, 0, 0];
+%         probT = [0.8, 0.15, 0.05];
+
+        % probT = [a, b, c]
+        % a is the chance to do the correct action
+        % b is the chance to do a random action
+        % c is the chance to stay in the same state
+        % a+b+c = 1
         
         % Finite states and actions
         allstates = allcomb([1 2 3 4 5 6 7], [1 2 3 4 5 6 7]);

@@ -7,7 +7,7 @@ classdef Chainwalk < MDP
         daction = 1;
         dreward = 1;
         isAveraged = 0;
-        gamma = 0.8;
+        gamma = 1;
         
         % Bounds
         stateLB = 1;
@@ -21,7 +21,7 @@ classdef Chainwalk < MDP
         reward_states = [10 41];
 
         % Finite states and actions
-        allstates = 1:50;
+        allstates = (1:50)';
         allactions = [-1 1];
     end
     
@@ -35,7 +35,7 @@ classdef Chainwalk < MDP
         function action = parse(obj, action)
             action = obj.allactions(:,action);
             noise = rand(1,size(action,2));
-            action(noise < 0.1) = -action(noise < 0.1);
+%             action(noise < 0.1) = -action(noise < 0.1);
         end
 
         function nextstate = transition(obj, state, action)
@@ -45,7 +45,12 @@ classdef Chainwalk < MDP
         
         function reward = reward(obj, state, action, nextstate)
             reward = zeros(1,size(state,2));
-            reward(ismember(nextstate,obj.reward_states)) = 1;
+            reward(ismember(state,obj.reward_states)) = 1;
+
+            dist = abs(bsxfun(@minus,state,obj.reward_states'));
+%             reward = zeros(1,size(state,2));
+%             reward(min(dist,[],1)<=1) = 1;
+            reward = -min(dist,[],1);
         end
         
         function absorb = isterminal(obj, nextstate)

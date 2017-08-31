@@ -19,7 +19,9 @@ elseif size(p,2) ~= n
 end
 
 m = size(p,1);
-p = bsxfun(@times, p, 1 ./ sum(p,1)); % Ensure that p represents a distribution
+idx0 = sum(p,1) < 1e-20;
+p(:,~idx0) = bsxfun(@times, p(:,~idx0), 1 ./ sum(p(:,~idx0),1)); % Ensure that p represents a distribution
+p(:,idx0) = 1/m;
 F = cumsum(p,1);
 temp = bsxfun(@ge,F,rand(1,n));
 r = m - sum(temp,1) + 1;

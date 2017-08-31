@@ -7,7 +7,7 @@ classdef ChainwalkContinuous < MDP
         daction = 1;
         dreward = 1;
         isAveraged = 0;
-        gamma = 0.8;
+        gamma = 1;
         
         % Bounds
         stateLB = 1;
@@ -33,7 +33,7 @@ classdef ChainwalkContinuous < MDP
         function action = parse(obj, action)
             action = min(max(action,obj.actionLB),obj.actionUB);
             noise = rand(size(action));
-            action(noise < 0.1) = -action(noise < 0.1);
+%             action(noise < 0.1) = -action(noise < 0.1);
         end
 
         function nextstate = transition(obj, state, action)
@@ -42,7 +42,7 @@ classdef ChainwalkContinuous < MDP
         end
         
         function reward = reward(obj, state, action, nextstate)
-            dist = abs(bsxfun(@minus,nextstate,obj.reward_states'));
+            dist = abs(bsxfun(@minus,state,obj.reward_states'));
 %             reward = zeros(1,size(state,2));
 %             reward(min(dist,[],1)<=1) = 1;
             reward = -min(dist,[],1);
@@ -65,7 +65,7 @@ classdef ChainwalkContinuous < MDP
                 '-b','MarkerSize',10,'MarkerEdgeColor','b','LineWidth',2,'MarkerFaceColor','b')
             plot(obj.reward_states,ones(length(obj.reward_states)),...
                 'og','MarkerSize',10,'MarkerEdgeColor','g','LineWidth',2,'MarkerFaceColor','g')
-            obj.handleAgent = plot(-1,-1,...
+            obj.handleAgent = plot(-1,1,...
                 'ro','MarkerSize',8,'MarkerFaceColor','r');
         end
         
