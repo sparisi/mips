@@ -143,16 +143,19 @@ classdef CollectWall < MDP
             drawnow limitrate
         end
         
-        function pixels = render(obj, state)
+        function [pixels, clims, cmap] = render(obj, state)
             steps_pixels = obj.step;
             tot_size = ceil(1/steps_pixels)+1;
             
             if nargin == 1, pixels = tot_size^2; return, end
             
-            wall_value = -10;
+            wall_value = -20;
             agent_value = -5;
-            goal_value = 10;
+            goal_value = 5;
             coin_value = 20;
+            
+            clims = [-20, 20];
+            cmap = [0 0 0; 0 0 255; 0 180 180; 0 255 0; 255 255 0] / 255;
             
             agent = state(1:2,:);
             hole_center = state(3,:);

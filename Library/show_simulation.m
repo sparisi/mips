@@ -22,12 +22,15 @@ if nargin < 4 || isempty(pausetime), pausetime = 0.01; end
 if ~render
     mdp.plotepisode(ds, pausetime)
 else
-    pixels = mdp.render([ds.s(:,1), ds.nexts]);
+    [pixels, clims, cmap] = mdp.render([ds.s(:,1), ds.nexts]);
     fig = findobj('type','figure','name','Pixels Animation');
     if isempty(fig), fig = figure(); fig.Name = 'Pixels Animation'; end
     for i = 1 : size(pixels,3)
-        clf, image(pixels(:,:,i),'CDataMapping','scaled'), drawnow limitrate
-        title(strrep(mat2str(ds.r(:,i)'), ' ', ', '))
+        clf, imagesc(pixels(:,:,i));
+        fig.CurrentAxes.CLim = clims;
+        colormap(cmap);
+        drawnow limitrate
+        if i ~= size(pixels,3), title(strrep(mat2str(ds.r(:,i)'), ' ', ', ')), end
         pause(pausetime)
     end
 end

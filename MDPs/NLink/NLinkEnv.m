@@ -64,7 +64,7 @@ classdef NLinkEnv < MDP
             drawnow limitrate
         end
         
-        function pixels = render(obj, state)
+        function [pixels, clims, cmap] = render(obj, state)
             n_links = length(obj.lengths);
             meters_to_pixels = 5;
             tot_size = meters_to_pixels*n_links*2+2;
@@ -91,6 +91,9 @@ classdef NLinkEnv < MDP
             cols = -cols + tot_size;
             pages = repmat((1:n)',n_links,meters_to_pixels+1);
             pixels(sub2ind(size(pixels), cols, rows, pages)) = 1;
+            
+            clims = [min(min(min(pixels))), max(max(max(pixels)))];
+            cmap = parula;
         end
         
     end
