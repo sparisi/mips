@@ -5,6 +5,7 @@ close all
 %  ======================== LOW LEVEL SETTINGS =========================  %
 dim = 2;
 mdp = LQR(dim);
+mdp = LQR_v2(dim);
 robj = 1;
 dreward = mdp.dreward;
 gamma = mdp.gamma;
@@ -37,7 +38,7 @@ policy_high = GaussianConstantDiag(n_params, mu0, Sigma0high);
 
 %% ===================================================================== %%
 %  ======================== LEARNING SETTINGS ==========================  %
-episodes_eval = 150;
-steps_eval = 50;
-episodes_learn = 150;
-steps_learn = 50;
+episodes_eval = 1150;
+steps_eval = 150;
+episodes_learn = 350;
+steps_learn = 250;

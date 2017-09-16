@@ -45,7 +45,7 @@ classdef GaussianLinearFixedvarDiagmean < GaussianLinear
         
         %% WML
         function obj = weightedMLUpdate(obj, weights, Action, Phi)
-            assert(size(Phi,1) == obj.basis()+1)
+            assert(size(Phi,1) == obj.basis())
             assert(min(weights)>=0, 'Weights cannot be negative.')
             weights = weights / sum(weights);
             PhiW = bsxfun(@times,Phi,weights);
