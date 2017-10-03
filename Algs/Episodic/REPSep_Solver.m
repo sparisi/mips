@@ -1,5 +1,5 @@
-classdef REPS_Solver < handle
-% Relative Entropy Policy Search.
+classdef REPSep_Solver < handle
+% Relative Entropy Policy Search for bandits (episodic problems).
 % It supports Importance Sampling (IS).
 %
 % =========================================================================
@@ -19,7 +19,7 @@ classdef REPS_Solver < handle
     methods
         
         %% CLASS CONSTRUCTOR
-        function obj = REPS_Solver(epsilon)
+        function obj = REPSep_Solver(epsilon)
             obj.epsilon = epsilon;
             obj.eta = 1;
         end
