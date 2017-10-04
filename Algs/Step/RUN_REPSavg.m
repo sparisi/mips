@@ -7,7 +7,7 @@
 
 bfsV = @(varargin)basis_poly(2,mdp.dstate,1,varargin{:});
 % bfsV = @(varargin)basis_krbf(5, [mdp.stateLB, mdp.stateUB], 0, varargin{:});
-% bfsV = @(varargin)basis_krbf(5, -[20;20], [20;20], 0, varargin{:});
+% bfsV = @(varargin)basis_krbf(3, [-20 20; -20 20], 0, varargin{:});
 
 solver = REPSavg_Solver(0.5,bfsV);
 

@@ -17,10 +17,10 @@ showplots = 1;
 J_history = [];
 
 mdp = ChainwalkContinuous; sigma = 1; maxsteps = 20;
-% mdp = ChainwalkContinuousMulti(2); sigma = 2; maxsteps = 20;
+% mdp = ChainwalkContinuousMulti(2); sigma = 1; maxsteps = 40;
 % mdp = MCarContinuous; sigma = 4; maxsteps = 100;
 % mdp = CartPoleContinuous; sigma = 4; maxsteps = 1000;
-mdp = PuddleworldContinuous; sigma = 0.2; maxsteps = 100;
+% mdp = PuddleworldContinuous; sigma = 0.2; maxsteps = 100;
 
 robj = 1;
 gamma = mdp.gamma;
@@ -145,5 +145,5 @@ end
 
 %% Show
 policy_eval.drawAction = @(s) mu(s,theta);
-[J, ds] = show_simulation(mdp, policy_eval, 50, 0.01);
+[J, ds] = show_simulation(mdp, policy_eval, 100, 0.01);
 J

@@ -172,21 +172,20 @@ classdef REPSavg_Solver < handle
         function plotV(obj, stateLB, stateUB)
             if length(stateLB) > 2, return, end
 
-            fig = findobj('type','figure','name','V-function');
-            if isempty(fig)
-                figure('Name','V-function')
-                if length(stateLB) == 2
-                    axis([stateLB(1) stateUB(1) stateLB(2) stateUB(2)])
-                end
-            else
-                figure(fig)
-            end
-            
             if length(stateLB) == 1
                 n = 100;
                 s = linspace(stateLB(1),stateUB(1),n);
                 V = obj.getV(s);
-                plot(s,V)
+
+                fig = findobj('type','figure','name','V-function');
+                if isempty(fig)
+                    figure('Name','V-function')
+                    plot(s,V)
+                else
+                    fig.CurrentAxes.Children.YData = V;
+                    drawnow limitrate
+                end
+
             elseif length(stateLB) == 2
                 n = 30;
                 x = linspace(stateLB(1),stateUB(1),n);
@@ -194,15 +193,11 @@ classdef REPSavg_Solver < handle
                 [X, Y] = meshgrid(x,y);
                 s = [X(:), Y(:)]';
                 V = obj.getV(s);
-%                 imagesc('XData',x,'YData',y,'CData',reshape(V,n,n))
-                surf(X,Y,reshape(V,n,n))
+                updatesurf('V-function', X, Y, reshape(V,n,n))
                 colorbar
+                xlabel x
+                ylabel y
             end
-            
-            xlabel x
-            ylabel y
-            
-            drawnow limitrate
         end
 
     end

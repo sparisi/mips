@@ -17,9 +17,9 @@ nn = Network([ ...
 
 optim = RMSprop(length(nn.W));
 optim = ADAM(length(nn.W));
-optim.alpha = 0.00025;
+optim.alpha = 0.025;
 
-loss = @(y,t) mse(y,t);
+loss = @(y,t) meansquarederror(y,t);
 
 batchsize = 32;
 
@@ -42,7 +42,7 @@ while t < 1000
     [~, dL] = loss(Y,T(:,mb));
     dW = nn.backward(dL' / batchsize);
 %     nn.update(optim.step(nn.W, dW));
-    nn.update(nn.W - 0.01*dW);
+    nn.update(nn.W - 0.1*dW);
     t = t + 1;
     
     Y_eval = nn.forward(X')';

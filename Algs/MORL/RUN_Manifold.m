@@ -4,7 +4,7 @@
 
 N = 10;
 N_MAX = N * 5;
-% solver = REPS_Solver(1); distance = 'KL Div';
+% solver = REPSep_Solver(1); distance = 'KL Div';
 solver = NES_Solver(0.1); distance = 'Norm';
 % solver = MORE_Solver(0.9,0.99,-75,policy_high);
 

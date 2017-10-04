@@ -45,10 +45,12 @@ if nargin < 5
 else
     if isrow(widths), widths = widths'; end
     B = 1./widths.^2;
-    distance = bsxfun(@minus,state',reshape(centers,[1 size(centers)])).^2;
-    distance = permute(distance,[1 3 2]);
-    expterm = bsxfun(@times,distance,reshape(B',[1,size(B')]));
-    Phi = exp(-sqrt(sum(expterm,3)))';
+    stateB = bsxfun(@times, state, sqrt(B));
+    centersB = bsxfun(@times, centers, sqrt(B));
+    stateB = permute(stateB,[3,2,1]);
+    centersB = permute(centersB,[2,3,1]);
+    Phi = exp(-sqrt(sum((centersB-stateB).^2,3)));
+
 %     Phi = bsxfun(@times, Phi, 1 ./ sum(Phi,1));
     if offset == 1, Phi = [ones(1,size(state,2)); Phi]; end
 end

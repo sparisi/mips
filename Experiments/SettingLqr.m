@@ -6,6 +6,7 @@ close all
 dim = 2;
 mdp = LQR(dim);
 mdp = LQR_v2(dim);
+% mdp = LQR_v3(dim,[-5*ones(dim,1), 5*ones(dim,1)]);
 robj = 1;
 dreward = mdp.dreward;
 gamma = mdp.gamma;

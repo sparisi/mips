@@ -6,7 +6,7 @@ N = 25;
 N_MAX = N * 1;
 if makeDet, policy = policy.makeDeterministic; end
 
-% solver = REPS_Solver(0.9);
+% solver = REPSep_Solver(0.9);
 % solver = NES_Solver(0.1);
 solver = MORE_Solver(0.9,0.99,-75,policy_high);
 

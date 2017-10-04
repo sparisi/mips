@@ -33,8 +33,8 @@ nn = Network([ ...
 optim = RMSprop(length(nn.W));
 optim.alpha = 0.00025;
 
-loss = @(y,t) mse(y,t);
-loss = @(y,t) ce(y,t);
+loss = @(y,t) meansquarederror(y,t);
+loss = @(y,t) crossentropy(y,t);
 
 batchsize = 512;
 

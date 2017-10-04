@@ -7,7 +7,7 @@ if makeDet, policy = policy.makeDeterministic; end
 
 iter = 1;
 
-% solver = REPS_Solver(0.9);
+% solver = REPSep_Solver(0.9);
 % solver = NES_Solver(0.1);
 solver = MORE_Solver(0.9,0.99,-75,policy_high);
 
@@ -15,7 +15,7 @@ solver = MORE_Solver(0.9,0.99,-75,policy_high);
 while true
 
     [data, avgRew] = collect_episodes(mdp, N, steps_learn, policy_high, policy);
-
+return
     % First, fill the pool to maintain the samples distribution
     if iter == 1
         J = repmat(min(data.J(robj,:),[],2),1,N_MAX);

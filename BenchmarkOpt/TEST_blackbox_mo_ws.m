@@ -45,7 +45,7 @@ for i = 1 : size(W,1)
 
     solver = MORE_Solver(0.9,0.99,-75,sampling); divStr = 'KL Div';
 %     solver = NES_Solver(0.1); divStr = 'Norm';
-    solver = REPS_Solver(0.9); divStr = 'KL Div';
+    solver = REPSep_Solver(0.9); divStr = 'KL Div';
 
     iter = 1;
 
