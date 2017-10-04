@@ -14,7 +14,7 @@ Launch `INSTALL` to add the path of all folders.
   <p>
 All the algorithms and solvers are located in this folder, as well as some script to run them. By using scripts, it is possible to interrupt and resume the learning process without losing any data.
 The only parameters that you might want to change are the learning rates and the number of rollouts per iteration.
-Also, a history of the results is usually kept. For example, `J_history` stores the average return at each iteration.
+Also, a history of the results is usually kept. For example, <code>J_history</code> stores the average return at each iteration.
   </p>
 </details>
 
@@ -66,9 +66,9 @@ Policies are modeled as objects. Their most important method is `drawAction`, bu
 <details>
 <summary><b>MDPs</b></summary>
   <p>
-Each MDP is modeled as an object (`MDP.m`) and requires some properties (dimension of state and action spaces, bounds, etc...) and methods (for simulating and plotting).  
-There are also some extension, that are *Contextual MDPs* (`CMDP.m`) and *Multi-objective MDPs* (`MOMDP.m`).  
-For MDPs sharing the same environment (e.g., Mountain Car with continuous or discrete actions, Cart-pole with or without swing-up, ...), there are common *Environment* (`Env`) classes.
+Each MDP is modeled as an object (<code>MDP.m</code>) and requires some properties (dimension of state and action spaces, bounds, etc...) and methods (for simulating and plotting).  
+There are also some extension, that are <i>Contextual MDPs</i> (<code>CMDP.m</code>) and <i>Multi-objective MDPs</i> (<code>MOMDP.m</code>).  
+For MDPs sharing the same environment (e.g., Mountain Car with continuous or discrete actions, Cart-pole with or without swing-up, ...), there are common <i>Environment</i> (<code>Env</code>) classes.
 This classes define common variables and the transition function, while the subclasses define the remainder functions (reward, action parsing, terminal conditions, ...).
 
 > **IMPORTANT!** To allow parallel execution of multiple episodes, `simulator` functions need to support vectorized operations, i.e., they need to deal with states and actions represented as `S x N` and `A x N` matrices, respectively.
@@ -114,7 +114,7 @@ updateplot('Return',iter,J,1)
 <details>
 <summary><b>Mean and std of data from multiple trials</b></summary>
   <p>
-If you are interested on evaluating an algorithm on several trials you can use the function `shadedErrorBar`. For a complete example, please refer to `make_stdplot.m`.
+If you are interested on evaluating an algorithm on several trials you can use the function <code>shadedErrorBar</code>. For a complete example, please refer to <code>make_stdplot.m</code>.
   </p>
 </details>  
 
@@ -122,7 +122,7 @@ If you are interested on evaluating an algorithm on several trials you can use t
 <details>
 <summary><b>Real time animation</b></summary>
   <p>
-Launch `mdp.showplot` to initialize the plotting and an animation of the agent-environment interaction will be shown during the learning. To stop plotting use `mdp.closeplot`.
+Launch <code>mdp.showplot</code> to initialize the plotting and an animation of the agent-environment interaction will be shown during the learning. To stop plotting use <code>mdp.closeplot</code>.
 
 > **IMPORTANT!** This is possible only if you are learning using one episode per iteration.
   </p>
@@ -176,7 +176,7 @@ policy.plotGreedy(mdp.stateLB,mdp.stateUB) % plot the action taken by zeroing th
 <details>
 <summary><b>MOMDPs Pareto frontier</b></summary>
   <p>
-To plot a set of points as a Pareto frontier of a MOMDP, use `MOMDP.plotfront`. You can use additional arguments like in the built-in `plot` to customize the plot. Please note that the points have to be passed as rows and that the function does not filter dominated points.
+To plot a set of points as a Pareto frontier of a MOMDP, use <code>MOMDP.plotfront</code>. You can use additional arguments like in the built-in <code>plot</code> to customize the plot. Please note that the points have to be passed as rows and that the function does not filter dominated points.
 
 ```
 MOMDP.plotfront([0.5 0.5; 1 0; 0 1], '--or', 'LineWidth', 2)
