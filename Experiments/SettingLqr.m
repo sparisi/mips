@@ -3,16 +3,17 @@ close all
 
 %% ===================================================================== %%
 %  ======================== LOW LEVEL SETTINGS =========================  %
-dim = 2;
+dim = 1;
 mdp = LQR(dim);
 mdp = LQR_v2(dim);
-% mdp = LQR_v3(dim,[-5*ones(dim,1), 5*ones(dim,1)]);
+mdp = LQR_v3(dim,[-5*ones(dim,1), 5*ones(dim,1)]);
 robj = 1;
 dreward = mdp.dreward;
 gamma = mdp.gamma;
 daction = mdp.daction;
 
 bfs = @(varargin)basis_poly(1,dim,0,varargin{:});
+bfsV = @(varargin)basis_krbf(7, [-20 20; -20 20], 0, varargin{:});
 
 A0 = zeros(dim,bfs()+1);
 Sigma0 = eye(dim);

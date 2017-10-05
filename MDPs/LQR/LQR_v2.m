@@ -108,11 +108,33 @@ classdef LQR_v2 < MDP
     methods(Hidden = true)
 
         function initplot(obj)
-            warning('This MDP does not support plotting!')
+            if obj.dstate > 2, return, end
+            
+            obj.handleEnv = figure(); hold all
+
+            if obj.dstate == 2
+                plot(0, 0,...
+                    'og','MarkerSize',10,'MarkerEdgeColor','g','LineWidth',2,'MarkerFaceColor','g')
+                obj.handleAgent = plot(-1,-1,...
+                    'ro','MarkerSize',8,'MarkerFaceColor','r');
+                axis([-20 20 -20 20])
+            else
+                plot([-20 20],[0 0],...
+                    '-b','MarkerSize',10,'MarkerEdgeColor','b','LineWidth',2,'MarkerFaceColor','b')
+                plot(0,0,...
+                    'og','MarkerSize',10,'MarkerEdgeColor','g','LineWidth',2,'MarkerFaceColor','g')
+                obj.handleAgent = plot(-1,0,...
+                    'ro','MarkerSize',8,'MarkerFaceColor','r');
+                axis([-20 20 -2 2])
+            end
         end
         
         function updateplot(obj, state)
-            warning('This MDP does not support plotting!')
+            if obj.dstate > 2, return, end
+
+            obj.handleAgent.XData = state(1,1);
+            if obj.dstate == 2, obj.handleAgent.YData = state(2,1); end
+            drawnow limitrate
         end
 
     end

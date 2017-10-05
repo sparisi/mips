@@ -180,6 +180,7 @@ classdef REPSavg_Solver < handle
                 fig = findobj('type','figure','name','V-function');
                 if isempty(fig)
                     figure('Name','V-function')
+                    title('V-function')
                     plot(s,V)
                 else
                     fig.CurrentAxes.Children.YData = V;
