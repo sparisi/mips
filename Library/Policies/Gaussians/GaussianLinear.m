@@ -48,7 +48,7 @@ classdef (Abstract) GaussianLinear < Gaussian
         
         %% PLOT PDF
         function fig = plot(obj, state)
-        % Plot N(mu(i),Sigma(i,i)) for each dimension i (NORMPDF)
+        % Plot N(mu(i),Sigma(i,i)) for each dimension i (NORMPDF).
             ns = size(state,2);
             assert(ns == 1, 'PDF can be plotted only for one state.')
             fig = figure(); hold all
@@ -65,6 +65,44 @@ classdef (Abstract) GaussianLinear < Gaussian
             plot(range', norm')
             legend show
         end
+        
+        function plotmean(obj, stateLB, stateUB)
+        % Plot the mean action over the state space.
+            if length(stateLB) > 2, return, end
+
+            if length(stateLB) == 1
+                n = 100;
+                s = linspace(stateLB(1),stateUB(1),n);
+                mu = obj.A*obj.basis1(s);
+                
+                for i = 1 : size(mu,1)
+                    str = ['Mean action ' num2str(i)];
+                    fig = findobj('type','figure','name',str);
+                    if isempty(fig)
+                        figure('Name',str)
+                        title(str)
+                        plot(s,mu(i,:))
+                    else
+                        fig.CurrentAxes.Children.YData = mu(i,:);
+                    end
+                end
+                drawnow limitrate
+
+            elseif length(stateLB) == 2
+                n = 30;
+                x = linspace(stateLB(1),stateUB(1),n);
+                y = linspace(stateLB(2),stateUB(2),n);
+                [X, Y] = meshgrid(x,y);
+                s = [X(:), Y(:)]';
+                mu = obj.A*obj.basis1(s);
+                for i = 1 : size(mu,1)
+                    updatesurf(['Mean action ' num2str(i)], X, Y, reshape(mu(i,:),n,n))
+                    colorbar
+                    xlabel x
+                    ylabel y
+                end
+            end
+        end        
         
     end
 
