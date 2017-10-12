@@ -17,7 +17,7 @@ classdef LQR_v3 < MDP
         daction
         dreward
         isAveraged = 0;
-        gamma = 0.9;
+        gamma = 1;
         
         % Upper/Lower Bounds
         stateLB
@@ -46,6 +46,8 @@ classdef LQR_v3 < MDP
             % Bounds
             obj.stateLB = -inf(dim,1);
             obj.stateUB = inf(dim,1);
+%             obj.stateLB = -20*ones(dim,1);
+%             obj.stateUB = 20*ones(dim,1);
             obj.actionLB = -inf(dim,1);
             obj.actionUB = inf(dim,1);
             obj.rewardLB = -inf;
@@ -62,12 +64,14 @@ classdef LQR_v3 < MDP
             nstate = size(state,2);
             absorb = false(1,nstate);
             nextstate = obj.A*state + obj.B*action;
+            nextstate = min(max(nextstate,obj.stateLB),obj.stateUB);
+            
             for i = 1 : size(obj.goals,2)
                 dist = bsxfun(@minus,state,obj.goals(:,i));
                 rewardS(i,:) = -sum(bsxfun(@times, dist'*obj.Q, dist'), 2)';
             end
             
-            reward = min(rewardS,[],1) ...
+            reward = max(rewardS,[],1) ...
                 -sum(bsxfun(@times, action'*obj.R, action'), 2)';
         end
         
