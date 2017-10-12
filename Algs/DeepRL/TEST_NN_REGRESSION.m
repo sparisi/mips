@@ -1,19 +1,22 @@
-clear, clc, close all
+clear, close all
 
-dimX = 3; dimY = 2;
-f = @(x) [sin(0.5*x(1,:).^2 - 0.25*x(2,:).^2 + 3) .* cos(2*x(1,:)+1 - exp(x(2,:)));
-    (x(1,:) + 2*x(2,:) - 7).^2 + (2*x(1,:) + x(2,:) - 5).^2 + x(3,:)];
-
+% Prepare dataset
+rng(3)
 dimX = 2; dimY = 1;
-f = @(x) -0.1*(x(1,:)-x(2,:)).^2 - (x(1,:)+x(2,:))/sqrt(2) + 4;
+N = 1000;
+X = myunifrnd(-2*ones(dimX,1), 2*ones(dimX,1), N);
+% X = normalize_data(X')';
 
-nn = Network([ ...
-    Lin(dimX,15) ...
-    Bias(15) ...
-    Sig() ...
-    Lin(15,dimY) ...
-    Bias(dimY) ...
-    ]);
+% Choose objective function
+f = @(x) rosenbrock(x);
+f = @(x) rastrigin(x);
+f = @(x) quadcostmulti(x,0.5*minmax(X));
+T = f(X); % Target
+
+% Create network
+nn = Network( [dimX, 15, dimY], {'Tanh'} );
+% nn = Network( [dimX, 15, 50, 15, dimY], {'Tanh', 'Tanh', 'Tanh'} );
+% nn = Network( [dimX, 5, 25, 75, 15, dimY], {'Tanh', 'Tanh', 'Tanh', 'Tanh'} );
 
 optim = RMSprop(length(nn.W));
 optim = ADAM(length(nn.W));
@@ -25,24 +28,18 @@ batchsize = 32;
 
 t = 1;
 
-%% Prepare dataset
-rng(3)
-N = 100;
-X = myunifrnd(-100*ones(dimX,1), 100*ones(dimX,1), N);
-X = normalize_data(X')';
-% X = rand(dimX,N);
-T = f(X); % Target
 
 %% Learn
-while t < 1000
+tic
+while t < 10000
     
     mb = randperm(N,batchsize);
     
     Y = nn.forwardfull(X(:,mb)')';
     [~, dL] = loss(Y,T(:,mb));
     dW = nn.backward(dL' / batchsize);
-%     nn.update(optim.step(nn.W, dW));
-    nn.update(nn.W - 0.1*dW);
+    nn.update(optim.step(nn.W, dW));
+%     nn.update(nn.W - 0.01*dW);
     t = t + 1;
     
     Y_eval = nn.forward(X')';
@@ -53,3 +50,11 @@ while t < 1000
     if t == 2, autolayout, end
     
 end
+toc
+
+%% Plotting
+ft = @(x,y) f([x;y]);
+fn = @(x,y) nn.forward([x;y]');
+figure
+subplot(1,2,1), fsurf(ft,[minmax(X(1,:)) minmax(X(2,:))]), title('Target function');
+subplot(1,2,2), fsurf(fn,[minmax(X(1,:)) minmax(X(2,:))]), title('Neural network approx.');

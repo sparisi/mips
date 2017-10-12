@@ -8,9 +8,20 @@ classdef Network < handle
    
    methods
        
-       function obj = Network(L)
-           obj.L = L;
-           obj.W = cat(2,obj.L.W);
+       function obj = Network(varargin)
+           if nargin == 1
+               obj.L = varargin{1};
+               obj.W = cat(2,obj.L.W);
+           elseif nargin == 2
+               dims = varargin{1};
+               activs = varargin{2};
+               obj.L = [Lin(dims(1),dims(2)), Bias(dims(2))];
+               for i = 2 : numel(dims) - 1
+                   obj.L = [obj.L ...
+                       feval(activs{i-1}), Lin(dims(i),dims(i+1)), Bias(dims(i+1))];
+               end
+               obj.W = cat(2,obj.L.W);
+           end
        end
        
        function update(obj, W)

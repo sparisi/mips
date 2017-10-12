@@ -1,4 +1,4 @@
-clear, clc, close all
+clear, close all
 
 rng(3)
 
@@ -41,6 +41,7 @@ batchsize = 512;
 t = 1;
 
 %% Learn
+tic
 while t < 1000
     
     mb = randperm(train_n,batchsize); 
@@ -66,3 +67,4 @@ while t < 1000
     if t == 2, autolayout, end
     
 end
+toc
