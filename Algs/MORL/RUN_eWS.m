@@ -16,8 +16,8 @@ step = 16; % Density of the weights
 
 if normalized
     normalize = @(J)normalize_data(J',mdp.antiutopia,mdp.utopia);
-    utopia = ones(1,dreward);
-    antiutopia = zeros(1,dreward);
+    utopia = ones(1,mdp.dreward);
+    antiutopia = zeros(1,mdp.dreward);
 else
     normalize = @(J)J';
     utopia = mdp.utopia;
@@ -26,7 +26,7 @@ end
 
 metric = @(r,w)metric_ws(normalize(r),w); % Linear scalarization function
 metric = @(r,w)metric_cheby(normalize(r),w,utopia); % Chebychev scalarization
-W = convexcomb(dreward, step-1);
+W = convexcomb(mdp.dreward, step-1);
 
 iter = 1;
 maxIter = 120;
@@ -36,7 +36,7 @@ maxIter = 120;
 for i = 1 : size(W,1)
     
     current_pol = policy_high;
-    J = zeros(dreward,N_MAX);
+    J = zeros(mdp.dreward,N_MAX);
     Theta = zeros(current_pol.daction,N_MAX);
     
     current_iter = 1;

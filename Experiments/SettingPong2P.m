@@ -5,13 +5,10 @@ close all
 %  ======================== LOW LEVEL SETTINGS =========================  %
 mdp = Pong2P;
 robj = 1;
-dreward = mdp.dreward;
-gamma = mdp.gamma;
-nactions = mdp.actionUB;
 
 bfs = @(varargin)basis_poly(2,mdp.dstate,0,varargin{:});
 
-policy = Gibbs(bfs, zeros((bfs()+1)*(nactions-1),1), mdp.actionLB:mdp.actionUB);
+policy = Gibbs(bfs, zeros((bfs()+1)*(mdp.actionUB-1),1), mdp.actionLB:mdp.actionUB);
 
 
 %% ===================================================================== %%

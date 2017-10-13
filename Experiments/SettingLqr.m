@@ -4,16 +4,15 @@ close all
 %% ===================================================================== %%
 %  ======================== LOW LEVEL SETTINGS =========================  %
 dim = 1;
-mdp = LQR(dim);
+% mdp = LQR(dim);
 mdp = LQR_v2(dim);
-mdp = LQR_v3(dim,[-5*ones(dim,1), 5*ones(dim,1)]);
+% mdp = LQR_v3(dim,[-5*ones(dim,1), 5*ones(dim,1)]);
+
 robj = 1;
-dreward = mdp.dreward;
-gamma = mdp.gamma;
-daction = mdp.daction;
 
 bfs = @(varargin)basis_poly(1,dim,0,varargin{:});
-bfsV = @(varargin)basis_krbf(7, [-20 20; -20 20], 0, varargin{:});
+% bfs = @(varargin)basis_krbf(10, 20*[-ones(dim,1), ones(dim,1)], 0, varargin{:});
+% bfs = @(varargin)basis_rbf(5*[-ones(dim,1), ones(dim,1)], 0.5./[5; 5], 0, varargin{:});
 
 A0 = zeros(dim,bfs()+1);
 Sigma0 = eye(dim);
@@ -42,5 +41,5 @@ policy_high = GaussianConstantDiag(n_params, mu0, Sigma0high);
 %  ======================== LEARNING SETTINGS ==========================  %
 episodes_eval = 1150;
 steps_eval = 150;
-episodes_learn = 350;
-steps_learn = 250;
+episodes_learn = 50;
+steps_learn = 150;

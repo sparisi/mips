@@ -18,7 +18,7 @@ maxCorrection = 25; % Max iterations during the correction
 randfactor = 10; % Randomization after single-objective optimization
 
 target_policy = policy; % Learn the low-level policy
-alg = @(policy, data, lrate) eNACbase(policy, data, gamma, lrate);
+alg = @(policy, data, lrate) eNACbase(policy, data, mdp.gamma, lrate);
 collect = @(policy) collect_samples(mdp, episodes_learn, steps_learn, policy);
 calc_entropy = @(data, policy) policy.entropy(horzcat(data.s));
 eval = @(policies) evaluate_policies(mdp, episodes_eval, steps_eval, policies);
@@ -54,7 +54,7 @@ verboseOut = true;
 while true
     [ds, J] = collect(target_policy);
     S = calc_entropy(ds, target_policy);
-    [target_policy, gnorm] = solver.optimization_step(ds, target_policy, dreward);
+    [target_policy, gnorm] = solver.optimization_step(ds, target_policy, mdp.dreward);
     if verboseOut, fprintf('%d) Entropy: %.2f \tNorm: %.2e \tJ: %s\n', ...
             iter, S, gnorm, num2str(J','%.4f, ')); end
     if gnorm < tolerance_step || S < minS || iter > maxIter, break, end
@@ -68,7 +68,7 @@ inter_J = [];
 
 
 %% For all the remaining objectives
-for obj = linspace(dreward-1, 1, dreward-1)
+for obj = linspace(mdp.dreward-1, 1, dreward-1)
     % Filter suboptimal policies
     all_policies = [front_pol, inter_pol]; 
     all_J = [front_J, inter_J];

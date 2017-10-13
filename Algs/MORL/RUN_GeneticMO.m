@@ -8,7 +8,7 @@ mutation = 0.8;
 crossover = @Genetic_Solver.uniformCrossover;
 mutate = @(theta) Genetic_Solver.gaussianMutation(theta, policy_high.Sigma, 0.2);
 
-if dreward == 2
+if mdp.dreward == 2
     hvf = @(J) hypervolume2d(J, mdp.antiutopia, mdp.utopia); % Hypervolume function handle
 else
     hvf = @(J) hypervolume(J, mdp.antiutopia, mdp.utopia, 1e6);

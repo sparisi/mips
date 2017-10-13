@@ -7,9 +7,9 @@ while true
     [ds, J] = collect_samples(mdp, episodes_learn, steps_learn, policy);
     S = policy.entropy(horzcat(ds.s));
 
-%     [grad, stepsize] = GPOMDPbase(policy,ds,gamma,lrate);
-%     [grad, stepsize] = eREINFORCEbase(policy,ds,gamma,lrate);
-    [grad, stepsize] = eNACbase(policy,ds,gamma,lrate);
+%     [grad, stepsize] = GPOMDPbase(policy,ds,mdp.gamma,lrate);
+%     [grad, stepsize] = eREINFORCEbase(policy,ds,mdp.gamma,lrate);
+    [grad, stepsize] = eNACbase(policy,ds,mdp.gamma,lrate);
     
 %     J = evaluate_policies(mdp, episodes_eval, steps_eval, policy.makeDeterministic);
     J = evaluate_policies(mdp, episodes_eval, steps_eval, policy);
@@ -21,8 +21,8 @@ while true
     
 %     updateplot('Return',iter,J,1)
     
-%     policy = policy.update(policy.theta + grad(:,robj) * stepsize(robj));
-    policy = policy.update(policy.theta + grad(:,robj) / norm(grad(:,robj)));
+    policy = policy.update(policy.theta + grad(:,robj) * stepsize(robj));
+%     policy = policy.update(policy.theta + grad(:,robj) / norm(grad(:,robj)));
     
     iter = iter + 1;
 

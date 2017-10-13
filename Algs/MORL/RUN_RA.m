@@ -14,7 +14,7 @@ minS = 0.1; % Min entropy of the policy (stopping condition)
 lrate = 0.1;
 
 target_policy = policy; % Learn the low-level policy
-gradient = @(policy, data, lrate) eNACbase(policy, data, gamma, lrate);
+gradient = @(policy, data, lrate) eNACbase(policy, data, mdp.gamma, lrate);
 collect = @(policy) collect_samples(mdp, episodes_learn, steps_learn, policy);
 calc_entropy = @(data, policy) policy.entropy(horzcat(data.s));
 eval = @(policies) evaluate_policies(mdp, episodes_eval, steps_eval, policies);
@@ -46,7 +46,7 @@ grads = bsxfun(@times, grads, stepsize); % Apply stepsize
 iter = 1;
 
 % Generate all combinations of weights for the directions in the simplex
-W = convexcomb(dreward, simplexstep);
+W = convexcomb(mdp.dreward, simplexstep);
 ndir = size(W,1);
 
 

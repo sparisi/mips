@@ -5,16 +5,13 @@ close all
 %  ======================== LOW LEVEL SETTINGS =========================  %
 mdp = QuadLink;
 robj = 1;
-dreward = mdp.dreward;
-gamma = mdp.gamma;
-daction = mdp.daction;
 
 bfs = @(varargin)basis_poly(1, mdp.dstate, 0, varargin{:});
 
-A0 = zeros(daction,bfs()+1);
-Sigma0 = 25000*eye(daction);
-policy = GaussianLinearDiag(bfs, daction, A0, Sigma0);
-policy = GaussianLinearChol(bfs, daction, A0, Sigma0);
+A0 = zeros(mdp.daction,bfs()+1);
+Sigma0 = 25000*eye(mdp.daction);
+policy = GaussianLinearDiag(bfs, mdp.daction, A0, Sigma0);
+policy = GaussianLinearChol(bfs, mdp.daction, A0, Sigma0);
 
 
 %% ===================================================================== %%

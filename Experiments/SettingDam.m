@@ -5,18 +5,15 @@ close all
 %  ======================== LOW LEVEL SETTINGS =========================  %
 mdp = Dam(2);
 mdp.penalize = 0;
-robj = 2;
-dreward = mdp.dreward;
-gamma = mdp.gamma;
-daction = mdp.daction;
+robj = 1;
 
 bfs = @dam_basis_rbf;
 
 A0 = [50, -50, 0, 0, 50];
-% A0 = zeros(daction,bfs()+1);
+% A0 = zeros(mdp.daction,bfs()+1);
 Sigma0 = 50^2;
-% policy = GaussianLinearDiag(bfs, daction, A0, Sigma0);
-policy = GaussianLinearChol(bfs, daction, A0, Sigma0);
+% policy = GaussianLinearDiag(bfs, mdp.daction, A0, Sigma0);
+policy = GaussianLinearChol(bfs, mdp.daction, A0, Sigma0);
 
 
 %% ===================================================================== %%

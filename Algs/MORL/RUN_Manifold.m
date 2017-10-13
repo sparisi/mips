@@ -13,7 +13,7 @@ if makeDet, policy = policy.makeDeterministic; end
 utopia = mdp.utopia;
 antiutopia = mdp.antiutopia;
 
-if dreward == 2
+if mdp.dreward == 2
     hyperv = @(J,antiutopia) hypervolume2d(J, antiutopia, utopia);
 else
     hyperv = @(J,antiutopia) hypervolume(J, antiutopia, utopia, 1e6);

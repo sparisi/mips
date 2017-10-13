@@ -5,14 +5,11 @@ close all
 %  ======================== LOW LEVEL SETTINGS =========================  %
 mdp = DeepSeaTreasure;
 robj = 1;
-dreward = mdp.dreward;
-gamma = mdp.gamma;
-nactions = mdp.actionUB;
 
 bfs = @deep_basis_poly;
 % bfs = @(varargin)basis_krbf(11, [mdp.stateLB, mdp.stateUB], 0, varargin{:});
 
-policy = Gibbs(bfs, zeros((bfs()+1)*(nactions-1),1), mdp.actionLB:mdp.actionUB);
+policy = Gibbs(bfs, zeros((bfs()+1)*(mdp.actionUB-1),1), mdp.actionLB:mdp.actionUB);
 
 
 %% ===================================================================== %%
