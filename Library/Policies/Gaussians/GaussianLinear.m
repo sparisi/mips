@@ -16,7 +16,7 @@ classdef (Abstract) GaussianLinear < Gaussian
             phi1 = [ones(1,size(States,2)); obj.basis(States)];
         end
         
-        %% Derivative of the logarithm of the policy
+        %% LOG(PDF)
         function logprob = logpdf(obj, Actions, States)
             ns = size(States,2);
             [d,na] = size(Actions);
@@ -74,16 +74,18 @@ classdef (Abstract) GaussianLinear < Gaussian
                 n = 100;
                 s = linspace(stateLB(1),stateUB(1),n);
                 mu = obj.A*obj.basis1(s);
-                
-                for i = 1 : size(mu,1)
-                    str = ['Mean action ' num2str(i)];
-                    fig = findobj('type','figure','name',str);
-                    if isempty(fig)
-                        figure('Name',str)
-                        title(str)
+                ncols = min(5,size(mu,1));
+                nrows = ceil(size(mu,1)/ncols);
+                fig = findobj('type','figure','name','Mean action');
+                if isempty(fig)
+                    figure('Name','Mean action')
+                    for i = 1 : size(mu,1)
+                        subplot(nrows,ncols,i,'align')
                         plot(s,mu(i,:))
-                    else
-                        fig.CurrentAxes.Children.YData = mu(i,:);
+                    end
+                else
+                    for i = 1 : size(mu,1)
+                        fig.Children(i).Children.YData = mu(i,:);
                     end
                 end
                 drawnow limitrate
@@ -95,14 +97,9 @@ classdef (Abstract) GaussianLinear < Gaussian
                 [X, Y] = meshgrid(x,y);
                 s = [X(:), Y(:)]';
                 mu = obj.A*obj.basis1(s);
-                for i = 1 : size(mu,1)
-                    updatesurf(['Mean action ' num2str(i)], X, Y, reshape(mu(i,:),n,n))
-                    colorbar
-                    xlabel x
-                    ylabel y
-                end
+                subsurf('Mean action', X, Y, mu, 1)
             end
-        end        
+        end
         
     end
 
