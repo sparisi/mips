@@ -76,15 +76,15 @@ classdef REPSdisc_Solver < handle
             maxQ = max(Q);
             weights = W .* exp( ( Q - maxQ ) / eta ); % numerical trick
             sumWeights = sum(weights);
-            sumWeightsV = sum( weights .* (Q - maxQ) );
-            sumWeightsVSquare = sum( weights .* (Q - maxQ).^2 );
+            sumWeightsQ = sum( weights .* (Q - maxQ) );
+            sumWeightsQQ = sum( weights .* (Q - maxQ).^2 );
             
             % dual function
             g = eta * obj.epsilon + eta * log(sumWeights/n) + maxQ;
             % gradient wrt eta
-            gd = obj.epsilon + log(sumWeights/n) - sumWeightsV / (eta * sumWeights);
+            gd = obj.epsilon + log(sumWeights/n) - sumWeightsQ / (eta * sumWeights);
             % hessian
-            h = ( sumWeightsVSquare * sumWeights - sumWeightsV^2 ) / ( eta^3 * sumWeights^2 );
+            h = ( sumWeightsQQ * sumWeights - sumWeightsQ^2 ) / ( eta^3 * sumWeights^2 );
         end
 
     end

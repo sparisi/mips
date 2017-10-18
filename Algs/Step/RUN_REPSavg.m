@@ -5,9 +5,10 @@
 % J Peters, K Muelling, Y Altun
 % Relative Entropy Policy Search (2010)
 
-bfsV = @(varargin)basis_poly(2,mdp.dstate,1,varargin{:});
+bfsV = @(varargin)basis_poly(2,mdp.dstate,0,varargin{:});
 % bfsV = @(varargin)basis_krbf(5, [mdp.stateLB, mdp.stateUB], 0, varargin{:});
-% bfsV = @(varargin)basis_krbf(3, [-20 20; -20 20], 0, varargin{:});
+% bfsV = @(varargin)basis_krbf(10, 20*[-ones(dim,1), ones(dim,1)], 0, varargin{:});
+% bfsV = @(varargin)basis_rbf(5*[-ones(dim,1), ones(dim,1)], 0.5./[5; 5], 0, varargin{:});
 
 solver = REPSavg_Solver(0.5,bfsV);
 
@@ -32,6 +33,8 @@ while iter < 1500
     fprintf('%d ) Entropy: %.2f, KL: %.2f, J: %.4f\n', iter, entropy, divKL, J(robj))
     
     iter = iter + 1;
+    
+    solver.plotV(mdp.stateLB, mdp.stateUB)
     
 end
 

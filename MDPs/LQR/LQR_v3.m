@@ -44,10 +44,8 @@ classdef LQR_v3 < MDP
             obj.dreward = 1;
             
             % Bounds
-            obj.stateLB = -inf(dim,1);
-            obj.stateUB = inf(dim,1);
-%             obj.stateLB = -20*ones(dim,1);
-%             obj.stateUB = 20*ones(dim,1);
+            obj.stateLB = -20*ones(dim,1);
+            obj.stateUB = 20*ones(dim,1);
             obj.actionLB = -inf(dim,1);
             obj.actionUB = inf(dim,1);
             obj.rewardLB = -inf;

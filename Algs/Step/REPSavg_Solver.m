@@ -73,8 +73,8 @@ classdef REPSavg_Solver < handle
                         obj.eta, [], [], [], [], lowerBound_eta, upperBound_eta, [], options);
 
                     % Compute the weights
-                    bError = R + VN - V;
-                    d = W .* exp( (bError - max(bError)) / obj.eta );
+                    A = R + VN - V;
+                    d = W .* exp( (A - max(A)) / obj.eta );
 
                     % Check conditions
                     qWeighting = W;
@@ -97,8 +97,8 @@ classdef REPSavg_Solver < handle
                         obj.theta, [], [], [], [], lowerBound_theta, upperBound_theta, [], options);
 
                     % Compute the weights
-                    bError = R + obj.theta' * (PhiN - Phi);
-                    d = W .* exp( (bError - max(bError)) / obj.eta );
+                    A = R + obj.theta' * (PhiN - Phi);
+                    d = W .* exp( (A - max(A)) / obj.eta );
 
                     % Check conditions
                     qWeighting = W;
@@ -128,19 +128,19 @@ classdef REPSavg_Solver < handle
             if nargin < 6, W = ones(1, size(R,2)); end % IS weights
             
             n = sum(W);
-            bError = R + VN - V;
-            maxBError = max(bError);
-            weights = W .* exp( ( bError - maxBError ) / eta ); % Numerical trick
+            A = R + VN - V;
+            maxA = max(A);
+            weights = W .* exp( ( A - maxA ) / eta ); % Numerical trick
             sumWeights = sum(weights);
-            sumWeightsB = (bError - maxBError) * weights';
-            sumWeightsBB = (bError - maxBError).^2 * weights';
+            sumWeightsA = (A - maxA) * weights';
+            sumWeightsAA = (A - maxA).^2 * weights';
 
             % Dual function
-            g = eta * obj.epsilon + eta * log(sumWeights/n) + maxBError;
+            g = eta * obj.epsilon + eta * log(sumWeights/n) + maxA;
             % Gradient wrt eta
-            gd = obj.epsilon + log(sumWeights/n) - sumWeightsB / (eta * sumWeights);
+            gd = obj.epsilon + log(sumWeights/n) - sumWeightsA / (eta * sumWeights);
             % Hessian
-            h = (sumWeightsBB * sumWeights - sumWeightsB^2) / (eta^3 * sumWeights^2);
+            h = (sumWeightsAA * sumWeights - sumWeightsA^2) / (eta^3 * sumWeights^2);
         end
 
         function [g, gd, h] = dual_theta(obj, theta, eta, R, Phi, PhiN, W)
@@ -148,15 +148,15 @@ classdef REPSavg_Solver < handle
 
             n = sum(W);
             PhiDiff = PhiN - Phi;
-            bError = R + theta' * PhiDiff;
-            maxBError = max(bError);
-            weights = W .* exp( ( bError - maxBError ) / eta ); % Numerical trick
+            A = R + theta' * PhiDiff;
+            maxA = max(A);
+            weights = W .* exp( ( A - maxA ) / eta ); % Numerical trick
             sumWeights = sum(weights);
             sumPhiWeights = PhiDiff * weights';
             sumPhiWeightsPhi = PhiDiff * bsxfun( @times, weights', PhiDiff' );
 
             % Dual function
-            g = eta * obj.epsilon + eta * log(sumWeights/n) + maxBError;
+            g = eta * obj.epsilon + eta * log(sumWeights/n) + maxA;
             % Gradient wrt theta
             gd = sumPhiWeights / sumWeights;
             % Hessian
