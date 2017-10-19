@@ -105,13 +105,10 @@ classdef GaussianConstantDiag < GaussianConstant
                 obj.U = diag(std);
             elseif nargin == 3 % Update by mean and covariance
                 obj.mu = varargin{1};
-                obj.Sigma = varargin{2};
-                [U, p] = chol(varargin{2});
-                assert(p == 0, 'Covariance must be positive definite.')
-                obj.U = U;
-                U = U';
-                U = U(tril(true(obj.daction), 0)).';
-                obj.theta = [obj.mu; U'];
+                std = sqrt(diag(varargin{2}));
+                obj.Sigma = diag(std.^2);
+                obj.U = diag(std);
+                obj.theta = [obj.mu; std];
             else
                 error('Wrong number of input arguments.')
             end

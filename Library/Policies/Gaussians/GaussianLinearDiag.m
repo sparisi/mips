@@ -101,8 +101,8 @@ classdef GaussianLinearDiag < GaussianLinear
             elseif nargin == 3 % Update by mean and covariance
                 assert(isdiag(varargin{2}))
                 obj.A = varargin{1};
-                obj.Sigma = varargin{2};
                 std = sqrt(diag(varargin{2}));
+                obj.Sigma = diag(std.^2);
                 obj.U = diag(std);
                 obj.theta = [obj.A(:); std];
             else
