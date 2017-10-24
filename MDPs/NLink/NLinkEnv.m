@@ -9,22 +9,22 @@ classdef NLinkEnv < MDP
             original_action = action;
             action = bsxfun(@max, bsxfun(@min,action,obj.actionUB), obj.actionLB);
             nextstate = obj.dynamics(state,action);
-            reward = obj.reward_joint(original_action, nextstate);
+            reward = obj.reward_joint(state, original_action);
             absorb = false(1,size(state,2));
             if obj.realtimeplot, obj.updateplot(nextstate); end
         end
         
         %% Rewards
-        function reward = reward_task(obj, action, nextstate)
-            X = obj.getJointsInTaskSpace(nextstate);
+        function reward = reward_task(obj, state, action)
+            X = obj.getJointsInTaskSpace(state);
             endEffector = X(5:6,:);
             distance2 = sum(bsxfun(@minus,endEffector,obj.x).^2,1);
             reward = exp( -distance2 / (2*(1^2)) ) ... % The closer to the goal, the higher the reward
                 - 0.05 * sum(abs(action),1); % Penalty on the action
         end
             
-        function reward = reward_joint(obj, action, nextstate)
-            distance = abs(angdiff(nextstate(1:2:end,:),obj.q_des,'rad'));
+        function reward = reward_joint(obj, state, action)
+            distance = abs(angdiff(state(1:2:end,:),obj.q_des,'rad'));
             penalty_dist = -matrixnorms(distance,2).^2;
 %             penalty_dist = exp( -matrixnorms(distance,2).^2 );
             penalty_action = - 0.05 * sum(abs(action),1);

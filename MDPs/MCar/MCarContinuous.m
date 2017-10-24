@@ -20,6 +20,7 @@ classdef MCarContinuous < MCarEnv
     methods
         function state = init(obj, n)
             state = repmat([-0.5, 0]',1,n);
+            state = [myunifrnd(-0.6,-0.4,n); zeros(1,n)];
         end
         
         function action = parse(obj, action)
