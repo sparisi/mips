@@ -32,10 +32,6 @@ classdef MCar < MCarEnv
         function action = parse(obj, action)
             action = obj.allactions(action);
         end
-        
-        function absorb = isterminal(obj, state)
-            [~, absorb] = obj.reward([], [], state);
-        end
     end
     
 end

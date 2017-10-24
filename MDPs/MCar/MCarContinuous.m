@@ -25,10 +25,6 @@ classdef MCarContinuous < MCarEnv
         function action = parse(obj, action)
             action = bsxfun(@max, bsxfun(@min,action,obj.actionUB), obj.actionLB);
         end
-        
-        function absorb = isterminal(obj, state)
-            [~, absorb] = obj.reward([], [], state);
-        end
     end
     
 end

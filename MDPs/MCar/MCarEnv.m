@@ -20,6 +20,7 @@ classdef (Abstract) MCarEnv < MDP
             acceleration = obj.ddp(position, velocity, action);
             pNext = position + obj.dt * velocity + 0.5 * obj.dt^2 * acceleration;
             vNext = velocity + obj.dt * acceleration;
+            vNext = bsxfun(@max, bsxfun(@min,vNext,obj.stateUB(2)), obj.stateLB(2)); % Bound velocity
             nextstate = [pNext; vNext];
         end
         
@@ -47,23 +48,24 @@ classdef (Abstract) MCarEnv < MDP
         end
         
         %% Reward function
-        function [reward, absorb] = reward(obj, state, action, nextstate)
-            position = nextstate(1,:);
-            velocity = nextstate(2,:);
-            nstates = size(position,2);
-            reward = zeros(1,nstates);
-            absorb = false(1,nstates);
-            fail = (position < obj.stateLB(1)) | ...
-                    (velocity > obj.stateUB(2)) | ...
-                    (velocity < obj.stateLB(2));
-            success = (position > obj.stateUB(1)) & ...
-                    (velocity <= obj.stateUB(2)) & ...
-                    (velocity >= obj.stateLB(2));
+        function [success, fail] = status(obj, state)
+            position = state(1,:);
+            fail = position < obj.stateLB(1);
+            success = position > obj.stateUB(1);
+        end
+        
+        function reward = reward(obj, state, action, nextstate)
+            [success, fail] = obj.status(nextstate);
+            reward = zeros(size(success));
             reward(fail) = -1;
             reward(success) = 1;
-            absorb(fail | success) = 1;
         end
    
+        function absorb = isterminal(obj, state)
+            [success, fail] = obj.status(state);
+            absorb = fail | success;
+        end
+        
     end
     
     %% Plotting
