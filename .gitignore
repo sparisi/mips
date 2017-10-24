@@ -1,3 +1,4 @@
 *.mex*
 *~
+*.asv
 /mips_develop/*
