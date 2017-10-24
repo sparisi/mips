@@ -34,8 +34,6 @@ while iter < 1500
     
     iter = iter + 1;
     
-    solver.plotV(mdp.stateLB, mdp.stateUB)
-    
 end
 
 %%

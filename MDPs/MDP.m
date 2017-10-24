@@ -42,7 +42,7 @@ classdef (Abstract) MDP < handle
             action = obj.parse(action);
             nextstate = obj.transition(state,action);
             reward = obj.reward(state,action,nextstate);
-            absorb = obj.isterminal(state);
+            absorb = obj.isterminal(nextstate);
             if obj.realtimeplot, obj.updateplot(nextstate); end
         end
         
