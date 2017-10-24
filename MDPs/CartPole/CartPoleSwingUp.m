@@ -36,8 +36,8 @@ classdef CartPoleSwingUp < CartPoleEnv
             reward(obj.isterminal(nextstate)) = -100;
         end
         
-        function absorb = isterminal(obj, nextstate)
-            absorb = nextstate(1,:) < obj.stateLB(1) | nextstate(1,:) > obj.stateUB(1);
+        function absorb = isterminal(obj, state)
+            absorb = state(1,:) < obj.stateLB(1) | state(1,:) > obj.stateUB(1);
         end
     end
  

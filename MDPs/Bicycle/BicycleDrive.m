@@ -37,14 +37,14 @@ classdef BicycleDrive < BicycleEnv
             action(2,:) = action(2,:) + noise;
         end
         
-        function absorb = isterminal(obj, nextstate)
-            omega_next = nextstate(3,:);
-            xf = nextstate(6,:);
-            yf = nextstate(7,:);
-            isfallen = ( omega_next < obj.stateLB(3) ) | ( omega_next > obj.stateUB(3) );            
+        function absorb = isterminal(obj, state)
+            omega = state(3,:);
+            xf = state(6,:);
+            yf = state(7,:);
+            isfallen = ( omega < obj.stateLB(3) ) | ( omega > obj.stateUB(3) );            
             dist_goal = matrixnorms(bsxfun(@minus,[xf;yf],obj.goal),2);
             isgoal = dist_goal < obj.goalradius;
-            absorb = false(1,size(nextstate,2));
+            absorb = false(1,size(state,2));
             absorb(isfallen | isgoal) = true;
         end
         

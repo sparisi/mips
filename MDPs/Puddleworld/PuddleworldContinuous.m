@@ -35,8 +35,8 @@ classdef PuddleworldContinuous < PuddleworldEnv
             reward = obj.puddlepenalty(nextstate) - 1;
         end
         
-        function absorb = isterminal(obj, nextstate)
-            absorb = sum(nextstate,1) >= 1.9;
+        function absorb = isterminal(obj, state)
+            absorb = sum(state,1) >= 1.9;
         end
     end
     

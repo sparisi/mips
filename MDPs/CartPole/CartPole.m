@@ -37,9 +37,9 @@ classdef CartPole < CartPoleEnv
             reward(obj.isterminal(nextstate)) = -1;
         end
         
-        function absorb = isterminal(obj, nextstate)
-            absorb = sum(bsxfun(@lt, nextstate, obj.stateLB),1) | ...
-                sum(bsxfun(@gt, nextstate, obj.stateUB),1);
+        function absorb = isterminal(obj, state)
+            absorb = sum(bsxfun(@lt, state, obj.stateLB),1) | ...
+                sum(bsxfun(@gt, state, obj.stateUB),1);
         end
     end
  

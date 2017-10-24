@@ -53,8 +53,8 @@ classdef Chainwalk < MDP
             reward = -min(dist,[],1);
         end
         
-        function absorb = isterminal(obj, nextstate)
-            absorb = false(1,size(nextstate,2));
+        function absorb = isterminal(obj, state)
+            absorb = false(1,size(state,2));
         end
         
     end

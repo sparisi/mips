@@ -37,10 +37,10 @@ classdef BicycleBalance < BicycleEnv
             reward = (omega_s / obj.stateLB(3)).^2 - (omega_next / obj.stateLB(3)).^2;
         end
         
-        function absorb = isterminal(obj, nextstate)
-            omega_next = nextstate(3,:);
-            isfallen = ( omega_next < obj.stateLB(3) ) | ( omega_next > obj.stateUB(3) );            
-            absorb = false(1,size(nextstate,2));
+        function absorb = isterminal(obj, state)
+            omega = state(3,:);
+            isfallen = ( omega < obj.stateLB(3) ) | ( omega > obj.stateUB(3) );            
+            absorb = false(1,size(state,2));
             absorb(isfallen) = true;
         end
     end
