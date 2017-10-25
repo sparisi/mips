@@ -1,7 +1,10 @@
-function updatescatter(name, X, Y, Z, value)
+function updatescatter(name, X, Y, Z, value, size)
 % UPDATESCATTER Updates scatter plots without generating a new figure.
-% The call is scatter(X,Y,1,value) or scatter3(X,Y,Z,1,value) if Z is not
-% empty.
+% The call is scatter(X,Y,SIZE,VALUE) or scatter3(X,Y,Z,SIZE,VALUE) if Z is 
+% not empty.
+% By default, SIZE = 1.
+
+if nargin < 6, size = 1; end
 
 % Look for a figure with the specified name
 fig = findobj('type','figure','name',name);
@@ -10,7 +13,7 @@ fig = findobj('type','figure','name',name);
 if isempty(fig)
     fig = figure();
     fig.Name = name;
-    if isempty(Z), scatter(X,Y,1,value),
+    if isempty(Z), scatter(X,Y,size,value),
     else, scatter3(X,Y,Z,1,value), end
     title(name)
     return

@@ -42,7 +42,7 @@ classdef NLinkEnv < MDP
             axis(sum(obj.lengths)*[-1.1 1.1 -1.1 1.1]);
 
             % Agent handle
-            lw = 4.0;
+            lw = 20/length(obj.lengths);
             colors = {[0.1 0.1 0.4], [0.4 0.4 0.8]};
             for i = 1 : 2 : length(obj.lengths)*2
                 obj.handleAgent{i} = line([0 0], [0, 0], 'linewidth', lw, 'color', colors{mod((i+1)/2,2)+1});
@@ -59,7 +59,7 @@ classdef NLinkEnv < MDP
             for i = 1 : 2 : size(X,1) - 2
                 obj.handleAgent{i}.XData = [X(i,1) X(i+2,1)];
                 obj.handleAgent{i}.YData = [X(i+1,1), X(i+3,1)];
-                obj.handleAgent{i+1}.Position = [X(i+2,1)-r,X(i+3,1)-r,2*r,2*r];
+                obj.handleAgent{i+1}.Position = [X(i,1)-r,X(i+1,1)-r,2*r,2*r];
             end
             drawnow limitrate
         end
