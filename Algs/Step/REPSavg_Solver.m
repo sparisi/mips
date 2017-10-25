@@ -64,11 +64,10 @@ classdef REPSavg_Solver < handle
             % Iteratively solve fmincon for eta and theta separately
             for i = 1 : maxIter
 
-                V = obj.theta' * Phi; % V(s)
-                VN = obj.theta' * PhiN; % V(s')
-                
                 if ~validKL || numStepsNoKL > 5 % If we skipped the KL optimization more than 5 times, redo it
                     % Here theta is constant, so we can pass directly V and VN
+                    V = obj.theta' * Phi; % V(s)
+                    VN = obj.theta' * PhiN; % V(s')
                     obj.eta = fmincon(@(eta)obj.dual_eta(eta,R,V,VN,W), ...
                         obj.eta, [], [], [], [], lowerBound_eta, upperBound_eta, [], options);
 
