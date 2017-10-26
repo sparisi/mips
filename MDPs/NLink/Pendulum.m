@@ -59,7 +59,17 @@ classdef Pendulum < NLinkEnv
             xy1 = obj.lengths(1) .* [qd.*cos(q); -qd.*sin(q)];
             X = [xy; xy1];
         end
-        
+
+        %% Plotting
+        function initplot(obj)
+            initplot@NLinkEnv(obj)
+            text(1,0.15,'0 (2\pi)','HorizontalAlignment','center')
+            text(-1,0.15,'\pi (-\pi)','HorizontalAlignment','center')
+            text(0,1,'\pi/2','HorizontalAlignment','center')
+            text(0,-1,'-\pi/2','HorizontalAlignment','center')
+            pbaspect([1 1 1])
+%             rectangle('Position',[-1,-1,2,2],'Curvature',[1,1]);
+        end
     end
      
 end
