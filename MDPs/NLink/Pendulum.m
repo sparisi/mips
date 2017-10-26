@@ -31,6 +31,7 @@ classdef Pendulum < NLinkEnv
         %% Simulation
         function state = init(obj, n)
             state = repmat([-pi/2 0]',1,n);
+            state = myunifrnd([-pi, -1], [pi, 1], n);
         end
         
         function [nextstate, reward, absorb] = simulator(obj, state, action)
