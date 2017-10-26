@@ -7,7 +7,7 @@
 % H van Hasselt
 % Double Q-Learing (2010)
 
-clear all
+clear, clear global
 close all
 
 rng(2)

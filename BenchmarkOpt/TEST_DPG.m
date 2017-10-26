@@ -5,7 +5,7 @@
 % D Silver, G Lever, N Heess, T Degris, D Wierstra, M Riedmiller
 % Deterministic Policy Gradient Algorithms (2014)
 
-clear all
+clear, clear global
 close all
 
 dim = 10;

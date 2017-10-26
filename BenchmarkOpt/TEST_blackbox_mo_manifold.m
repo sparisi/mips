@@ -1,4 +1,4 @@
-clear
+clear, clear global
 close all
 
 N = 25;

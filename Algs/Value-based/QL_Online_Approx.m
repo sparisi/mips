@@ -1,6 +1,6 @@
 % The Q-function is linearly approximated.
 
-clear all
+clear, clear global
 close all
 
 mdp = MCar;

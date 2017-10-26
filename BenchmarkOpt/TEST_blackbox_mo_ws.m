@@ -1,5 +1,5 @@
 clear
-close all
+clear, clear global
 
 N = 100;
 N_MAX = N * 1;

@@ -2,7 +2,7 @@
 % First, data is collected with a random policy. 
 % Then, the table of Q-values is updated until convergence using all data.
 
-clear all
+clear, clear global
 close all
 
 mdp = Gridworld;

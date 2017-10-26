@@ -1,7 +1,7 @@
 % Multiple subplots
 
 close all
-clear all
+clear, clear global
 
 filename = 'animation2';
 dt = 1; % Pause between each frame

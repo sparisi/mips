@@ -5,7 +5,7 @@
 % M G Lagoudakis, R Parr, M L Littman
 % Least-Squares Methods in Reinforcement Learning for Control (2002)
 
-clear all
+clear, clear global
 close all
 
 mdp = MCar;

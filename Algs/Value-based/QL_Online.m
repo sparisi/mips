@@ -2,7 +2,7 @@
 % To update the table of Q-values, only the current single sample is used.
 % All previous data is used just to for the evaluation.
 
-clear all
+clear, clear global
 close all
 
 rng(2)

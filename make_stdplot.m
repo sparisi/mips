@@ -3,7 +3,7 @@
 % format (eg, alg1_1.mat, alg1_2.mat, ..., alg2_1.mat, ...)
 
 close all
-clear all
+clear, clear global
 
 %% Change entries according to your needs
 folder = 'results/';
