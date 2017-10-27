@@ -16,6 +16,8 @@ if isempty(fig)
     if isempty(Z), scatter(X,Y,size,value),
     else, scatter3(X,Y,Z,1,value), end
     title(name)
+    xlabel x
+    ylabel y
     return
 end
 

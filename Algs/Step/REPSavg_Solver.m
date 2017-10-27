@@ -194,9 +194,6 @@ classdef REPSavg_Solver < handle
                 s = [X(:), Y(:)]';
                 V = obj.getV(s);
                 updatesurf('V-function', X, Y, reshape(V,n,n))
-                colorbar
-                xlabel x
-                ylabel y
             end
         end
 
