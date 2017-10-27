@@ -1,6 +1,7 @@
-classdef Pendulum < NLinkEnv
+classdef Pendulum2 < NLinkEnv
 % REFERENCE
-% https://github.com/openai/gym/blob/master/gym/envs/classic_control/pendulum.py
+% M Deisenroth, C E Rasmussen, J Peters
+% Gaussian Process Dynamic Programming (2009)
 
     %% Properties
     properties
@@ -9,6 +10,7 @@ classdef Pendulum < NLinkEnv
         masses = 1;
         g = 9.81;
         dt = 0.05;
+        mu = 0.05; % Friction coeff
         
         q_des = 0; % Upright position
         
@@ -22,9 +24,9 @@ classdef Pendulum < NLinkEnv
         % Bounds : state = [q qd]
         stateLB = [-pi, -8]';
         stateUB = [pi, 8]';
-        actionLB = -2;
-        actionUB = 2;
-        rewardLB = - pi.^2 - 0.1*8.^2 - 0.001*2.^2;
+        actionLB = -5;
+        actionUB = 5;
+        rewardLB = -1;
         rewardUB = 0;
     end
     
@@ -32,7 +34,7 @@ classdef Pendulum < NLinkEnv
 
         %% Simulation
         function state = init(obj, n)
-            state = repmat([0 0]',1,n);
+            state = repmat([-pi 0]',1,n);
             state = myunifrnd([-pi, -1], [pi, 1], n);
         end
         
@@ -40,10 +42,10 @@ classdef Pendulum < NLinkEnv
             q = state(1,:);
             qd = state(2,:);
             action = bsxfun(@max, bsxfun(@min,action,obj.actionUB), obj.actionLB);
-            reward = - angdiff(state(1,:),obj.q_des,'rad').^2 - 0.1*qd.^2 - 0.001*action.^2;
-            qd = qd + ...
-                (-3*obj.g/(2*obj.lengths) .* sin(q + pi) + ...
-                3./(obj.masses*obj.lengths.^2).*action) * obj.dt;
+            reward = - 1 + exp(-angdiff(state(1,:),obj.q_des,'rad').^2 - 0.2*qd.^2);
+            qdd = (-obj.mu*qd + obj.masses*obj.g*obj.lengths*sin(q) + action) ...
+                / (obj.masses*obj.lengths^2);
+            qd = qd + qdd*obj.dt;
             q = q + qd*obj.dt;
             q = wrapinpi(q);
             qd = bsxfun(@max, bsxfun(@min,qd,obj.stateUB(2)), obj.stateLB(2));
