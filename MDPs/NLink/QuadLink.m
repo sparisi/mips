@@ -12,7 +12,7 @@ classdef QuadLink < NLinkEnv
         g = 0;
         dt = 0.02;
 
-        x_des = [0.5 -0.5]'; % Goal in task space
+        x_des = [0 4]'; % Goal in task space
         q_des = [pi/2 0 0 0]'; % Goal in joint space
         
         % MDP variables
@@ -32,11 +32,6 @@ classdef QuadLink < NLinkEnv
     end
     
     methods
-
-        %% Simulator
-        function state = init(obj, n)
-            state = repmat([3/2*pi 0 0 0 0 0 0 0]',1,n);
-        end
 
         %% Dynamics
         function nextstate = dynamics(obj, state, action)

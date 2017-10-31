@@ -5,11 +5,25 @@ classdef NLinkEnv < MDP
     
     methods
         %% Simulator
+        function state = init(obj, n)
+            state = repmat([-pi/2 zeros(1,obj.dstate-1)]',1,n); % "Down" pos
+
+            randpos = myunifrnd(obj.stateLB(1:2:end),obj.stateUB(1:2:end),n); % Rand pos
+            randvel = myunifrnd(-1*ones(1,obj.daction),1*ones(1,obj.daction),n);
+            state = zeros(obj.dstate,n);
+            state(1:2:end,:) = randpos;
+            state(2:2:end,:) = randvel;
+        end
+        
         function [nextstate, reward, absorb] = simulator(obj, state, action)
             original_action = action;
             action = bsxfun(@max, bsxfun(@min,action,obj.actionUB), obj.actionLB);
             nextstate = obj.dynamics(state,action);
-            reward = obj.reward_joint(state, original_action);
+            nextstate(1:2:end,:) = wrapinpi(nextstate(1:2:end,:)); % Wrap angles
+            nextstate(2:2:end,:) = bsxfun(@max, ... % Bound velocities
+                bsxfun(@min,nextstate(2:2:end,:),obj.stateUB(2:2:end)), obj.stateLB(2:2:end));
+%             reward = obj.reward_joint(state, action);
+            reward = obj.reward_task(state, action);
             absorb = false(1,size(state,2));
             if obj.realtimeplot, obj.updateplot(nextstate); end
         end
@@ -18,19 +32,18 @@ classdef NLinkEnv < MDP
         function reward = reward_task(obj, state, action)
             X = obj.getJointsInTaskSpace(state);
             endEffector = X(5:6,:);
-            distance2 = sum(bsxfun(@minus,endEffector,obj.x).^2,1);
-            reward = exp( -distance2 / (2*(1^2)) ) ... % The closer to the goal, the higher the reward
-                - 0.05 * sum(abs(action),1); % Penalty on the action
+            distance2 = sum(bsxfun(@minus,endEffector,obj.x_des).^2,1);
+            reward = - distance2 ...
+                - 0.001 * sum(action.^2,1);
         end
-            
+        
         function reward = reward_joint(obj, state, action)
-            distance = abs(angdiff(state(1:2:end,:),obj.q_des,'rad'));
-            penalty_dist = -matrixnorms(distance,2).^2;
-%             penalty_dist = exp( -matrixnorms(distance,2).^2 );
-            penalty_action = - 0.05 * sum(abs(action),1);
-            reward = penalty_dist + penalty_action;
+            distance = angdiff(state(1:2:end,:),obj.q_des,'rad');
+            penalty_dist = -sum(distance.^2,1);
+            penalty_action = -sum(action.^2,1);
+            reward = penalty_dist + 0.001*penalty_action;
         end
-    end        
+    end
 
     %% Plotting
     methods(Hidden = true)

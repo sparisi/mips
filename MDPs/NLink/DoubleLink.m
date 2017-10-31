@@ -11,7 +11,7 @@ classdef DoubleLink < NLinkEnv
         g = 0;
         dt = 0.02;
         
-        x = [0.5 -0.5]'; % Goal in task space
+        x_des = [0 2]'; % Goal in task space
         q_des = [pi/2 0]'; % Goal in joint space
         
         % MDP variables
@@ -32,10 +32,6 @@ classdef DoubleLink < NLinkEnv
     
     methods
 
-        function state = init(obj, n)
-            state = repmat([3/2*pi 0 0 0]',1,n);
-        end
-        
         %% Dynamics
         function nextstate = dynamics(obj, state, action)
             [gravity, coriolis, invM, friction] = obj.getDynamicsMatrices(state);

@@ -22,8 +22,8 @@ classdef Pendulum2 < NLinkEnv
         gamma = 1;
 
         % Bounds : state = [q qd]
-        stateLB = [-pi, -8]';
-        stateUB = [pi, 8]';
+        stateLB = [-pi, -7]';
+        stateUB = [pi, 7]';
         actionLB = -5;
         actionUB = 5;
         rewardLB = -1;
@@ -42,7 +42,7 @@ classdef Pendulum2 < NLinkEnv
             q = state(1,:);
             qd = state(2,:);
             action = bsxfun(@max, bsxfun(@min,action,obj.actionUB), obj.actionLB);
-            reward = - 1 + exp(-angdiff(state(1,:),obj.q_des,'rad').^2 - 0.2*qd.^2);
+            reward = - 1 + exp(-angdiff(q,obj.q_des,'rad').^2 - 0.2*qd.^2);
             qdd = (-obj.mu*qd + obj.masses*obj.g*obj.lengths*sin(q) + action) ...
                 / (obj.masses*obj.lengths^2);
             qd = qd + qdd*obj.dt;

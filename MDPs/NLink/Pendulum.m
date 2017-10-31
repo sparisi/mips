@@ -7,7 +7,7 @@ classdef Pendulum < NLinkEnv
         % Environment variables
         lengths = 1;
         masses = 1;
-        g = 9.81;
+        g = 10;
         dt = 0.05;
         
         q_des = 0; % Upright position
@@ -32,7 +32,7 @@ classdef Pendulum < NLinkEnv
 
         %% Simulation
         function state = init(obj, n)
-            state = repmat([0 0]',1,n);
+            state = repmat([-pi 0]',1,n);
             state = myunifrnd([-pi, -1], [pi, 1], n);
         end
         
@@ -40,9 +40,9 @@ classdef Pendulum < NLinkEnv
             q = state(1,:);
             qd = state(2,:);
             action = bsxfun(@max, bsxfun(@min,action,obj.actionUB), obj.actionLB);
-            reward = - angdiff(state(1,:),obj.q_des,'rad').^2 - 0.1*qd.^2 - 0.001*action.^2;
+            reward = - angdiff(q,obj.q_des,'rad').^2 - 0.1*qd.^2 - 0.001*action.^2;
             qd = qd + ...
-                (-3*obj.g/(2*obj.lengths) .* sin(q + pi) + ...
+                (-3*obj.g/(2*obj.lengths).*sin(q+pi) + ...
                 3./(obj.masses*obj.lengths.^2).*action) * obj.dt;
             q = q + qd*obj.dt;
             q = wrapinpi(q);
