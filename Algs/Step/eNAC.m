@@ -9,11 +9,13 @@ function [grad_nat, stepsize] = eNAC(policy, data, gamma, lrate)
 % Natural Actor-Critic (2008)
 
 dlogpi = policy.dlogPidtheta([data.s],[data.a]);
-episodeslength = [data.length];
-idx = cumsum(episodeslength);
 totepisodes = numel(data);
 
-timesteps = cell2mat(arrayfun(@(x)1:x,episodeslength,'uni',0));
+idx = cumsum([data.length]);
+ii = zeros(1,sum([data.length]));
+ii(idx(1:end-1)+1) = 1;
+timesteps = cumsummove(ones(1,sum([data.length])),ii);
+
 allgamma = gamma.^(timesteps-1);
 
 sumdlog = cumsumidx(bsxfun(@times,dlogpi,allgamma),idx);

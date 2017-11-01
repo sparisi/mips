@@ -8,17 +8,19 @@ function [grad_nat, stepsize] = eNACbase(policy, data, gamma, lrate)
 % J Peters, S Vijayakumar, S Schaal
 % Natural Actor-Critic (2008)
 
-episodeslength = [data.length];
-idx = cumsum(episodeslength);
 totepisodes = numel(data);
 
-timesteps = cell2mat(arrayfun(@(x)1:x,episodeslength,'uni',0));
+idx = cumsum([data.length]);
+ii = zeros(1,sum([data.length]));
+ii(idx(1:end-1)+1) = 1;
+timesteps = cumsummove(ones(1,sum([data.length])),ii);
+
 allgamma = gamma.^(timesteps-1);
 
-sumdlog = cumsumidx(bsxfun(@times,policy.dlogPidtheta(horzcat(data.s),horzcat(data.a)),allgamma),idx);
+sumdlog = cumsumidx(bsxfun(@times,policy.dlogPidtheta([data.s],[data.a]),allgamma),idx);
 sumdlog = [sumdlog; ones(1,totepisodes)];
 F = sumdlog * sumdlog';
-sumrew = cumsumidx(bsxfun(@times,horzcat(data.r),allgamma),idx);
+sumrew = cumsumidx(bsxfun(@times,[data.r],allgamma),idx);
 g = sumdlog * sumrew';
 aR = sum(sumrew,2);
 el = sum(sumdlog,2);

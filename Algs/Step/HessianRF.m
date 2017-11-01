@@ -10,18 +10,18 @@ function h = HessianRF(policy, data, gamma)
 % Multi-objective Reinforcement Learning through Continuous Pareto Manifold 
 % Approximation (2016)
 
-actions = horzcat(data.a);
-states = horzcat(data.s);
+actions = [data.a];
+states = [data.s];
 dlogpi = policy.dlogPidtheta(states,actions);
 hlogpi = policy.hlogPidtheta(states,actions);
-episodeslength = horzcat(data.length);
+episodeslength = [data.length];
 totstep = sum(episodeslength);
 totepisodes = numel(data);
 
 sumdlog = cumsumidx(dlogpi,cumsum(episodeslength));
 sumdlog2 = bsxfun(@times,permute(sumdlog,[1 3 2]),permute(sumdlog,[3 1 2]));
 sumhlog = cumsumidx3(hlogpi,cumsum(episodeslength));
-sumrew = cumsumidx(horzcat(data.gammar),cumsum(episodeslength));
+sumrew = cumsumidx([data.gammar],cumsum(episodeslength));
 
 h = squeeze( sum( bsxfun(@times, sumdlog2 + sumhlog, reshape(sumrew',[1 1 size(sumrew')])), 3) );
 
