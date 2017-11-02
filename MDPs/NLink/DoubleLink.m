@@ -7,8 +7,7 @@ classdef DoubleLink < NLinkEnv
         masses = [1 1];
         inertias = [1 1] .* ([1 1].^2 + 0.0001) ./ 3.0;
         friction_coeff = [2.5 2.5]'; % Viscous friction coefficients
-%         g = 9.81; % If 0, the problem becames a simpler planar reaching task
-        g = 0;
+        g = 9.81; % If 0, the problem becames a simpler planar reaching task
         dt = 0.02;
         
         x_des = [0 2]'; % Goal in task space

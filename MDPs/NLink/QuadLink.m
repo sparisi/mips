@@ -8,12 +8,11 @@ classdef QuadLink < NLinkEnv
         lengths = [1 1 1 1];
         masses = [1 1 1 1];
         friction_coeff = [2.5 2.5 2.5 2.5]'; % Viscous friction coefficients
-%         g = 9.81; % If 0, the problem becames a simpler planar reaching task
-        g = 0;
+        g = 9.81; % If 0, the problem becames a simpler planar reaching task
         dt = 0.02;
 
-        x_des = [0 4]'; % Goal in task space
-        q_des = [pi/2 0 0 0]'; % Goal in joint space
+        x_des = [4 0]'; % Goal in task space
+        q_des = [0 0 0 0]'; % Goal in joint space
         
         % MDP variables
         dstate = 8;

@@ -4,6 +4,8 @@ close all
 %% ===================================================================== %%
 %  ======================== LOW LEVEL SETTINGS =========================  %
 mdp = DoubleLink;
+% mdp = QuadLink;
+
 robj = 1;
 
 % bfs = @(varargin) basis_pixels(mdp,varargin{:});
