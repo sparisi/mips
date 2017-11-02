@@ -43,11 +43,12 @@ classdef REPSep_Solver < handle
                 'TolX', 10^-8, ...
                 'TolFun', 10^-12, ...
                 'MaxIter', 300);
+
             lowerBound = 1e-8; % eta > 0
             upperBound = 1e8; % eta < inf
-            eta0 = 1;
+
             obj.eta = fmincon(@(eta)obj.dual(eta,J,W), ...
-                eta0, [], [], [], [], lowerBound, upperBound, [], options);
+                obj.eta, [], [], [], [], lowerBound, upperBound, [], options);
             
             % Compute weights for weighted ML update
             d = W .* exp( (J - max(J)) / obj.eta );

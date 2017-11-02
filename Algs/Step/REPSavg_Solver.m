@@ -80,7 +80,7 @@ classdef REPSavg_Solver < handle
                     pWeighting = d;
                     pWeighting = pWeighting / sum(pWeighting);
                     divKL = kl_mle(pWeighting, qWeighting);
-                    error = divKL - obj.epsilon;
+                    error = abs(divKL - obj.epsilon);
                     validKL = error < tolKL * obj.epsilon;
                     featureDiff = bsxfun(@rdivide,(Phi - PhiN)*pWeighting',std(Phi,0,2)); % Standardize
                     validSF = max(abs(featureDiff)) < tolSF;
@@ -104,7 +104,7 @@ classdef REPSavg_Solver < handle
                     pWeighting = d;
                     pWeighting = pWeighting / sum(pWeighting);
                     divKL = kl_mle(pWeighting, qWeighting);
-                    error = divKL - obj.epsilon;
+                    error = abs(divKL - obj.epsilon);
                     validKL = error < tolKL * obj.epsilon;
                     featureDiff = bsxfun(@rdivide,(Phi - PhiN)*pWeighting',std(Phi,0,2)); % Standardize
                     validSF = max(abs(featureDiff)) < tolSF;

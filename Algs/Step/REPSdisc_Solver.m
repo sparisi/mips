@@ -43,29 +43,20 @@ classdef REPSdisc_Solver < handle
 %                 'MaxFunEvals', 10 * 5, ...
 %                 'TolX', 10^-8, 'TolFun', 10^-12, 'MaxIter', 10);
 
-            lowerBound_eta = 1e-8;
-            upperBound_eta = 1e8;
+            lowerBound = 1e-8;
+            upperBound = 1e8;
             
-            maxIter = 100;
-            validKL = false;
+            obj.eta = fmincon(@(eta)obj.dual_eta(eta,Q,W), ...
+                obj.eta, [], [], [], [], lowerBound, upperBound, [], options);
             
-            for i = 1 : maxIter
-                if validKL, break, end
-
-                obj.eta = fmincon(@(eta)obj.dual_eta(eta,Q,W), ...
-                    obj.eta, [], [], [], [], lowerBound_eta, upperBound_eta, [], options);
-                
-                % Compute the weights
-                d = W .* exp( (Q - max(Q)) / obj.eta );
-                
-                % Check conditions
-                qWeighting = W;
-                pWeighting = d;
-                pWeighting = pWeighting / sum(pWeighting);
-                divKL = kl_mle(pWeighting, qWeighting);
-                error = divKL - obj.epsilon;
-                validKL = error < 0.1 * obj.epsilon;
-            end
+            % Compute the weights
+            d = W .* exp( (Q - max(Q)) / obj.eta );
+            
+            % Check conditions
+            qWeighting = W;
+            pWeighting = d;
+            pWeighting = pWeighting / sum(pWeighting);
+            divKL = kl_mle(pWeighting, qWeighting);
         end
         
         %% DUAL FUNCTIONS
