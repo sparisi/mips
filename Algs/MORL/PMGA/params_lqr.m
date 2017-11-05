@@ -4,28 +4,38 @@ function [theta, ...     % parameters of the objective functions, theta = phi_rh
     D_t_theta, ...       % derivative of theta wrt t
     D_rho_theta, ...     % derivative of theta wrt rho
     J] = ...             % objective functions in closed form
-    params_lqr(param_type, mdp)
+    params_lqr(param_type, num_obj)
 
-assert(isa(mdp,'LQR'))
+dim_theta = num_obj;
+dim_t = dim_theta-1;
+t = sym('t',[1,dim_t]);
+theta = sym('theta', [dim_theta,1]);
 
-dim_theta = mdp.dreward;
-    
-if dim_theta == 2
+
+if strcmp(param_type, 'NN') % Neural network (unconstrained) for any dimension
+
+    d1 = 3; % Hidden layer size
+    dim_rho = dim_t*d1+d1+d1*dim_theta+dim_theta;
+    rho = sym('rho',[1,dim_rho]);
+    % One hidden layer with tanh + sigmoid at the end to bound theta in [-1,0]
+    theta = transpose( ...
+        - 1 ./ (1 + exp( ...
+        - (tanh( ...
+        t*reshape(rho(1:dim_t*d1),[dim_t,d1])+rho(dim_t*d1+1:dim_t*d1+d1))*reshape(rho(dim_t*d1+d1+1:dim_t*d1+d1+dim_theta*d1),d1,dim_theta)+rho(end-dim_theta+1:end))) ));
+
+elseif dim_theta == 2
     
     if strcmp(param_type, 'P1') % Unconstrained
         dim_rho = 4;
-        t = sym('t');
         rho = sym('rho',[1,dim_rho]);
-        theta = sym('theta', [dim_theta,1]);
-        theta(1) = sym('-1/(1+exp(rho1+rho2*t))');
-        theta(2) = sym('-1/(1+exp(rho3+rho4*t))');
+        theta(1) = sym('-1/(1+exp(rho1+rho2*t1))');
+        theta(2) = sym('-1/(1+exp(rho3+rho4*t1))');
     elseif strcmp(param_type, 'P2') % Constrained
         dim_rho = 2;
-        t = sym('t');
         rho = sym('rho',[1,dim_rho]);
         theta = sym('theta', [dim_theta,1]);
-        theta(1) = sym('-1/(1+exp(-2.18708-rho1*t^2+(3.33837+rho1)*t))');
-        theta(2) = sym('-1/(1+exp(1.15129-rho2*t^2+(-3.33837+rho2)*t))');
+        theta(1) = sym('-1/(1+exp(-2.18708-rho1*t1^2+(3.33837+rho1)*t1))');
+        theta(2) = sym('-1/(1+exp(1.15129-rho2*t1^2+(-3.33837+rho2)*t1))');
     else
         error('Unknown param type.');
     end
@@ -33,9 +43,7 @@ if dim_theta == 2
 elseif dim_theta == 3
     
     dim_rho = 9;
-    t = sym('t',[1,2]);
     rho = sym('rho',[1,dim_rho]);
-    theta = sym('theta', [dim_theta,1]);
 
     if strcmp(param_type, 'P1') % Unconstrained
         theta(1) = sym('-1/(1+exp(rho1 + rho2*t1 + rho3*t2))');
@@ -52,7 +60,6 @@ elseif dim_theta == 3
 elseif dim_theta == 5
     
     %%% Unconstrained
-    t = sym('t',[1,4]);
     A = allcomb(t,t);
     A(13:15,:) = [];
     A(9:10,:) = [];
@@ -62,7 +69,6 @@ elseif dim_theta == 5
     rho_per_theta = length(A)+1;
     dim_rho = (rho_per_theta)*dim_theta;
     rho = sym('rho',[1,dim_rho]);
-    theta = sym('theta', [dim_theta,1]);
 
     for i = 1 : dim_theta
         idx = rho_per_theta*(i-1);
@@ -75,7 +81,7 @@ D_t_theta = jacobian(theta,t);
 D_rho_theta = jacobian(theta,rho);
 
 if nargout == 6
-    dim   = mdp.dreward;
+    dim   = num_obj;
     LQR   = lqr_init(dim);
     g     = LQR.g;
     B     = LQR.B;

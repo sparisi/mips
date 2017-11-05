@@ -16,12 +16,12 @@ antiutopia = mdp.antiutopia;
 true_front = mdp.truefront;
 dim_J = mdp.dreward;
 
-param_type = 'P1'; % P1 unconstrained, P2 constrained
+param_type = 'NN'; % P1 unconstrained, P2 constrained
 ind_type = {'mix2', [1,1]}; % MIX2: beta1 * I_AU / I_U - beta2
 ind_type = {'mix3', 1}; % MIX3: I_AU * (1 - lambda * I_U)
 [ind_handle, ind_d_handle] = parse_indicator_handle(ind_type{1},ind_type{2},utopia,antiutopia);
 
-[theta, rho, t, D_t_theta, D_rho_theta, J_sym] = params_lqr( param_type, mdp );
+[theta, rho, t, D_t_theta, D_rho_theta, J_sym] = params_lqr( param_type, mdp.dreward );
 dim_rho = length(rho);
 dim_t = length(t);
 dim_theta = length(theta);
@@ -55,7 +55,7 @@ MAX_ITER = 1000;
 
 rho_learned = [1 1 0 0];
 % rho_learned = [3 7];
-% rho_learned = rand(1,dim_rho);
+rho_learned = rand(1,dim_rho);
 
 rho_history = [];
 L_history = [];

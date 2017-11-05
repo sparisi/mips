@@ -7,11 +7,11 @@ reset(symengine)
 dim = 2;
 
 % mdp = Dam(dim); bfs = @dam_basis_rbf; mu0 = [50, -50, 0, 0, 50]; sigma0 = 150^2;
-% [theta, rho, t, D_t_theta, D_rho_theta] = feval(['params_' lower(class(mdp))], [], mdp);
+% [theta, rho, t, D_t_theta, D_rho_theta] = feval(['params_' lower(class(mdp))], [], mdp.dreward);
 % policy = GaussianLinearDiag(bfs, mdp.daction, mu0, sigma0);
 
 mdp = LQR(dim); bfs = @(varargin)basis_poly(1,dim,0,varargin{:}); mu0 = -0.5*eye(dim); sigma0 = eye(dim);
-[theta, rho, t, D_t_theta, D_rho_theta] = feval(['params_' lower(class(mdp))], 'P1', mdp);
+[theta, rho, t, D_t_theta, D_rho_theta] = feval(['params_' lower(class(mdp))], 'NN', mdp.dreward);
 policy = GaussianLinearFixedvarDiagmean(bfs, mdp.daction, mu0, sigma0);
 
 utopia = mdp.utopia;
@@ -39,7 +39,7 @@ lrate = 2;
 
 episodes = 50;
 steps = 50;
-n_points = 1; % #points t used to estimate the integral
+n_points = 5; % #points t used to estimate the integral
 lo = zeros(dim_t,1);
 hi = ones(dim_t,1);
 [~, volume] = simplex(lo,hi);
@@ -48,7 +48,7 @@ MAX_ITER = 1000;
 
 % rho_learned = -20*ones(1,dim_rho);
 rho_learned = rand(1, dim_rho);
-rho_learned(end) = 50;
+% rho_learned(end) = 50;
 
 rho_history = [];
 L_history = [];
@@ -100,17 +100,17 @@ else
     hv_fun = @(varargin)mexHypervolume(varargin{:},antiutopia,utopia,1e6);
 end
 
-n_points_eval = 1000;
+n_points_eval = 100;
 t_points_eval = linspacesim(lo, hi, n_points_eval);
 t_arg = mat2cell(t_points_eval', size(t_points_eval,2), ones(1,dim_t));
-episodes_eval = 1000;
+episodes_eval = 100;
 steps_eval = 100;
 front_manual = mdp.truefront;
 theta_f = matlabFunction(theta);
 
 close all
 figure
-for j = 1 : 10 : size(rho_history,1)
+for j = 1 : 1 : size(rho_history,1)
     
     clf, hold all
 

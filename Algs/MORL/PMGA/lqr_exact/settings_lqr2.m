@@ -47,6 +47,20 @@ elseif strcmp(param_type, 'P2') % Constrained
     k1_1 = sym('-1/(1+exp(-2.18708-r1*t^2+(3.33837+r1)*t))');
     k2_2 = sym('-1/(1+exp(1.15129-r2*t^2+(-3.33837+r2)*t))');
     dim_r = 2;
+elseif strcmp(param_type, 'NN') % Neural network (unconstrained)
+    dim_theta = length(theta);
+    dim_t = length(t);
+    d1 = 3; % Hidden layer size
+    dim_r = dim_t*d1+d1+d1*dim_theta+dim_theta;
+    r = sym('r',[1,dim_r]);
+
+    % One hidden layer with tanh + sigmoid at the end to bound theta in [-1,0]
+    net = transpose( ...
+        - 1 ./ (1 + exp( ...
+        - (tanh( ...
+        t*reshape(r(1:dim_t*d1),[dim_t,d1])+r(dim_t*d1+1:dim_t*d1+d1))*reshape(r(dim_t*d1+d1+1:dim_t*d1+d1+dim_theta*d1),d1,dim_theta)+r(end-dim_theta+1:end))) ));
+    k1_1 = net(1);
+    k2_2 = net(2);
 else
     error('Unknown parameterization.');
 end

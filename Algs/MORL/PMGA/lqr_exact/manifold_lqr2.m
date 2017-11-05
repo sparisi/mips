@@ -16,7 +16,7 @@ indicator = {'pareto'};
 indicator = {'mix1', 1.5}; % MIX1: I_AU * (1 - lambda * I_P)
 indicator = {'mix2', [3,1]}; % MIX2: beta1 * I_AU / I_U - beta2
 indicator = {'mix3', 1}; % MIX3: I_AU * (1 - lambda * I_U)
-param_type = 'P2'; % P1 unconstrained, P2 constrained
+param_type = 'NN'; % P1 unconstrained, P2 constrained
 
 [J, theta, rho, t, D_theta_J, D2_theta_J, D_t_theta, D_rho_theta, I, I_params, AUp, Up] = ...
     settings_lqr2( indicator{1}, param_type );
@@ -81,7 +81,7 @@ tolerance = 0.01;
 rho_learned = [2 2];
 % rho_learned = [6 6];
 % rho_learned = zeros(1, dim_rho);
-% rho_learned = rand(1, dim_rho);
+rho_learned = rand(1, dim_rho);
 rho_history = [];
 L_history = [];
 iter = 1;
