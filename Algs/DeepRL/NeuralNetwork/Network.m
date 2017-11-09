@@ -20,8 +20,8 @@ classdef Network < handle
                    obj.L = [obj.L ...
                        feval(activs{i-1}), Lin(dims(i),dims(i+1)), Bias(dims(i+1))];
                end
-               obj.L(end).W = rand(size(obj.L(end).W))/1000;
-               obj.L(end-1).W(:) = rand(size(obj.L(end-1).W))/1000;
+               obj.L(end).W = (rand(size(obj.L(end).W))-0.5)/1000;
+               obj.L(end-1).W(:) = (rand(size(obj.L(end-1).W))-0.5)/1000;
                obj.W = cat(2,obj.L.W);
            end
        end
