@@ -1,4 +1,4 @@
-clear, clear global
+clear all
 mdp = DeepSeaTreasure;
 robj = 1;
 trials = 10;

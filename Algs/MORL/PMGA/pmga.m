@@ -1,6 +1,6 @@
 %% Init
 clc
-clear, clear global
+clear all
 close all
 reset(symengine)
 

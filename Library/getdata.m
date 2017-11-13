@@ -10,7 +10,7 @@ function data = getdata(data, data_iter, nmax, vars, bfs)
 % - Q (Monte Carlo estimates of Q-function)
 % - gammar (discounted rewards)
 % 
-% BFS is a cell array of pairs {basis function name, function handle}.
+% BFS is a cell array of pairs {name, function handle}.
 
 % Init
 if isempty(data)

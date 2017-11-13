@@ -3,7 +3,7 @@
 
 %% Init
 clc
-clear, clear global
+clear all
 reset(symengine)
 
 dim = 2;

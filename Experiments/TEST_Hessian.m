@@ -1,5 +1,5 @@
 %% Init
-clear, clear global
+clear all
 clc
 
 dim   = 2;

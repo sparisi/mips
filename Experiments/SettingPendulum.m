@@ -1,4 +1,4 @@
-clear, clear global
+clear all
 close all
 
 %% ===================================================================== %%
@@ -8,10 +8,10 @@ robj = 1;
 
 % bfs = @(varargin) basis_pixels(mdp,varargin{:});
 bfs = @(varargin) basis_poly(2, mdp.dstate, 0, varargin{:});
-% bfs = @(varargin) basis_krbf(10, [mdp.stateLB, mdp.stateUB], 0, varargin{:});
+bfs = @(varargin) basis_krbf(10, [mdp.stateLB, mdp.stateUB], 0, varargin{:});
 
 A0 = zeros(mdp.daction,bfs()+1);
-Sigma0 = 16*eye(mdp.daction);
+Sigma0 = 64*eye(mdp.daction);
 policy = GaussianLinearDiag(bfs, mdp.daction, A0, Sigma0);
 % policy = GaussianLinearChol(bfs, mdp.daction, A0, Sigma0);
 

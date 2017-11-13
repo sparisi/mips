@@ -1,5 +1,5 @@
 %% Init
-clear, clear global
+clear all
 close all
 clc
 reset(symengine)

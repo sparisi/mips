@@ -1,4 +1,4 @@
-clear, clear global
+clear all
 
 rng(10)
 

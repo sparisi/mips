@@ -5,7 +5,7 @@
 % D Ernst, P Geurts, L Wehenkel
 % Tree-based batch mode reinforcement learning (2005)
 
-clear, clear global
+clear all
 close all
 
 mdp = Gridworld;

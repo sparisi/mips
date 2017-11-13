@@ -1,7 +1,7 @@
 % Single plot
 
 close all
-clear, clear global
+clear all
 
 filename = 'animation2';
 dt = 1; % Pause between each frame
