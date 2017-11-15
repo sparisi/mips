@@ -26,7 +26,7 @@ classdef REPSavg_Solver < handle
             obj.epsilon = epsilon;
             obj.basis = bfs;
             obj.eta = 1;
-            obj.theta = ones(bfs(),1);
+            obj.theta = rand(bfs(),1)-0.5;
         end
 
         %% CORE
@@ -63,7 +63,6 @@ classdef REPSavg_Solver < handle
 
             % Iteratively solve fmincon for eta and theta separately
             for i = 1 : maxIter
-
                 if ~validKL || numStepsNoKL > 5 % If we skipped the KL optimization more than 5 times, redo it
                     % Here theta is constant, so we can pass directly V and VN
                     V = obj.theta' * Phi; % V(s)
@@ -110,6 +109,8 @@ classdef REPSavg_Solver < handle
                     validSF = max(abs(featureDiff)) < tolSF;
                 end
                 
+%                 fprintf('REPS optimization, iter %i\n',i);
+
                 if validSF && validKL
                     break
                 end
