@@ -26,7 +26,7 @@ classdef CREPS_Solver < handle
             obj.epsilon = epsilon;
             obj.basis = bfs;
             obj.eta = 1;
-            obj.theta = ones(bfs(),1);
+            obj.theta = rand(bfs(),1)-0.5;
         end
         
         %% CORE

@@ -4,9 +4,12 @@
 % REFERENCE
 % J Peters, K Muelling, Y Altun
 % Relative Entropy Policy Search (2010)
+%
+% H van Hoof, G Neumann, J Peters
+% Non-parametric Policy Search with Limited Information Loss (2017)
 
 bfsV = @(varargin)basis_poly(2,mdp.dstate,0,varargin{:});
-% bfsV = @(varargin)basis_krbf(5, [mdp.stateLB, mdp.stateUB], 0, varargin{:});
+bfsV = @(varargin)basis_krbf(10, [mdp.stateLB, mdp.stateUB], 0, varargin{:});
 % bfsV = @(varargin)basis_krbf(10, 20*[-ones(dim,1), ones(dim,1)], 0, varargin{:});
 % bfsV = @(varargin)basis_rbf(5*[-ones(dim,1), ones(dim,1)], 0.5./[5; 5], 0, varargin{:});
 
@@ -25,7 +28,14 @@ while iter < 1500
     entropy = policy.entropy([ds.s]);
     data = getdata(data,ds,nmax,varnames,bfsnames);
 
-    [d, divKL] = solver.optimize(data.r, data.phiV, data.phiV_nexts);
+    % Ensure stationary distribution of transient dynamics by resetting 
+    % the system with a probability
+    reset_prob = 1/steps_learn; 
+
+    [d, divKL] = solver.optimize(data.r, data.phiV, ...
+        bsxfun(@plus, (1-reset_prob)*data.phiV_nexts, ... 
+        reset_prob*mean(data.phiV(:,1:steps_learn:end),2)));
+
     policy = policy.weightedMLUpdate(d, data.a, data.phiP);
 
     J = evaluate_policies(mdp, episodes_eval, steps_eval, policy.makeDeterministic);
@@ -33,7 +43,6 @@ while iter < 1500
     fprintf('%d ) Entropy: %.2f, KL: %.2f, J: %.4f\n', iter, entropy, divKL, J(robj))
     
     iter = iter + 1;
-    
 end
 
 %%
