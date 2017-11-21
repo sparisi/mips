@@ -29,7 +29,7 @@ policy_high = GaussianConstantChol(n_params, mu0, Sigma0high);
 
 %% ===================================================================== %%
 %  ======================== LEARNING SETTINGS ==========================  %
-episodes_eval = 1;
+episodes_eval = 1000;
 steps_eval = 500;
 episodes_learn = 100;
 steps_learn = 100;
