@@ -1,7 +1,8 @@
 classdef CartPoleDouble < CartPoleEnv
 % Cart-pole with discrete actions.
 % The goal is to balance two poles starting from upright position.
-% The episode ends if one of the poles tilts too much.
+% The episode ends if the pole tilts too much or if the cart goes out of
+% bounds.
     
     properties
         % MDP variables

@@ -1,7 +1,8 @@
 classdef CartPoleContinuous < CartPoleEnv
-% Cart-pole with discrete actions.
+% Cart-pole with continuous actions.
 % The goal is to balance the pole starting from upright position.
-% The episode ends if the pole tilts too much.
+% The episode ends if the pole tilts too much or if the cart goes out of
+% bounds.
     
     properties
         % MDP variables

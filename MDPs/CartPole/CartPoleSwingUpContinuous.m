@@ -1,6 +1,7 @@
 classdef CartPoleSwingUpContinuous < CartPoleEnv
 % Cart-pole with continuous actions.
-% The goal is to balance the pole starting from a random position.
+% The goal is to swing up and balance the pole starting from a random position.
+% The episode ends if the cart goes out of bounds.
 
     properties
         % MDP variables
