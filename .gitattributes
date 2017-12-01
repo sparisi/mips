@@ -4,3 +4,6 @@ src/main/resources/static/* linguist-vendored
 project-docs/* linguist-documentation
 
 *.rb linguist-language=Matlab
+
+Algs/MORL/PMGA/lqr_exact/mexFiles/* linguist-vendored=true
+
