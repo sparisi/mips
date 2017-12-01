@@ -5,6 +5,7 @@ close all
 mdp = CartPoleContinuous;
 episodes_eval = 100;
 steps_eval = 1000;
+steps_learn = 1000;
 
 % Normalization in [-1,1]
 range = [mdp.stateLB, mdp.stateUB];
@@ -17,4 +18,4 @@ preprocessS = @(s)bsxfun(@times, bsxfun(@minus,s,m), 1./range_centered(:,2))';
 % Normalization in [0,1]
 preprocessR = @(r)r;
 
-noise_std = 0.1;
+noise_std = 10;

@@ -2,9 +2,10 @@ clear
 close all
 
 %% Get problem specification
-mdp = ChainwalkContinuousMulti(2);
-episodes_eval = 100;
+mdp = Pendulum;
+episodes_eval = 500;
 steps_eval = 100;
+steps_learn = 50;
 
 % Normalization in [-1,1]
 range = [mdp.stateLB, mdp.stateUB];
@@ -14,6 +15,4 @@ preprocessS = @(s)bsxfun(@times, bsxfun(@minus,s,m), 1./range_centered(:,2))';
 
 preprocessR = @(r)r;
 
-dimL1 = 30;
-
-noise_std = 0.1;
+noise_std = 16;

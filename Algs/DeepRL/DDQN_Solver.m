@@ -16,6 +16,7 @@ classdef DDQN_Solver < handle
         maxsteps = 1e3;  % Max steps per episode
         epsilon  = 1;    % Parameter of the e-greedy policy
         tau      = 0.1;  % Soft update of the target network
+        exploration_decay = 0.995; % Decay factor for the epsilon greedy policy
 
         %% Functions
         mdp                  % MDP with functions for initial state distribution and transition function
@@ -55,12 +56,11 @@ classdef DDQN_Solver < handle
                 state = obj.mdp.initstate(1);
                 step = 0;
                 terminal = false;
-                while ~terminal && obj.t < obj.minsize
+                while ~terminal && obj.t < obj.minsize && step < obj.maxsteps
                     step = step + 1;
                     action = randi(obj.dimA);
                     [nextstate, reward, terminal] = obj.mdp.simulator(state, action);
                     obj.storedata(state, action, reward, nextstate, terminal);
-                    terminal = terminal || step == obj.maxsteps;
                     state = nextstate;
                 end
             end
@@ -96,18 +96,17 @@ classdef DDQN_Solver < handle
             obj.epsilon = 1;
             
             % Run episode
-            while ~terminal
+            while ~terminal && step < obj.maxsteps
                 step = step + 1;
                 states(step, :) = state;
                 
-                obj.epsilon = obj.epsilon * 0.995;
+                obj.epsilon = obj.epsilon * obj.exploration_decay;
 
                 Q = forward(obj.nnQ, obj.preprocessS(state));
                 action = egreedy(Q', obj.epsilon)';
 
                 [nextstate, reward, terminal] = obj.mdp.simulator(state, action);
                 obj.storedata(state,action,reward,nextstate,terminal);
-                terminal = terminal || step == obj.maxsteps;
                 state = nextstate;
                 
                 J = J + obj.gamma^(step-1)*reward;

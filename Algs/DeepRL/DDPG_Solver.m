@@ -17,7 +17,7 @@ classdef DDPG_Solver < handle
         maxsteps = 1e3;     % Max steps per episode
         tau = 1e-2          % Update coefficient for the target networks
         sigma = 0.05        % Noise on the action (std)
-        noise_decay = 0.99; % Decay of the exploration during an episode
+        noise_decay = 0.9999; % Decay of the exploration during an episode
         
         %% Functions
         mdp                  % MDP with functions for init an episode and performing a step
@@ -68,20 +68,18 @@ classdef DDPG_Solver < handle
             step = 0;
             terminal = false;
             
-            noise = zeros(1,obj.dimA);
+            obj.sigma = obj.noise_decay*obj.sigma;
             
-            while ~terminal
+            while ~terminal && step < obj.maxsteps
                 step = step + 1;
                 states(step, :) = state;
 
                 obs = obj.preprocessS(state);
                 action = forward(obj.nnP,obs);
-%                 noise = obj.noise_decay * (noise + mymvnrnd(0, obj.sigma.^2, obj.dimA));
-                noise = obj.noise_decay * mymvnrnd(0, obj.sigma.^2, obj.dimA);
+                noise = mymvnrnd(0, obj.sigma.^2, obj.dimA);
                 action = action + noise;
 
                 [nextstate, reward, terminal] = obj.mdp.simulator(state, action');
-                terminal = terminal || step == obj.maxsteps;
                 obs_next = obj.preprocessS(nextstate);
                 reward = obj.preprocessR(reward);
                 

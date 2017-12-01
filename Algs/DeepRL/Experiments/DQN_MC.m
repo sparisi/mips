@@ -3,8 +3,9 @@ close all
 
 %% Get problem specification
 mdp = MCar;
-episodes_eval = 1;
+episodes_eval = 100;
 steps_eval = 30;
+steps_learn = 100;
 
 % Normalization in [-1,1]
 range = [mdp.stateLB, mdp.stateUB];
