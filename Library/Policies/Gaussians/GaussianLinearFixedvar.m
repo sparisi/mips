@@ -27,14 +27,14 @@ classdef GaussianLinearFixedvar < GaussianLinear
         
         %% Derivative of the logarithm of the policy
         function dlpdt = dlogPidtheta(obj, state, action)
-            phi = obj.basis1(state);
+            phi = obj.basis_bias(state);
             dlpdt = mtimescolumn((obj.Sigma) \ (action - obj.A*phi), phi);
         end
         
         %% Hessian matrix of the logarithm of the policy
         function hlpdt = hlogPidtheta(obj, state, action)
             nsamples = size(state,2);
-            phi = obj.basis1(state);
+            phi = obj.basis_bias(state);
             phimat = kron(phi',eye(obj.daction));
             invSigma = inv(obj.Sigma);
             hlpdt = zeros(obj.dparams,obj.dparams,nsamples);

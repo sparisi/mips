@@ -25,9 +25,9 @@ classdef GaussianLinearFixedvarDiagmean < GaussianLinear
             obj.A = initA;
         end
         
-        %% OVERRIDE! DO NOT add the constant feature 1 to the basis function
-        function phi1 = basis1(obj, States)
-            phi1 = obj.basis(States);
+        %% OVERRIDE! DO NOT add the constant feature 1 (bias) to the basis function
+        function phi_bias = basis_bias(obj, States)
+            phi_bias = obj.basis(States);
         end
         
         %% Derivative of the logarithm of the policy

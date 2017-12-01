@@ -33,7 +33,7 @@ classdef GaussianLinearLogistic < GaussianLinear
         function dlpdt = dlogPidtheta(obj, state, action)
             nsamples = size(state,2);
             logv = logistic(obj.theta(end-obj.daction+1:end), obj.tau);
-            phi = obj.basis1(state);
+            phi = obj.basis_bias(state);
             mu = obj.A * phi;
             dlpdt = zeros(obj.dparams,nsamples);
             diff = action - mu;

@@ -48,11 +48,6 @@ classdef (Abstract) PolicyDiscrete < Policy
             S = mean(S);
         end
         
-        %% Adds the constant feature 1 to the basis function
-        function phi1 = basis1(obj, States)
-            phi1 = [ones(1,size(States,2)); obj.basis(States)];
-        end
-        
         %% Plotting
         function plotGreedy(obj, LB, UB)
         % Plot the most probable action for 2D states.

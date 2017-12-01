@@ -17,7 +17,7 @@ solver = REPSavg_Solver(0.5,bfsV);
 
 data = [];
 varnames = {'r','s','nexts','a'};
-bfsnames = { {'phiP', @(s)policy.basis1(s)}, {'phiV', bfsV} };
+bfsnames = { {'phiP', @(s)policy.basis_bias(s)}, {'phiV', bfsV} };
 iter = 1;
 
 %% Learning

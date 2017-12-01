@@ -33,7 +33,7 @@ classdef GaussianLinearChol < GaussianLinear
         %% Derivative of the logarithm of the policy
         function dlogpdt = dlogPidtheta(obj, state, action)
             nsamples = size(state,2);
-            phi = obj.basis1(state);
+            phi = obj.basis_bias(state);
             A = obj.A;
             mu = A*phi;
             cholU = obj.U;

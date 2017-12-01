@@ -42,7 +42,7 @@ classdef Gibbs < PolicyDiscrete
         % for all possible actions.
             nstates = size(States,2);
             lactions = length(obj.action_list);
-            phi = obj.basis1(States);
+            phi = obj.basis_bias(States);
             dphi = size(phi,1);
 
             Q = [reshape(obj.theta,dphi,lactions-1)'*phi;
@@ -61,7 +61,7 @@ classdef Gibbs < PolicyDiscrete
             found = (ismember(Actions,obj.action_list));
             assert(min(found) == 1, 'Unknown action.');
 
-            phi = obj.basis1(States);
+            phi = obj.basis_bias(States);
             dphi = size(phi,1);
             prob_list = obj.distribution(States);
 

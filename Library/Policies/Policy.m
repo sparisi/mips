@@ -15,7 +15,7 @@ classdef (Abstract) Policy
         obj = update(obj, theta);
         entropy = entropy(obj);
         
-        % To enable arrays equality, i.e., 
+        %% To enable arrays equality, i.e., 
         % [pol1, pol2] == pol3 or [pol1, pol2] == [pol3, pol4]
         function areEq = eq(obj1, obj2)
             n1 = numel(obj1);
@@ -36,6 +36,11 @@ classdef (Abstract) Policy
             else
                 error('Matrix dimensions must agree.')
             end
+        end
+        
+        %% Adds the constant feature 1 (bias) to the basis function
+        function phi_bias = basis_bias(obj, States)
+            phi_bias = [ones(1,size(States,2)); obj.basis(States)];
         end
     end
     
