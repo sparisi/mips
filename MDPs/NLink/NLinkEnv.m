@@ -35,6 +35,7 @@ classdef NLinkEnv < MDP
             distance2 = sum(bsxfun(@minus,endEffector,obj.x_des).^2,1);
             reward = - distance2 ...
                 - 0.001 * sum(action.^2,1);
+%             reward = exp(reward) - 1; % Alternative reward
         end
         
         function reward = reward_joint(obj, state, action)
