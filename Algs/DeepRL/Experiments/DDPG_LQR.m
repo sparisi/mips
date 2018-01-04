@@ -1,13 +1,15 @@
 clear
 close all
 
+rng(1)
+
 %% Get problem specification
 mdp = LQR_v2(2);
 episodes_eval = 150;
 steps_eval = 150;
 steps_learn = 150;
 
-% Clip in [-300, -300] and normalization in [-1,1]
+% Clip in [-30, -30] and normalization in [-1,1]
 mdp.stateLB(:) = -30;
 mdp.stateUB(:) = 30;
 range = [mdp.stateLB, mdp.stateUB];

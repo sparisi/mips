@@ -11,7 +11,7 @@ function Phi = basis_quadratic(dim, state)
 %               returns the feature vectors representing it; 
 %               otherwise it returns the number of features
 
-D = 2 * dim + dim * (dim - 1) / 2;
+D = 2 * dim + dim * (dim - 1) / 2 + 1;
 
 if nargin == 1
     Phi = D;
