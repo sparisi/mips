@@ -1,15 +1,9 @@
-classdef LQR_v3 < MDP
+classdef LQR_v3 < MDP & LQREnv
 % As LQR_V2, but with multiple goal states. The agent must go to the
 % closest goal state.
     
     %% Properties
     properties
-        % Environment variables
-        A
-        B
-        x0
-        Q
-        R
         goals
         
         % MDP variables

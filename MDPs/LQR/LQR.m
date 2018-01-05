@@ -1,4 +1,6 @@
-classdef LQR < MOMDP
+classdef LQR < MOMDP & LQREnv
+% Multi-objective version of LQR.
+%
 % REFERENCE
 % S Parisi, M Pirotta, N Smacchia, L Bascetta, M Restelli 
 % Policy gradient approaches for multi-objective sequential decision making
@@ -6,14 +8,6 @@ classdef LQR < MOMDP
     
     %% Properties
     properties
-        % Environment variables
-        e = 0.1;
-        A
-        B
-        x0
-        Q
-        R
-        
         % MDP variables
         dstate
         daction
@@ -38,14 +32,15 @@ classdef LQR < MOMDP
 
         %% Constructor
         function obj = LQR(dim)
+            e = 0.1;
             obj.A = eye(dim);
             obj.B = eye(dim);
             obj.x0 = 10*ones(dim,1);
-            obj.Q = repmat({obj.e*eye(dim)},dim,1);
-            obj.R = repmat({(1-obj.e)*eye(dim)},dim,1);
+            obj.Q = repmat(e*eye(dim),1,1,dim);
+            obj.R = repmat((1-e)*eye(dim),1,1,dim);
             for i = 1 : dim
-                obj.Q{i}(i,i) = 1-obj.e;
-                obj.R{i}(i,i) = obj.e;
+                obj.Q(i,i,i) = 1-e;
+                obj.R(i,i,i) = e;
             end
             
             obj.dstate = dim;
@@ -88,8 +83,8 @@ classdef LQR < MOMDP
             reward = zeros(obj.dreward,nstate);
             
             for i = 1 : obj.dreward
-                reward(i,:) = -sum(bsxfun(@times, state'*obj.Q{i}, state'), 2)' ...
-                    -sum(bsxfun(@times, action'*obj.R{i}, action'), 2)';
+                reward(i,:) = -sum(bsxfun(@times, state'*obj.Q(:,:,i), state'), 2)' ...
+                    -sum(bsxfun(@times, action'*obj.R(:,:,i), action'), 2)';
             end
         end
         
@@ -109,51 +104,6 @@ classdef LQR < MOMDP
             xlabel 'Obj 1'
             ylabel 'Obj 2'
             zlabel 'Obj 3'
-        end
-        
-        %% Closed form
-        function P = riccati(obj, K)
-            g = obj.gamma;
-            A = obj.A;
-            B = obj.B;
-            R = obj.R;
-            Q = obj.Q;
-            I = eye(obj.dreward);
-
-            P = zeros(obj.dreward,obj.dreward,obj.dreward);
-            
-            for i = 1 : obj.dreward
-                if isequal(A, B, I)
-                    P(:,:,i) = (Q{i} + K * R{i} * K) / (I - g * (I + 2 * K + K^2));
-                else
-                    tolerance = 0.0001;
-                    converged = false;
-                    P(:,:,i) = I;
-                    Pnew(:,:,i) = Q{i} + g*A'*P(:,:,i)*A + g*K'*B'*P(:,:,i)*A + g*A'*P(:,:,i)*B*K + g*K'*B'*P(:,:,i)*B*K + K'*R{i}*K;
-                    while ~converged
-                        P(:,:,i) = Pnew(:,:,i);
-                        Pnew(:,:,i) = Q{i} + g*A'*P(:,:,i)*A + g*K'*B'*P(:,:,i)*A + g*A'*P(:,:,i)*B*K + g*K'*B'*P(:,:,i)*B*K + K'*R{i}*K;
-                        converged = max(abs(P(:)-Pnew(:))) < tolerance;
-                    end
-                end
-            end
-        end
-        
-        function J = avg_return(obj, K, Sigma)
-            P = obj.riccati(K);
-            J = zeros(obj.dreward,1);
-            B = obj.B;
-            R = obj.R;
-            g = obj.gamma;
-            x0 = obj.x0;
-
-            for i = 1 : obj.dreward
-                if g == 1
-                    J(i) = - trace(Sigma*(R{i}+B'*P(:,:,i)*B));
-                else
-                    J(i) = - (x0'*P(:,:,i)*x0 + (1/(1-g))*trace(Sigma*(R{i}+g*B'*P(:,:,i)*B)));
-                end
-            end
         end
         
     end
