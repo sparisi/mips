@@ -101,7 +101,11 @@ classdef (Abstract) LQREnv < handle
                 if g == 1
                     J(i,:) = - trace(Sigma*(R(:,:,i)+B'*P(:,:,i)*B));
                 else
-                    J(i,:) = - (x0'*P(:,:,i)*x0 + (1/(1-g))*trace(Sigma*(R(:,:,i)+g*B'*P(:,:,i)*B)));
+                    % If the init state is fixed, use the first equation. 
+                    % If it is drawn from a unif distrib, use the second.
+
+%                     J(i,:) = - (x0'*P(:,:,i)*x0 + (1/(1-g))*trace(Sigma*(R(:,:,i)+g*B'*P(:,:,i)*B)));
+                    J(i,:) = - (x0'*P(:,:,i)*x0/3 + (1/(1-g))*trace(Sigma*(R(:,:,i)+g*B'*P(:,:,i)*B)));
                 end
             end
         end
@@ -109,7 +113,7 @@ classdef (Abstract) LQREnv < handle
         function K = k_opt(obj)
             for i = 1 : size(obj.Q,3)
                 [x,l,g] = dare(obj.A,obj.B,obj.Q(:,:,i),obj.R(:,:,i));
-                K(:,:,i) = -diag(l);
+                K(:,:,i) = -1+diag(l);
             end
         end
         
