@@ -22,7 +22,7 @@ classdef (Abstract) LQREnv < handle
             R = obj.R;
             Q = obj.Q;
             num_obj = size(obj.Q,3);
-            I = eye(num_obj);
+            I = eye(size(A));
             P = zeros(size(obj.Q));
             
             for i = 1 : num_obj
@@ -57,7 +57,7 @@ classdef (Abstract) LQREnv < handle
             end
         end
         
-        function [Qf, model] = q_function(obj, K, Sigma, s, a)
+        function Qmodel = q_model(obj, K, Sigma)
             P = obj.riccati(K);
             g = obj.gamma;
             A = obj.A;
@@ -65,7 +65,30 @@ classdef (Abstract) LQREnv < handle
             R = obj.R;
             Q = obj.Q;
             num_obj = size(obj.Q,3);
-            I = eye(num_obj);
+            
+            for i = 1 : num_obj
+                if g < 1
+                    Qmodel(i).Qss = -Q(:,:,i) - g*A'*P(:,:,i)*A;
+                    Qmodel(i).Qaa = -R(:,:,i) - g*B'*P(:,:,i)*B;
+                    Qmodel(i).Qsa = -2*g*B'*P*A;
+                    Qmodel(i).Q0  = -(g/(1-g))*trace( Sigma * (R(:,:,i) + g*B'*P(:,:,i)*B) );
+                else
+                    Qmodel(i).Qss = -Q(:,:,i) - A'*P(:,:,i)*A;
+                    Qmodel(i).Qaa = -R(:,:,i) - B'*P(:,:,i)*B;
+                    Qmodel(i).Qsa = -2*B'*P*A;
+                    Qmodel(i).Q0  = -trace( Sigma * (R(:,:,i) + B'*P(:,:,i)*B) );
+                end
+            end
+        end
+        
+        function Qf = q_function(obj, K, Sigma, s, a)
+            P = obj.riccati(K);
+            g = obj.gamma;
+            A = obj.A;
+            B = obj.B;
+            R = obj.R;
+            Q = obj.Q;
+            num_obj = size(obj.Q,3);
             
             tmp = (A*s + B*a);
             
