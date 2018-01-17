@@ -26,8 +26,9 @@ classdef (Abstract) LQREnv < handle
             P = zeros(size(obj.Q));
             
             for i = 1 : num_obj
-                if isequal(A, B, I)
-                    P(:,:,i) = (Q(:,:,i) + K * R(:,:,i) * K) / (I - g * (I + 2 * K + K^2));
+                if isequal(A, B, I) && isdiag(Q(:,:,i)) && isdiag(R(:,:,i))
+                    P(:,:,i) = (Q(:,:,i) + K .* R(:,:,i) .* K) ./ (I - g * (I + 2 * K + K.^2));
+                    P(:,:,i) = diag(diag(P(:,:,i)));
                 else
                     tolerance = 0.0001;
                     converged = false;
@@ -37,6 +38,7 @@ classdef (Abstract) LQREnv < handle
                         P(:,:,i) = Pnew(:,:,i);
                         Pnew(:,:,i) = Q(:,:,i) + g*A'*P(:,:,i)*A + g*K'*B'*P(:,:,i)*A + g*A'*P(:,:,i)*B*K + g*K'*B'*P(:,:,i)*B*K + K'*R(:,:,i)*K;
                         converged = max(abs(P(:)-Pnew(:))) < tolerance;
+                        if isnan(max(abs(P(:)-Pnew(:)))), error('LQR system unstable!'), end
                     end
                 end
             end
@@ -145,9 +147,21 @@ classdef (Abstract) LQREnv < handle
         end
         
         function K = k_opt(obj)
+            g = obj.gamma;
+            A = obj.A;
+            B = obj.B;
+            R = obj.R;
+            Q = obj.Q;
+
             for i = 1 : size(obj.Q,3)
-                [x,l,g] = dare(obj.A,obj.B,obj.Q(:,:,i),obj.R(:,:,i));
-                K(:,:,i) = diag(-1+l);
+                if isequal(A, B, eye(size(A))) && isdiag(Q(:,:,i)) && isdiag(R(:,:,i))
+                    K(:,:,i) = ( - sqrt( g*(Q(:,:,i)+R(:,:,i)).^2 + 2*g.*R(:,:,i).*(Q(:,:,i)-R(:,:,i)) + R(:,:,i).^2 ) + ...
+                        g*Q(:,:,i) - g*R(:,:,i) + R(:,:,i) ) ./ (2*g.*R(:,:,i));
+                    K(:,:,i) = diag(diag(K(:,:,i)));
+                else
+                    warning('Cannot compute the optimal control matrix in closed form.')
+                    K(:,:,i) = nan(size(A));
+                end
             end
         end
         
