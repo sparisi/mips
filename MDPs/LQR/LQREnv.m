@@ -146,22 +146,11 @@ classdef (Abstract) LQREnv < handle
             end
         end
         
-        function K = k_opt(obj)
-            g = obj.gamma;
-            A = obj.A;
-            B = obj.B;
-            R = obj.R;
-            Q = obj.Q;
-
+        function [K, P] = opt(obj)
             for i = 1 : size(obj.Q,3)
-                if isequal(A, B, eye(size(A))) && isdiag(Q(:,:,i)) && isdiag(R(:,:,i))
-                    K(:,:,i) = ( - sqrt( g*(Q(:,:,i)+R(:,:,i)).^2 + 2*g.*R(:,:,i).*(Q(:,:,i)-R(:,:,i)) + R(:,:,i).^2 ) + ...
-                        g*Q(:,:,i) - g*R(:,:,i) + R(:,:,i) ) ./ (2*g.*R(:,:,i));
-                    K(:,:,i) = diag(diag(K(:,:,i)));
-                else
-                    warning('Cannot compute the optimal control matrix in closed form.')
-                    K(:,:,i) = nan(size(A));
-                end
+                [x,l,g] = dare(sqrt(obj.gamma)*obj.A,sqrt(obj.gamma)*obj.B,obj.Q(:,:,i),obj.R(:,:,i));
+                K(:,:,i) = -g;
+                P(:,:,i) = x;
             end
         end
         
