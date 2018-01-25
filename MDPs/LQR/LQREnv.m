@@ -26,7 +26,7 @@ classdef (Abstract) LQREnv < handle
             P = zeros(size(obj.Q));
             
             for i = 1 : num_obj
-                if isequal(A, B, I) && isdiag(Q(:,:,i)) && isdiag(R(:,:,i))
+                if isequal(A, B, I) && isdiag(Q(:,:,i)) && isdiag(R(:,:,i)) && isdiag(K)
                     P(:,:,i) = (Q(:,:,i) + K .* R(:,:,i) .* K) ./ (I - g * (I + 2 * K + K.^2));
                     P(:,:,i) = diag(diag(P(:,:,i)));
                 else
@@ -100,19 +100,11 @@ classdef (Abstract) LQREnv < handle
                         -sum(bsxfun(@times, a'*R(:,:,i), a'), 2)' ...
                         -g*sum(bsxfun(@times, tmp'*P(:,:,i), tmp'), 2)' ...
                         +trace( Sigma * (R(:,:,i) + g*B'*P(:,:,i)*B) );
-                    model.Qss = -Q(:,:,i) - g*A'*P(:,:,i)*A;
-                    model.Qaa = -R(:,:,i) - g*B'*P(:,:,i)*B;
-                    model.Qsa = -2*g*B'*P*A;
-                    model.Q0  = -(g/(1-g))*trace( Sigma * (R(:,:,i) + g*B'*P(:,:,i)*B) );
                 else
                     Qf(i,:) = -sum(bsxfun(@times, s'*Q(:,:,i), s'), 2)' ...
                         -sum(bsxfun(@times, a'*R(:,:,i), a'), 2)' ...
                         -g*sum(bsxfun(@times, tmp'*P(:,:,i), tmp'), 2)' ...
                         -(g/(1-g))*trace( Sigma * (R(:,:,i) + g*B'*P(:,:,i)*B) );
-                    model.Qss = -Q(:,:,i) - A'*P(:,:,i)*A;
-                    model.Qaa = -R(:,:,i) - B'*P(:,:,i)*B;
-                    model.Qsa = -2*B'*P*A;
-                    model.Q0  = -trace( Sigma * (R(:,:,i) + B'*P(:,:,i)*B) );
                 end
             end
         end
