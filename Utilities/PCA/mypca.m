@@ -6,7 +6,7 @@ function [reduce, d, reconstruct, nmse] = mypca(x, minExplained)
 %
 %    INPUT
 %     - x            : [M x N] matrix, where N is the number of samples and
-%                     M is the dimensionality of each samples
+%                      M is the dimensionality of each sample
 %     - minExplained : (optional) minimum explained variance (default 1)
 %
 %    OUTPUT

@@ -23,7 +23,7 @@ classdef CollectWall < MDP
         stateUB = ones(4,1);
         actionLB = -ones(2,1);
         actionUB = ones(2,1)
-        rewardLB = -1;
+        rewardLB = -2;
         rewardUB = 1;
     end
     
