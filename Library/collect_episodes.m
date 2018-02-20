@@ -27,7 +27,7 @@ function [data, avgRew] = collect_episodes(mdp, episodes, steps, pol_high, pol_l
 pol_low = repmat(pol_low,1,episodes);
 
 if ismember('CMDP',superclasses(mdp)) % Contextual MDP
-    data.Context = mdp.getcontext(episodes);
+    data.Context = mdp.initctx(episodes);
     data.Theta = pol_high.drawAction(data.Context);
     for i = 1 : episodes
         pol_low(i) = pol_low(i).update(data.Theta(:,i));
