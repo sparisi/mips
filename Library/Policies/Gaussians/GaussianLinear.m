@@ -42,15 +42,15 @@ classdef (Abstract) GaussianLinear < Gaussian
         end
         
         %% PLOT PDF
-        function fig = plot(obj, state)
+        function fig = plot(obj, States)
         % Plot N(mu(i),Sigma(i,i)) for each dimension i (NORMPDF).
-            ns = size(state,2);
+            ns = size(States,2);
             assert(ns == 1, 'PDF can be plotted only for one state.')
             fig = figure(); hold all
             xlabel 'x'
             ylabel 'pdf(x)'
             
-            phi = obj.basis_bias(state);
+            phi = obj.basis_bias(States);
             mu = obj.A*phi;
             range = ndlinspace(mu - 3*diag(obj.Sigma), mu + 3*diag(obj.Sigma), 100);
             
