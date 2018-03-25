@@ -6,12 +6,12 @@ close all
 clear all
 
 %% Change entries according to your needs
-folder = 'results/';
+folder = 'data/';
 separator = '_';
-filenames = {'alg1', 'alg2', 'alg3'};
+filenames = {'alg1', 'alg2'};
 variable = 'J_history';
-variable = 'mean(J_history)';
-variable = '-log(-mean(J_history))';
+% variable = 'mean(J_history)';
+% variable = '-log(-mean(J_history))';
 
 %% Plot
 h = {};
@@ -42,6 +42,6 @@ for name = filenames
     
 end
 
-legend([h{:}],filenames)
+legend([h{:}], filenames, 'Interpreter', 'none')
 
 leg.Position = [0.2 0.7 0 0];
