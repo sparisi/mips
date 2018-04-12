@@ -32,13 +32,16 @@ classdef (Abstract) LQREnv < handle
                 else
                     tolerance = 0.0001;
                     converged = false;
+                    iter = 0; maxiter = 5000;
                     P(:,:,i) = I;
                     Pnew(:,:,i) = Q(:,:,i) + g*A'*P(:,:,i)*A + g*K'*B'*P(:,:,i)*A + g*A'*P(:,:,i)*B*K + g*K'*B'*P(:,:,i)*B*K + K'*R(:,:,i)*K;
                     while ~converged
                         P(:,:,i) = Pnew(:,:,i);
                         Pnew(:,:,i) = Q(:,:,i) + g*A'*P(:,:,i)*A + g*K'*B'*P(:,:,i)*A + g*A'*P(:,:,i)*B*K + g*K'*B'*P(:,:,i)*B*K + K'*R(:,:,i)*K;
                         converged = max(abs(P(:)-Pnew(:))) < tolerance;
+                        iter = iter + 1;
                         if isnan(max(abs(P(:)-Pnew(:)))), error('LQR system unstable!'), end
+                        if iter > maxiter, break, end % LQR unstable, but we want an approximate solution
                     end
                 end
             end
