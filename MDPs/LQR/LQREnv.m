@@ -63,6 +63,12 @@ classdef (Abstract) LQREnv < handle
         end
         
         function Qmodel = q_model(obj, K, Sigma)
+        % QMODEL is a struct with all matrices of the quadratic model of 
+        % the true Q-function, namely Q0, Qss, Qaa, Qsa. The model is
+        %    Q = Q0 + s'*Qss*s + a'*Qaa*a + s'*Qsa*a
+        %
+        % Additionally, it merges all these matrices into a bigger one
+        %    Q = [1 s a]'*H*[1 s a]
             P = obj.riccati(K);
             g = obj.gamma;
             A = obj.A;
@@ -81,8 +87,11 @@ classdef (Abstract) LQREnv < handle
                     Qmodel(i).Qss = -Q(:,:,i) - A'*P(:,:,i)*A;
                     Qmodel(i).Qaa = -R(:,:,i) - B'*P(:,:,i)*B;
                     Qmodel(i).Qsa = -2*B'*P*A;
-                    Qmodel(i).Q0  = -trace( Sigma * (R(:,:,i) + B'*P(:,:,i)*B) );
+                    Qmodel(i).Q0  = trace( Sigma * (R(:,:,i) + B'*P(:,:,i)*B) );
                 end
+                Qmodel(i).H = [Qmodel(i).Qss   , Qmodel(i).Qsa/2
+                               Qmodel(i).Qsa/2 , Qmodel(i).Qaa];
+                Qmodel(i).H = blkdiag(Qmodel(i).Q0, Qmodel(i).H);
             end
         end
         
