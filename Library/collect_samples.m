@@ -20,6 +20,7 @@ function [data, J] = collect_samples(mdp, episodes, maxsteps, policy, contexts)
 %                   * gammar : discounted immediate reward, gamma^(t-1)*r
 %                   * Q      : approximation of the Q function, that is
 %                              Q(s_t,a_t) = sum_(h=t)^T gamma^(h-1)*r(s_h,a_h)
+%                   * endsim : 1 if the state is terminal, 0 otherwise
 %                   * length : length of the episode
 %     - J        : returns averaged over all the episodes
 
@@ -46,6 +47,7 @@ ds.nexts = nan(nvar_state, episodes, 1);
 ds.a = nan(nvar_action, episodes, 1);
 ds.r = nan(nvar_reward, episodes, 1);
 ds.gammar = nan(nvar_reward, episodes, 1);
+ds.endsim = nan(1, episodes, 1);
 
 % Keep track of the states which did not terminate
 ongoing = true(1,episodes);
@@ -78,6 +80,7 @@ while ( (step < maxsteps) && sum(ongoing) > 0 )
     ds.gammar(:,ongoing,step) = (gamma)^(step-1) .* reward;
     ds.s(:,ongoing,step) = running_states;
     ds.nexts(:,ongoing,step) = nextstate;
+    ds.endsim(:,ongoing,step) = endsim;
     
     % Continue
     idx = 1:episodes;
@@ -95,6 +98,7 @@ ds.a = permute(ds.a, [1 3 2]);
 ds.nexts = permute(ds.nexts, [1 3 2]);
 ds.gammar = permute(ds.gammar, [1 3 2]);
 ds.r = permute(ds.r, [1 3 2]);
+ds.endsim = permute(ds.endsim, [1 3 2]);
 ds.Q = cumsum(ds.gammar,2,'reverse'); % Because allocated (but not run) steps have value 0
 
 % Convert dataset to struct to allow storage of episodes with different length
@@ -105,7 +109,8 @@ data = struct( ...
     'nexts', num2cell(ds.nexts,[1 2]), ...
     'gammar', num2cell(ds.gammar,[1 2]), ...
     'Q', num2cell(ds.Q,[1 2]), ...
-    'length', num2cell(permute(endingstep,[3 1 2]),1) ...
+    'length', num2cell(permute(endingstep,[3 1 2]),1), ...
+    'endsim', num2cell(ds.endsim,[1 2]) ...
     );
 data = squeeze(data);
 
@@ -118,6 +123,7 @@ for i = find(endingstep < max(endingstep))
     data(i).nexts = data(i).nexts(:,1:endingstep(i));
     data(i).Q = data(i).Q(:,1:endingstep(i));
     data(i).length = endingstep(i);
+    data(i).endsim = data(i).endsim(:,1:endingstep(i));
 end
 
 % If we are in the average reward setting, then normalize the return
