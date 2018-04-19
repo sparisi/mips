@@ -20,7 +20,7 @@ function Phi = basis_poly(degree, dim, offset, state)
 %
 % =========================================================================
 % EXAMPLE
-% basis_poly(2,3,1,[3,5,6]') = [1, 3, 5, 6, 15, 18, 30]'
+% basis_poly(2,3,1,[3,5,6]') = [1, 3, 5, 6, 9, 15, 18, 25, 30, 36]'
 
 dimPhi = nmultichoosek(dim+1,degree);
 if nargin == 3

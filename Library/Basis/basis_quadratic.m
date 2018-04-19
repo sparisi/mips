@@ -10,6 +10,10 @@ function Phi = basis_quadratic(dim, state)
 %     - Phi   : if a state is provided as input, the function 
 %               returns the feature vectors representing it; 
 %               otherwise it returns the number of features
+%
+% =========================================================================
+% EXAMPLE
+% basis_quadratic(3,[3,5,6]') = [1, 3, 5, 6, 9, 15, 18, 25, 30, 36]'
 
 D = 2 * dim + dim * (dim - 1) / 2 + 1;
 
