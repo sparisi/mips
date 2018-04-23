@@ -11,14 +11,15 @@ dim = 15;
 mu0 = zeros(dim,1);
 sigma0 = 100 * eye(dim);
 sampling = GaussianConstantChol(dim, mu0, sigma0);
-sampling = GmmConstant(mu0,sigma0,4);
+% sampling = GmmConstant(mu0,sigma0,4);
 
-% solver = MORE_Solver(0.9,0.99,-75,sampling); divStr = 'KL Div';
+solver = MORE_Solver(0.9,0.99,-75000,sampling); divStr = 'KL Div';
+% solver = MORE2_Solver(0.9,sampling); divStr = 'KL Div';
 % solver = NES_Solver(0.1); divStr = 'Norm';
-solver = REPSep_Solver(0.9); divStr = 'KL Div';
+% solver = REPSep_Solver(0.9); divStr = 'KL Div';
 
 f = @(x)rosenbrock(x);
-f = @(x)rastrigin(x);
+% f = @(x)rastrigin(x);
 % f = @(x)noisysphere(x); N_eval = 1000;
 
 iter = 1;

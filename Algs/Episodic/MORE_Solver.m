@@ -120,19 +120,20 @@ classdef MORE_Solver < handle
                 return
             end
             
-            f = eta * (Q \ b) + r;
+            Qinv_b = Q \ b;
+            f = eta * Qinv_b + r;
             
             logDetQ = dimQ * log(2*pi) + 2*sum(log(diag(chol(Q))));
             logDetF = dimQ * log((eta+omega)*2*pi) - 2*sum(log(diag(chol(F))));
             
-            g = eta * obj.epsilon - omega * beta - 0.5 * eta * (b' * (Q \ b) ) ...
+            g = eta * obj.epsilon - omega * beta - 0.5 * eta * (b' * Qinv_b ) ...
                 + 0.5 * f' * (F \ f) - 0.5 * eta * logDetQ + 0.5 * (eta + omega) * logDetF;
             
             % Gradient of dual function (if required by the optimizer)
             if nargout > 1
                 Fi = inv(F);
                 invF_d_eta = -(Fi' * (Q \ Fi)); % deriv wrt eta of inv(F)
-                f_d_eta = Q \ b;                % deriv wrt eta of f
+                f_d_eta = Qinv_b;               % deriv wrt eta of f
                 
                 d_eta = obj.epsilon - 0.5 * b' * f_d_eta + 0.5 * f' * invF_d_eta * f ...
                     + f' * ( Fi * f_d_eta ) - 0.5 * logDetQ + 0.5 * logDetF ...
