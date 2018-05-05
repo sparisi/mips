@@ -9,6 +9,7 @@ clear all
 folder = 'data/';
 separator = '_';
 filenames = {'alg1', 'alg2'};
+colors = {'b', 'r'};
 variable = 'J_history';
 % variable = 'mean(J_history)';
 % variable = '-log(-mean(J_history))';
@@ -31,11 +32,16 @@ for name = filenames
     
     if ~isempty(dataMatrix)
         hold all
+        if ~isempty(colors)
+            lineprops = { 'LineWidth', 2, 'DisplayName', name{:}, 'Color', colors{numel(h)+1} };
+        else
+            lineprops = { 'LineWidth', 2, 'DisplayName', name{:} };
+        end
         tmp = shadedErrorBar( ...
             1:size(dataMatrix,2), ...
             mean(dataMatrix,1), ...
             std(dataMatrix), ...
-            { 'LineWidth', 2, 'DisplayName', name{:} }, ...
+            lineprops, ...
             0.1 );
         h{end+1} = tmp.mainLine;
     end
