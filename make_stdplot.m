@@ -9,6 +9,7 @@ clear all
 folder = 'data/';
 separator = '_';
 filenames = {'alg1', 'alg2'};
+legendnames = {'MY ALG 1', 'OTHER ALG'};
 colors = {'b', 'r'};
 markers = {'*', 'diamond'};
 variable = 'J_history';
@@ -51,6 +52,6 @@ for name = filenames
     
 end
 
-legend([h{:}], filenames, 'Interpreter', 'none')
+legend([h{:}], legendnames, 'Interpreter', 'none')
 
 leg.Position = [0.2 0.7 0 0];
