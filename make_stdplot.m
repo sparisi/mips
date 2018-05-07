@@ -10,6 +10,7 @@ folder = 'data/';
 separator = '_';
 filenames = {'alg1', 'alg2'};
 colors = {'b', 'r'};
+markers = {'*', 'diamond'};
 variable = 'J_history';
 % variable = 'mean(J_history)';
 % variable = '-log(-mean(J_history))';
@@ -32,10 +33,12 @@ for name = filenames
     
     if ~isempty(dataMatrix)
         hold all
+        lineprops = { 'LineWidth', 2, 'DisplayName', name{:} };
         if ~isempty(colors)
-            lineprops = { 'LineWidth', 2, 'DisplayName', name{:}, 'Color', colors{numel(h)+1} };
-        else
-            lineprops = { 'LineWidth', 2, 'DisplayName', name{:} };
+            lineprops = {lineprops{:}, 'Color', colors{numel(h)+1} };
+        end
+        if ~isempty(markers)
+            lineprops = {lineprops{:}, 'Marker', markers{numel(h)+1} };
         end
         tmp = shadedErrorBar( ...
             1:size(dataMatrix,2), ...
