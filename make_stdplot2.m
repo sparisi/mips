@@ -1,6 +1,6 @@
 % Compares results of different hyperparameters (of the same method) 
 % averaged over many trials. 
-% You need to set the folder where the data is stored and the filename
+% You need to set the folder (where data is stored) and the filename
 % format (eg, alg_param1_param2_1.mat)
 
 close all
@@ -11,8 +11,8 @@ folder = 'data/';
 base_name = 'alg';
 separator = '_';
 
-hp1_list = {'0.1', '0.5', '1'}; % hyperparameter lists
-hp2_list = {'0.01', '0.1', '0.2'};
+hp1_list = {0.1, 0.5, 1}; % hyperparameter lists
+hp2_list = {0.01, 0.1, 0.2};
 hp3_list = {'False'};
 filenames = {};
 
@@ -27,7 +27,7 @@ for hp1 = hp1_list
         for hp3 = hp3_list
 
             
-name = [base_name, separator, hp1{:}, separator, hp2{:}, separator, hp3{:}];
+name = [base_name, separator, num2str(hp1{:}), separator, num2str(hp2{:}), separator, num2str(hp3{:})];
 filenames = [filenames, name];
 counter = 1;
 dataMatrix = [];
