@@ -1,7 +1,14 @@
 classdef MDP_avg < MDP
 % Introduces state resets to learn average reward MDPs.
-    % Ensure stationary distribution of transient dynamics by resetting 
-    
+%
+% =========================================================================
+% REFERENCE
+% J Peters, K Muelling, Y Altun
+% Relative Entropy Policy Search (2010)
+%
+% H van Hoof, G Neumann, J Peters
+% Non-parametric Policy Search with Limited Information Loss (2017)
+
     properties (GetAccess = 'public', SetAccess = 'private')
         reset_prob
         mdp

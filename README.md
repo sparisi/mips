@@ -67,7 +67,7 @@ Policies are modeled as objects. Their most important method is `drawAction`, bu
 <summary><b>MDPs</b></summary>
   <p>
 Each MDP is modeled as an object (<code>MDP.m</code>) and requires some properties (dimension of state and action spaces, bounds, etc...) and methods (for simulating and plotting).  
-There are also some extension, that are <i>Contextual MDPs</i> (<code>CMDP.m</code>) and <i>Multi-objective MDPs</i> (<code>MOMDP.m</code>).  
+There are also some extension, that are <i>Contextual MDPs</i> (<code>CMDP.m</code>), <i>Multi-objective MDPs</i> (<code>MOMDP.m</code>), and <i>Average-reward MDPs</i> (<code>MDP_avg.m</code>).  
 For MDPs sharing the same environment (e.g., Mountain Car with continuous or discrete actions, Cart-pole with or without swing-up, ...), there are common <i>Environment</i> (<code>Env</code>) classes.
 This classes define common variables and the transition function, while the subclasses define the remainder functions (reward, action parsing, terminal conditions, ...).
 
