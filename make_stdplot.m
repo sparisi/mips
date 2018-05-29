@@ -9,6 +9,9 @@ clear all
 folder = 'data/';
 separator = '_';
 filenames = {'alg1', 'alg2'};
+legendnames = {'MY ALG 1', 'OTHER ALG'};
+colors = {'b', 'r'};
+markers = {'*', 'diamond'};
 variable = 'J_history';
 % variable = 'mean(J_history)';
 % variable = '-log(-mean(J_history))';
@@ -31,17 +34,24 @@ for name = filenames
     
     if ~isempty(dataMatrix)
         hold all
+        lineprops = { 'LineWidth', 2, 'DisplayName', name{:} };
+        if ~isempty(colors)
+            lineprops = {lineprops{:}, 'Color', colors{numel(h)+1} };
+        end
+        if ~isempty(markers)
+            lineprops = {lineprops{:}, 'Marker', markers{numel(h)+1} };
+        end
         tmp = shadedErrorBar( ...
             1:size(dataMatrix,2), ...
             mean(dataMatrix,1), ...
             std(dataMatrix), ...
-            { 'LineWidth', 2, 'DisplayName', name{:} }, ...
+            lineprops, ...
             0.1 );
         h{end+1} = tmp.mainLine;
     end
     
 end
 
-legend([h{:}], filenames, 'Interpreter', 'none')
+legend([h{:}], legendnames, 'Interpreter', 'none')
 
 leg.Position = [0.2 0.7 0 0];

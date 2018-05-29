@@ -28,7 +28,6 @@ for hp1 = hp1_list
 
             
 name = [base_name, separator, num2str(hp1{:}), separator, num2str(hp2{:}), separator, num2str(hp3{:})];
-filenames = [filenames, name];
 counter = 1;
 dataMatrix = [];
 for trial = 1 : 999
@@ -50,6 +49,7 @@ if ~isempty(dataMatrix)
         { 'LineWidth', 2, 'DisplayName', name }, ...
         0.1 );
         h{end+1} = tmp.mainLine;
+    filenames = [filenames, name];
 end
 
 
