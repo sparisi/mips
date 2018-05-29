@@ -5,7 +5,7 @@ lrate = 0.1;
 while true
     
     [ds, J] = collect_samples(mdp, episodes_learn, steps_learn, policy);
-    S = policy.entropy(horzcat(ds.s));
+    S = policy.entropy([ds.s]);
 
 %     [grad, stepsize] = GPOMDPbase(policy,ds,mdp.gamma,lrate);
 %     [grad, stepsize] = eREINFORCEbase(policy,ds,mdp.gamma,lrate);

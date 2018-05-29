@@ -20,7 +20,7 @@ randfactor = 10; % Randomization after single-objective optimization
 target_policy = policy; % Learn the low-level policy
 alg = @(policy, data, lrate) eNACbase(policy, data, mdp.gamma, lrate);
 collect = @(policy) collect_samples(mdp, episodes_learn, steps_learn, policy);
-calc_entropy = @(data, policy) policy.entropy(horzcat(data.s));
+calc_entropy = @(data, policy) policy.entropy([data.s]);
 eval = @(policies) evaluate_policies(mdp, episodes_eval, steps_eval, policies);
 
 
