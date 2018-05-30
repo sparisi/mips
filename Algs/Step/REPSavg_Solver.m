@@ -5,12 +5,9 @@ classdef REPSavg_Solver < handle
 %
 % =========================================================================
 % REFERENCE
-% M P Deisenroth, G Neumann, J Peters
-% A Survey on Policy Search for Robotics, Foundations and Trends in
-% Robotics (2013)
-%
-% J Peters, K Muelling, Y Altun
-% Relative Entropy Policy Search (2010)
+% H van Hoof, G Neumann, J Peters
+% Non-parametric Policy Search with Limited Information Loss
+% JMLR (2017)
 
     properties
         epsilon % KL divergence bound
@@ -34,18 +31,13 @@ classdef REPSavg_Solver < handle
             if nargin < 5, W = ones(1, size(R,2)); end % IS weights
 
             % Optimization problem settings
-            options = optimset('Algorithm', 'interior-point', ...
+            options = optimoptions('fmincon', ...
+                'Algorithm', 'trust-region-reflective', ...
                 'GradObj', 'on', ...
                 'Display', 'off', ...
+                'Hessian', 'on', ...
                 'MaxFunEvals', 10 * 5, ...
                 'TolX', 10^-8, 'TolFun', 10^-12, 'MaxIter', 50);
-
-%             options = optimset('Algorithm', 'trust-region-reflective', ...
-%                 'GradObj', 'on', ...
-%                 'Hessian', 'user-supplied', ...
-%                 'Display', 'off', ...
-%                 'MaxFunEvals', 10 * 5, ...
-%                 'TolX', 10^-8, 'TolFun', 10^-12, 'MaxIter', 50);
 
             lowerBound_theta = -ones(size(Phi,1), 1) * 1e8;
             upperBound_theta = ones(size(Phi,1), 1) * 1e8;
@@ -171,6 +163,7 @@ classdef REPSavg_Solver < handle
         %% PLOTTING
         function plotV(obj, stateLB, stateUB)
             if length(stateLB) > 2, return, end
+            if sum(isinf(stateLB) | isinf(stateUB)) > 0, return, end
 
             if length(stateLB) == 1
                 n = 100;
