@@ -127,7 +127,12 @@ sqrtR = sqrt(R);
 for i = 1 : k
     Z = (sum(R(:,i))^2 - sum(R(:,i).^2)) / sum(R(:,i))^2;
     PhiD = bsxfun(@times,Phi,R(:,i)');
-    A(:,:,i) = ((PhiD * Phi' + 1e-8 * eye(f)) \ PhiD * X')';
+    tmp = PhiD * Phi';
+    if rank(tmp) == f
+        A(:,:,i) = (tmp \ PhiD * X')';
+    else
+        A(:,:,i) = (pinv(tmp) * PhiD * X')';
+    end
     mu = A(:,:,i) * Phi;
     Xo = bsxfun(@minus, X, mu);
     Xo = bsxfun(@times, Xo, sqrtR(:,i)');

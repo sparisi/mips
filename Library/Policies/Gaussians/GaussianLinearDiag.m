@@ -77,7 +77,12 @@ classdef GaussianLinearDiag < GaussianLinear
             assert(size(Phi,1) == obj.basis()+1)
             weights = weights / sum(weights);
             PhiW = bsxfun(@times,Phi,weights);
-            A = (PhiW * Phi' + 1e-8 * eye(size(Phi,1))) \ PhiW * Action';
+            tmp = PhiW * Phi';
+            if rank(tmp) == size(Phi,1)
+                A = tmp \ PhiW * Action';
+            else
+                A = pinv(tmp) * PhiW * Action';
+            end
             A = A';
             std = sum( bsxfun(@times, weights, bsxfun(@minus, Action, A*Phi).^2), 2 );
             Z = (sum(weights)^2 - sum(weights.^2)) / sum(weights);

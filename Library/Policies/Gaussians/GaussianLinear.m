@@ -92,7 +92,7 @@ classdef (Abstract) GaussianLinear < Gaussian
                 [X, Y] = meshgrid(x,y);
                 s = [X(:), Y(:)]';
                 mu = obj.A*obj.basis_bias(s);
-                subsurf('Mean action', X, Y, mu, 1)
+                subcontourf('Mean action', X, Y, mu)
             end
         end
         

@@ -49,7 +49,12 @@ classdef GaussianLinearFixedvarDiagmean < GaussianLinear
             assert(min(weights)>=0, 'Weights cannot be negative.')
             weights = weights / sum(weights);
             PhiW = bsxfun(@times,Phi,weights);
-            A = (PhiW * Phi' + 1e-8 * eye(size(Phi,1))) \ PhiW * Action';
+            tmp = PhiW * Phi';
+            if rank(tmp) == size(Phi,1)
+                A = tmp \ PhiW * Action';
+            else
+                A = pinv(tmp) * PhiW * Action';
+            end
             obj = obj.update(diag(A));
         end        
 
