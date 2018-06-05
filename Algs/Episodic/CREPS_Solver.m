@@ -25,7 +25,7 @@ classdef CREPS_Solver < handle
         function obj = CREPS_Solver(epsilon, bfs)
             obj.epsilon = epsilon;
             obj.basis = bfs;
-            obj.eta = 1;
+            obj.eta = 1e3;
             obj.theta = rand(bfs(),1)-0.5;
         end
         
@@ -34,16 +34,22 @@ classdef CREPS_Solver < handle
             if nargin < 4, W = ones(1, size(J,2)); end % IS weights
             
             % Optimization problem settings
-            options = optimoptions('fmincon', ...
+            options_eta = optimoptions('fmincon', ...
                 'Algorithm', 'trust-region-reflective', ...
                 'GradObj', 'on', ...
                 'Display', 'off', ...
                 'Hessian', 'on', ...
                 'MaxFunEvals', 10 * 5, ...
                 'TolX', 10^-8, 'TolFun', 10^-12, 'MaxIter', 50);
+            
+            options_theta = optimoptions('fminunc', ...
+                'Algorithm', 'trust-region', ...
+                'GradObj', 'on', ...
+                'Display', 'off', ...
+                'Hessian', 'on', ...
+                'MaxFunEvals', 10 * 5, ...
+                'TolX', 10^-8, 'TolFun', 10^-12, 'MaxIter', 50);
 
-            lowerBound_theta = -ones(length(obj.theta), 1) * 1e8;
-            upperBound_theta = ones(length(obj.theta), 1) * 1e8;
             lowerBound_eta = 1e-8;
             upperBound_eta = 1e8;
             
@@ -63,8 +69,8 @@ classdef CREPS_Solver < handle
 
                 if ~validKL || numStepsNoKL > 5 % If we skipped the KL optimization more than 5 times, redo it
                     % Here theta is constant, so we can pass directly V
-                    obj.eta = fmincon(@(eta)obj.dual_eta(eta,J,V,W), ...
-                        obj.eta, [], [], [], [], lowerBound_eta, upperBound_eta, [], options);
+                    obj.eta = fmincon(@(eta)obj.dual_eta(eta,J,V,W), obj.eta, ...
+                        [], [], [], [], lowerBound_eta, upperBound_eta, [], options_eta);
                     
                     % Compute the weights
                     advantage = J - V;
@@ -87,8 +93,8 @@ classdef CREPS_Solver < handle
                 
                 if ~validSF
                     % Here theta is not constant
-                    obj.theta = fmincon(@(theta)obj.dual_theta(theta,obj.eta,J,Phi,W), ...
-                        obj.theta, [], [], [], [], lowerBound_theta, upperBound_theta, [], options);
+                    obj.theta = fminunc(@(theta)obj.dual_theta(theta,obj.eta,J,Phi,W), ...
+                        obj.theta, options_theta);
                     
                     % Compute the weights
                     advantage = J - obj.theta' * Phi;

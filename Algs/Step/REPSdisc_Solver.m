@@ -22,12 +22,12 @@ classdef REPSdisc_Solver < handle
         %% CLASS CONSTRUCTOR
         function obj = REPSdisc_Solver(epsilon)
             obj.epsilon = epsilon;
-            obj.eta = 1;
+            obj.eta = 1e3;
         end
         
         %% CORE
-        function [d, divKL] = optimize(obj, Q, W)
-            if nargin < 3, W = ones(1, size(Q,2)); end % IS weights
+        function [d, divKL] = optimize(obj, R, W)
+            if nargin < 3, W = ones(1, size(R,2)); end % IS weights
 
             % Optimization problem settings
             options = optimoptions('fmincon', ...
@@ -41,11 +41,11 @@ classdef REPSdisc_Solver < handle
             lowerBound = 1e-8;
             upperBound = 1e8;
             
-            obj.eta = fmincon(@(eta)obj.dual_eta(eta,Q,W), ...
+            obj.eta = fmincon(@(eta)obj.dual_eta(eta,R,W), ...
                 obj.eta, [], [], [], [], lowerBound, upperBound, [], options);
             
             % Compute the weights
-            d = W .* exp( (Q - max(Q)) / obj.eta );
+            d = W .* exp( (R - max(R)) / obj.eta );
             
             % Check conditions
             qWeighting = W;
@@ -55,22 +55,22 @@ classdef REPSdisc_Solver < handle
         end
         
         %% DUAL FUNCTIONS
-        function [g, gd, h] = dual_eta(obj, eta, Q, W)
-            if nargin < 4, W = ones(1, size(Q,2)); end % IS weights
+        function [g, gd, h] = dual_eta(obj, eta, R, W)
+            if nargin < 4, W = ones(1, size(R,2)); end % IS weights
 
             n = sum(W);
-            maxQ = max(Q);
-            weights = W .* exp( ( Q - maxQ ) / eta ); % numerical trick
+            maxR = max(R);
+            weights = W .* exp( ( R - maxR ) / eta ); % numerical trick
             sumWeights = sum(weights);
-            sumWeightsQ = sum( weights .* (Q - maxQ) );
-            sumWeightsQQ = sum( weights .* (Q - maxQ).^2 );
+            sumWeightsR = sum( weights .* (R - maxR) );
+            sumWeightsRR = sum( weights .* (R - maxR).^2 );
             
             % dual function
-            g = eta * obj.epsilon + eta * log(sumWeights/n) + maxQ;
+            g = eta * obj.epsilon + eta * log(sumWeights/n) + maxR;
             % gradient wrt eta
-            gd = obj.epsilon + log(sumWeights/n) - sumWeightsQ / (eta * sumWeights);
+            gd = obj.epsilon + log(sumWeights/n) - sumWeightsR / (eta * sumWeights);
             % hessian
-            h = ( sumWeightsQQ * sumWeights - sumWeightsQ^2 ) / ( eta^3 * sumWeights^2 );
+            h = ( sumWeightsRR * sumWeights - sumWeightsR^2 ) / ( eta^3 * sumWeights^2 );
         end
 
     end

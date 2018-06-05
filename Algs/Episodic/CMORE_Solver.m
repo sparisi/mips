@@ -40,7 +40,7 @@ classdef CMORE_Solver < handle
             obj.Qi = inv(obj.Q);
             if nargin < 5, entropy_bound = 'absolute'; end
             obj.entropy_bound = entropy_bound;
-            obj.eta = 0.5;
+            obj.eta = 1e3;
             obj.omega = 0.5;
             obj.lambda_l1 = 0;
             obj.lambda_l2 = 0;

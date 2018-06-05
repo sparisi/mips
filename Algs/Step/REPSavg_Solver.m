@@ -1,5 +1,5 @@
 classdef REPSavg_Solver < handle
-% Step-based Relative Entropy Policy Search for average rewards.
+% Step-based Relative Entropy Policy Search for average reward MDPs.
 % The value function is linear in the parameters: V(s) = theta' * Phi(s).
 % It supports Importance Sampling (IS).
 %
@@ -14,6 +14,7 @@ classdef REPSavg_Solver < handle
         basis   % Basis function to approximate the value function
         eta     % Lagrangian (KL)
         theta   % Lagrangian (features)
+        l2_reg  % Regularizer for theta
     end
 
     methods
@@ -22,8 +23,9 @@ classdef REPSavg_Solver < handle
         function obj = REPSavg_Solver(epsilon, bfs)
             obj.epsilon = epsilon;
             obj.basis = bfs;
-            obj.eta = 1;
+            obj.eta = 1e3;
             obj.theta = rand(bfs(),1)-0.5;
+            obj.l2_reg = 0;
         end
 
         %% CORE
@@ -31,39 +33,40 @@ classdef REPSavg_Solver < handle
             if nargin < 5, W = ones(1, size(R,2)); end % IS weights
 
             % Optimization problem settings
-            options = optimoptions('fmincon', ...
+            options_eta = optimoptions('fmincon', ...
                 'Algorithm', 'trust-region-reflective', ...
                 'GradObj', 'on', ...
                 'Display', 'off', ...
                 'Hessian', 'on', ...
-                'MaxFunEvals', 10 * 5, ...
-                'TolX', 10^-8, 'TolFun', 10^-12, 'MaxIter', 50);
+                'MaxFunEvals', 1000, ...
+                'TolX', 10^-8, 'TolFun', 10^-12, 'MaxIter', 1000);
 
-            lowerBound_theta = -ones(size(Phi,1), 1) * 1e8;
-            upperBound_theta = ones(size(Phi,1), 1) * 1e8;
-            lowerBound_eta = 1e-8;
-            upperBound_eta = 1e8;
+            options_theta = optimoptions('fminunc', ...
+                'Algorithm', 'trust-region', ...
+                'GradObj', 'on', ...
+                'Display', 'off', ...
+                'Hessian', 'on', ...
+                'MaxFunEvals', 1000, ...
+                'TolX', 10^-8, 'TolFun', 10^-12, 'MaxIter', 1000);
 
             % Hyperparams
             maxIter = 100;
             numStepsNoKL = 0;
-            tolSF = 0.0001;
+            tolSF = 0.000001;
             tolKL = 0.1;
 
             validKL = false;
             validSF = false;
 
             % Iteratively solve fmincon for eta and theta separately
-            for i = 1 : maxIter
-                if ~validKL || numStepsNoKL > 5 % If we skipped the KL optimization more than 5 times, redo it
-                    % Here theta is constant, so we can pass directly V and VN
-                    V = obj.theta' * Phi; % V(s)
-                    VN = obj.theta' * PhiN; % V(s')
-                    obj.eta = fmincon(@(eta)obj.dual_eta(eta,R,V,VN,W), ...
-                        obj.eta, [], [], [], [], lowerBound_eta, upperBound_eta, [], options);
+            for iter = 1 : maxIter
+                if ~validKL || numStepsNoKL > 511 % If we skipped the KL optimization more than 5 times, redo it
+                    % Here theta is constant, so we can pass directly A
+                    A = R + obj.theta'*(PhiN-Phi);
+                    obj.eta = fmincon(@(eta)obj.dual_eta(eta,A,W), obj.eta, ...
+                        [], [], [], [], 1e-8, 1e8, [], options_eta);
 
                     % Compute the weights
-                    A = R + VN - V;
                     d = W .* exp( (A - max(A)) / obj.eta );
 
                     % Check conditions
@@ -73,9 +76,11 @@ classdef REPSavg_Solver < handle
                     divKL = kl_mle(pWeighting, qWeighting);
                     error = abs(divKL - obj.epsilon);
                     validKL = error < tolKL * obj.epsilon;
+%                     validKL = divKL < (1+tolKL) * obj.epsilon;
                     featureDiff = bsxfun(@rdivide,(Phi - PhiN)*pWeighting',std(Phi,0,2)); % Standardize
                     validSF = max(abs(featureDiff)) < tolSF;
                     numStepsNoKL = 0;
+                    fprintf('     %d | eta   - KL: %.4f / %.4f,  FE: %e / %e\n', iter, divKL, (1+tolKL)*obj.epsilon, max(abs(featureDiff)), tolSF)
                 else
                     % KL is still valid, skip KL optimization
                     numStepsNoKL = numStepsNoKL + 1;
@@ -83,8 +88,8 @@ classdef REPSavg_Solver < handle
                 
                 if ~validSF
                     % Here theta is not constant
-                    obj.theta = fmincon(@(theta)obj.dual_theta(theta,obj.eta,R,Phi,PhiN,W), ...
-                        obj.theta, [], [], [], [], lowerBound_theta, upperBound_theta, [], options);
+                    obj.theta = fminunc(@(theta)obj.dual_theta(theta,obj.eta,R,Phi,PhiN,W), ...
+                        obj.theta, options_theta);
 
                     % Compute the weights
                     A = R + obj.theta' * (PhiN - Phi);
@@ -97,30 +102,27 @@ classdef REPSavg_Solver < handle
                     divKL = kl_mle(pWeighting, qWeighting);
                     error = abs(divKL - obj.epsilon);
                     validKL = error < tolKL * obj.epsilon;
+%                     validKL = divKL < (1+tolKL) * obj.epsilon;
                     featureDiff = bsxfun(@rdivide,(Phi - PhiN)*pWeighting',std(Phi,0,2)); % Standardize
                     validSF = max(abs(featureDiff)) < tolSF;
+                    fprintf('     %d | theta - KL: %.4f / %.4f,  FE: %e / %e\n', iter, divKL, (1+tolKL)*obj.epsilon, max(abs(featureDiff)), tolSF)
                 end
                 
-%                 fprintf('REPS optimization, iter %i\n',i);
-
                 if validSF && validKL
                     break
                 end
-                
             end
             
-            if i == maxIter
+            if iter == maxIter
                 warning('REPS could not satisfy the constraints within max iterations.')
             end
-            
         end
 
         %% DUAL FUNCTIONS
-        function [g, gd, h] = dual_eta(obj, eta, R, V, VN, W)
-            if nargin < 6, W = ones(1, size(R,2)); end % IS weights
+        function [g, gd, h] = dual_eta(obj, eta, A, W)
+            if nargin < 4, W = ones(1, size(A,2)); end % IS weights
             
             n = sum(W);
-            A = R + VN - V;
             maxA = max(A);
             weights = W .* exp( ( A - maxA ) / eta ); % Numerical trick
             sumWeights = sum(weights);
@@ -128,7 +130,7 @@ classdef REPSavg_Solver < handle
             sumWeightsAA = (A - maxA).^2 * weights';
 
             % Dual function
-            g = eta * obj.epsilon + eta * log(sumWeights/n) + maxA;
+            g = eta * obj.epsilon + eta * log(sumWeights/n) + maxA + obj.l2_reg*sum(obj.theta.^2);
             % Gradient wrt eta
             gd = obj.epsilon + log(sumWeights/n) - sumWeightsA / (eta * sumWeights);
             % Hessian
@@ -148,11 +150,11 @@ classdef REPSavg_Solver < handle
             sumPhiWeightsPhi = PhiDiff * bsxfun( @times, weights', PhiDiff' );
 
             % Dual function
-            g = eta * obj.epsilon + eta * log(sumWeights/n) + maxA;
+            g = eta * obj.epsilon + eta * log(sumWeights/n) + maxA + obj.l2_reg*sum(theta.^2);
             % Gradient wrt theta
-            gd = sumPhiWeights / sumWeights;
+            gd = sumPhiWeights / sumWeights + obj.l2_reg/2*theta;
             % Hessian
-            h = ( sumPhiWeightsPhi * sumWeights - sumPhiWeights * sumPhiWeights') / sumWeights^2 / eta;
+            h = ( sumPhiWeightsPhi * sumWeights - sumPhiWeights * sumPhiWeights') / sumWeights^2 / eta + obj.l2_reg/2;
         end
         
         %% GET V-FUNCTION
@@ -187,7 +189,7 @@ classdef REPSavg_Solver < handle
                 [X, Y] = meshgrid(x,y);
                 s = [X(:), Y(:)]';
                 V = obj.getV(s);
-                updatesurf('V-function', X, Y, reshape(V,n,n))
+                updatecontourf('V-function', X, Y, reshape(V,n,n))
             end
         end
 

@@ -21,7 +21,7 @@ classdef REPSep_Solver < handle
         %% CLASS CONSTRUCTOR
         function obj = REPSep_Solver(epsilon)
             obj.epsilon = epsilon;
-            obj.eta = 1;
+            obj.eta = 1e3;
         end
         
         %% PERFORM AN OPTIMIZATION STEP
