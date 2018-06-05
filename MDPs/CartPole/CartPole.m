@@ -27,6 +27,7 @@ classdef CartPole < CartPoleEnv
     methods
         function state = init(obj, n)
             state = zeros(obj.dstate,n);
+            state(3,:) = myunifrnd(-deg2rad(15)*0.05,deg2rad(15)*0.05,n);
         end
         
         function action = parse(obj, action)

@@ -26,6 +26,7 @@ classdef CartPoleSwingUp < CartPoleEnv
     methods
         function state = init(obj, n)
             state = myunifrnd([-1,-2,pi-1,-3],[1,2,pi+1,3],n);
+            state(3,:) = wrapinpi(state(3,:));
         end
         
         function action = parse(obj, action)
@@ -33,7 +34,7 @@ classdef CartPoleSwingUp < CartPoleEnv
         end
             
         function reward = reward(obj, state, action, nextstate)
-            reward = cos(nextstate(3,:)) - 1;
+            reward = cos(nextstate(3,:)); % - nextstate(4,:).^2*0.001 - action.^2*0.0001;
             reward(obj.isterminal(nextstate)) = -100;
         end
         

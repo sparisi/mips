@@ -6,6 +6,7 @@ classdef NLinkEnv < MDP
     methods
         %% Simulator
         function state = init(obj, n)
+            if nargin == 1, n = 1; end
             state = repmat([-pi/2 zeros(1,obj.dstate-1)]',1,n); % "Down" pos
 
             randpos = myunifrnd(obj.stateLB(1:2:end),obj.stateUB(1:2:end),n); % Rand pos

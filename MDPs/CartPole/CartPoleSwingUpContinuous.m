@@ -2,6 +2,14 @@ classdef CartPoleSwingUpContinuous < CartPoleEnv
 % Cart-pole with continuous actions.
 % The goal is to swing up and balance the pole starting from a random position.
 % The episode ends if the cart goes out of bounds.
+% 
+% =========================================================================
+% REFERENCE
+% https://arxiv.org/pdf/1604.06778.pdf
+%
+% M Tornio, T Raiko
+% Variational bayesian Approach for Nonlinear Identification and Control
+% 2006
 
     properties
         % MDP variables
@@ -23,6 +31,7 @@ classdef CartPoleSwingUpContinuous < CartPoleEnv
     methods
         function state = init(obj, n)
             state = myunifrnd([-1,-2,pi-1,-3],[1,2,pi+1,3],n);
+            state(3,:) = wrapinpi(state(3,:));
         end
         
         function action = parse(obj, action)
@@ -30,7 +39,7 @@ classdef CartPoleSwingUpContinuous < CartPoleEnv
         end
             
         function reward = reward(obj, state, action, nextstate)
-            reward = cos(nextstate(3,:)) - 1;
+            reward = cos(nextstate(3,:)); % - nextstate(4,:).^2*0.001 - action.^2*0.0001;
             reward(obj.isterminal(nextstate)) = -100;
         end
         

@@ -7,10 +7,10 @@ classdef (Abstract) CartPoleEnv < MDP
     properties(Constant)
         g = 9.81;
         masscart = 1.0;
-        masspole = [0.1 0.01]';
-        length = [0.5 0.05]'; % Distance from the pivot to the poles centre of mass (so full length is the double)
+        masspole = [0.1 0.05]';
+        length = [0.5 0.25]'; % Distance from the pivot to the poles centre of mass (so full length is the double)
         force = 10.0;
-        dt = 0.02;
+        dt = 0.05;
         mu_c = 0.0005; % Coefficient of friction of cart on track
         mu_p = 0.000002; % Coefficient of friction of the pole's hinge
     end

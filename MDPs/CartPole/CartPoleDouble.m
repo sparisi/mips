@@ -13,7 +13,7 @@ classdef CartPoleDouble < CartPoleEnv
         gamma = 0.9;
 
         % Bounds : state = [x xd theta thetad]
-        stateLB = [-2.4, -inf, -deg2rad(15), -deg2rad(15) -inf, -inf]';
+        stateLB = [-2.4, -inf, -deg2rad(15), -deg2rad(15), -inf, -inf]';
         stateUB = [2.4, inf, deg2rad(15), deg2rad(15), inf, inf]';
         actionLB = 1;
         actionUB = 2;
@@ -26,11 +26,8 @@ classdef CartPoleDouble < CartPoleEnv
     
     methods
         function state = init(obj, n)
-            initLB = [-2.4, -1, -deg2rad(15), -deg2rad(15) -1, -1]';
-            initUB = [2.4, 1, deg2rad(15), deg2rad(15), 1, 1]';
-            state = bsxfun(@plus, ...
-                bsxfun(@times, (initUB - initLB), rand(obj.dstate,n)), initLB);
-            state(1:2,:) = 0; % The cart is always in the middle, with 0 vel
+            state = zeros(obj.dstate,n);
+            state(3,:) = myunifrnd(-deg2rad(15)*0.05,deg2rad(15)*0.05,n);
         end
         
         function action = parse(obj, action)

@@ -25,6 +25,7 @@ classdef CartPoleContinuous < CartPoleEnv
         function state = init(obj, n)
             state = zeros(obj.dstate,n);
             theta = myunifrnd(-deg2rad(5),deg2rad(5),n);
+            theta = wrapinpi(theta);
             state(3,:) = theta;
         end
         
