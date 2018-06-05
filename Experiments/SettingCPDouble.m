@@ -6,7 +6,10 @@ close all
 mdp = CartPoleDouble;
 robj = 1;
 
-bfs = @(varargin)basis_poly(2,mdp.dstate,0,varargin{:});
+tmp_policy.drawAction = @(x)randi(mdp.actionUB,1,size(x,2));
+ds = collect_samples(mdp, 100, 100, tmp_policy);
+B = avg_pairwise_dist([ds.s]);
+bfs = @(varargin) basis_fourier(100, mdp.dstate, B, 0, varargin{:});
 
 policy = Gibbs(bfs, zeros((bfs()+1)*(mdp.actionUB-1),1), mdp.actionLB:mdp.actionUB);
 

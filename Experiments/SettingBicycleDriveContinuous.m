@@ -10,7 +10,7 @@ bfs = @bicycledrive_basis_poly;
 % bfs = @(varargin) basis_poly(2,mdp.dstate,0,varargin{:});
 
 A0 = zeros(mdp.daction,bfs()+1);
-Sigma0 = 10*[4 0; 0 0.04];
+Sigma0 = 20*[4 0; 0 0.04];
 % policy = GaussianLinearDiag(bfs, mdp.daction, A0, Sigma0);
 policy = GaussianLinearChol(bfs, mdp.daction, A0, Sigma0);
 
@@ -20,7 +20,7 @@ policy = GaussianLinearChol(bfs, mdp.daction, A0, Sigma0);
 makeDet = 0; % 1 to learn deterministic low level policies
 n_params = policy.dparams;
 mu0 = policy.theta(1:n_params);
-Sigma0high = eye(n_params);
+Sigma0high = 10*eye(n_params);
 Sigma0high = Sigma0high + diag(abs(mu0)).^2;
 Sigma0high = nearestSPD(Sigma0high);
 policy_high = GaussianConstantChol(n_params, mu0, Sigma0high);
