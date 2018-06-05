@@ -48,4 +48,4 @@ end
 %% See best learned policy
 [value, idx] = max(J(robj,:));
 best_policy = Policies(idx);
-show_simulation(mdp, best_policy, 1000, 0.1);
+show_simulation(mdp, best_policy, 1000, 0.01)

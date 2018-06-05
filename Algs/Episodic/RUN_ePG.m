@@ -35,3 +35,4 @@ end
 
 %%
 plothistory(J_history)
+show_simulation(mdp, policy.update(policy_high.mu), 1000, 0.01)

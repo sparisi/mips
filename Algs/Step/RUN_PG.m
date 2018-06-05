@@ -11,8 +11,8 @@ while true
 %     [grad, stepsize] = eREINFORCEbase(policy,ds,mdp.gamma,lrate);
     [grad, stepsize] = eNACbase(policy,ds,mdp.gamma,lrate);
     
-%     J = evaluate_policies(mdp, episodes_eval, steps_eval, policy.makeDeterministic);
-    J = evaluate_policies(mdp, episodes_eval, steps_eval, policy);
+    J = evaluate_policies(mdp, episodes_eval, steps_eval, policy.makeDeterministic);
+%     J = evaluate_policies(mdp, episodes_eval, steps_eval, policy);
     
     norm_g = norm(grad(:,robj));
     fprintf('%d) Entropy: %.2f \tNorm: %.2e \tJ: %s \n', ...

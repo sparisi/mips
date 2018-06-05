@@ -7,9 +7,9 @@ if makeDet, policy = policy.makeDeterministic; end
 
 iter = 1;
 
-% solver = REPSep_Solver(0.9);
-% solver = NES_Solver(0.1);
-solver = MORE_Solver(0.9,0.99,-75,policy_high);
+solver = REPSep_Solver(0.9);
+solver = NES_Solver(0.1);
+% solver = MORE_Solver(0.9,0.99,-75,policy_high);
 
 %% Learning
 while true
@@ -33,6 +33,7 @@ while true
 
     % Eval current policy
 %     [data, avgRew] = collect_episodes(mdp, episodes_eval, steps_eval, policy_high.makeDeterministic, policy);
+    awgRew = evaluate_policies(mdp, episodes_eval, steps_eval, policy.update(policy_high.mu));
 
     % Perform a policy update step
     [policy_high, div] = solver.step(J, Theta, policy_high, W);
@@ -48,6 +49,4 @@ end
 
 %%
 plothistory(J_history)
-show_simulation(mdp, ...
-    policy.update(policy_high.makeDeterministic.drawAction), ...
-    1000, 0.01)
+show_simulation(mdp, policy.update(policy_high.mu), 1000, 0.01)
