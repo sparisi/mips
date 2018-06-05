@@ -5,8 +5,8 @@
 % J Peters, K Muelling, Y Altun
 % Relative Entropy Policy Search (2010)
 
-solver = REPSdisc_Solver(0.5);
-nmax = episodes_learn * steps_learn;
+solver = REPSdisc_Solver(0.1);
+nmax = episodes_learn*steps_learn*5;
 data = [];
 varnames = {'r','s','nexts','a','Q'};
 bfsnames = { {'phi', @(s)policy.basis_bias(s)} };
@@ -32,4 +32,4 @@ end
 
 %%
 plot(J_history)
-show_simulation(mdp, policy.makeDeterministic, 100, 0.05)
+show_simulation(mdp, policy.makeDeterministic, 100, 0.01)
