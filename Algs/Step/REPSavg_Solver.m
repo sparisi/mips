@@ -15,6 +15,8 @@ classdef REPSavg_Solver < handle
         eta     % Lagrangian (KL)
         theta   % Lagrangian (features)
         l2_reg  % Regularizer for theta
+        tolKL = 0.1; % Tolerance of the KL error 
+        tolSF = 1e-5; % Tolerance of feature matching error
     end
 
     methods
@@ -52,15 +54,13 @@ classdef REPSavg_Solver < handle
             % Hyperparams
             maxIter = 100;
             numStepsNoKL = 0;
-            tolSF = 0.000001;
-            tolKL = 0.1;
 
             validKL = false;
             validSF = false;
 
             % Iteratively solve fmincon for eta and theta separately
             for iter = 1 : maxIter
-                if ~validKL || numStepsNoKL > 511 % If we skipped the KL optimization more than 5 times, redo it
+                if ~validKL || numStepsNoKL > 5 % If we skipped the KL optimization more than 5 times, redo it
                     % Here theta is constant, so we can pass directly A
                     A = R + obj.theta'*(PhiN-Phi);
                     obj.eta = fmincon(@(eta)obj.dual_eta(eta,A,W), obj.eta, ...
@@ -69,25 +69,26 @@ classdef REPSavg_Solver < handle
                     % Compute the weights
                     d = W .* exp( (A - max(A)) / obj.eta );
 
-                    % Check conditions
+                    % Check constraints
                     qWeighting = W;
                     pWeighting = d;
                     pWeighting = pWeighting / sum(pWeighting);
                     divKL = kl_mle(pWeighting, qWeighting);
                     error = abs(divKL - obj.epsilon);
-                    validKL = error < tolKL * obj.epsilon;
+                    validKL = error < obj.tolKL * obj.epsilon;
 %                     validKL = divKL < (1+tolKL) * obj.epsilon;
                     featureDiff = bsxfun(@rdivide,(Phi - PhiN)*pWeighting',std(Phi,0,2)); % Standardize
-                    validSF = max(abs(featureDiff)) < tolSF;
+                    validSF = max(abs(featureDiff)) < obj.tolSF;
                     numStepsNoKL = 0;
-                    fprintf('     %d | eta   - KL: %.4f / %.4f,  FE: %e / %e\n', iter, divKL, (1+tolKL)*obj.epsilon, max(abs(featureDiff)), tolSF)
+                    fprintf('     %d | eta   - KL: %.4f / %.4f,  FE: %e / %e\n', ...
+                        iter, divKL, (1+obj.tolKL)*obj.epsilon, max(abs(featureDiff)), obj.tolSF)
                 else
                     % KL is still valid, skip KL optimization
                     numStepsNoKL = numStepsNoKL + 1;
                 end
                 
-                if ~validSF
-                    % Here theta is not constant
+                if ~validSF || iter == 1
+                    % Here theta is the variable to be learned
                     obj.theta = fminunc(@(theta)obj.dual_theta(theta,obj.eta,R,Phi,PhiN,W), ...
                         obj.theta, options_theta);
 
@@ -95,17 +96,18 @@ classdef REPSavg_Solver < handle
                     A = R + obj.theta' * (PhiN - Phi);
                     d = W .* exp( (A - max(A)) / obj.eta );
 
-                    % Check conditions
+                    % Check constraints
                     qWeighting = W;
                     pWeighting = d;
                     pWeighting = pWeighting / sum(pWeighting);
                     divKL = kl_mle(pWeighting, qWeighting);
                     error = abs(divKL - obj.epsilon);
-                    validKL = error < tolKL * obj.epsilon;
+                    validKL = error < obj.tolKL * obj.epsilon;
 %                     validKL = divKL < (1+tolKL) * obj.epsilon;
                     featureDiff = bsxfun(@rdivide,(Phi - PhiN)*pWeighting',std(Phi,0,2)); % Standardize
-                    validSF = max(abs(featureDiff)) < tolSF;
-                    fprintf('     %d | theta - KL: %.4f / %.4f,  FE: %e / %e\n', iter, divKL, (1+tolKL)*obj.epsilon, max(abs(featureDiff)), tolSF)
+                    validSF = max(abs(featureDiff)) < obj.tolSF;
+                    fprintf('     %d | theta - KL: %.4f / %.4f,  FE: %e / %e\n', ...
+                        iter, divKL, (1+obj.tolKL)*obj.epsilon, max(abs(featureDiff)), obj.tolSF)
                 end
                 
                 if validSF && validKL

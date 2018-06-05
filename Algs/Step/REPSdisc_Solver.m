@@ -35,14 +35,11 @@ classdef REPSdisc_Solver < handle
                 'GradObj', 'on', ...
                 'Display', 'off', ...
                 'Hessian', 'on', ...
-                'MaxFunEvals', 10 * 5, ...
-                'TolX', 10^-8, 'TolFun', 10^-12, 'MaxIter', 50);
+                'MaxFunEvals', 500, ...
+                'TolX', 10^-8, 'TolFun', 10^-12, 'MaxIter', 100);
 
-            lowerBound = 1e-8;
-            upperBound = 1e8;
-            
             obj.eta = fmincon(@(eta)obj.dual_eta(eta,R,W), ...
-                obj.eta, [], [], [], [], lowerBound, upperBound, [], options);
+                obj.eta, [], [], [], [], 1e-8, 1e8, [], options);
             
             % Compute the weights
             d = W .* exp( (R - max(R)) / obj.eta );
@@ -60,16 +57,16 @@ classdef REPSdisc_Solver < handle
 
             n = sum(W);
             maxR = max(R);
-            weights = W .* exp( ( R - maxR ) / eta ); % numerical trick
+            weights = W .* exp( ( R - maxR ) / eta ); % Numerical trick
             sumWeights = sum(weights);
             sumWeightsR = sum( weights .* (R - maxR) );
             sumWeightsRR = sum( weights .* (R - maxR).^2 );
             
-            % dual function
+            % Dual function
             g = eta * obj.epsilon + eta * log(sumWeights/n) + maxR;
-            % gradient wrt eta
+            % Gradient wrt eta
             gd = obj.epsilon + log(sumWeights/n) - sumWeightsR / (eta * sumWeights);
-            % hessian
+            % Hessian
             h = ( sumWeightsRR * sumWeights - sumWeightsR^2 ) / ( eta^3 * sumWeights^2 );
         end
 

@@ -1,4 +1,4 @@
-function subcontourf(name, X, Y, Z)
+function subcontourf(name, X, Y, Z, c)
 % SUBCONTOUR Plots multiple contourf on the same figure using subplot.
 %
 %    INPUT
@@ -6,6 +6,9 @@ function subcontourf(name, X, Y, Z)
 %     - X    : [N x M] matrix or [1 x M] vector
 %     - Y    : [N x M] matrix or [1 x N] vector
 %     - Z    : [D x MN] matrix
+%     - c    : (optional) 1 to display colorbar
+
+if nargin < 5, c = 0; end
 
 [nplots, ~] = size(Z);
 if isvector(X)
@@ -26,6 +29,7 @@ if isempty(fig)
         contourf(X,Y,reshape(Z(i,:),n,m))
         if nplots > 1, title(num2str(i)), end
     end
+    if c, colorbar, end
 else
     axes = findobj(fig,'type','axes');
     for i = nplots : -1 : 1

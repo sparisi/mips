@@ -7,7 +7,7 @@ rng(1)
 options = optimoptions(@fminunc, 'Algorithm', 'trust-region', ...
     'GradObj', 'on', ...
     'Display', 'off', ...
-    'MaxFunEvals', 10 * 5, ...
+    'MaxFunEvals', 100, ...
     'TolX', 10^-8, 'TolFun', 10^-12, 'MaxIter', 100);
 
 mdp.gamma = 0.99;
@@ -19,7 +19,7 @@ bfsV = @(varargin)basis_poly(2,mdp.dstate,0,varargin{:});
 bfsV = bfs;
 
 omega = (rand(bfsV(),1)-0.5)*2;
-solver = REPSdisc_Solver(0.1);
+solver = REPSdisc_Solver(0.5);
 
 data = [];
 varnames = {'r','s','nexts','a','endsim','Q'};

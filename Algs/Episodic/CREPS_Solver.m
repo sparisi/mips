@@ -17,6 +17,8 @@ classdef CREPS_Solver < handle
         basis   % Basis function to approximate the value function
         eta     % Lagrangian (KL)
         theta   % Lagrangian (features)
+        tolKL = 0.1; % Tolerance of the KL error 
+        tolSF = 1e-5; % Tolerance of feature matching error
     end
     
     methods
@@ -39,25 +41,20 @@ classdef CREPS_Solver < handle
                 'GradObj', 'on', ...
                 'Display', 'off', ...
                 'Hessian', 'on', ...
-                'MaxFunEvals', 10 * 5, ...
-                'TolX', 10^-8, 'TolFun', 10^-12, 'MaxIter', 50);
+                'MaxFunEvals', 100, ...
+                'TolX', 10^-8, 'TolFun', 10^-12, 'MaxIter', 100);
             
             options_theta = optimoptions('fminunc', ...
                 'Algorithm', 'trust-region', ...
                 'GradObj', 'on', ...
                 'Display', 'off', ...
                 'Hessian', 'on', ...
-                'MaxFunEvals', 10 * 5, ...
-                'TolX', 10^-8, 'TolFun', 10^-12, 'MaxIter', 50);
+                'MaxFunEvals', 100, ...
+                'TolX', 10^-8, 'TolFun', 10^-12, 'MaxIter', 100);
 
-            lowerBound_eta = 1e-8;
-            upperBound_eta = 1e8;
-            
             % Hyperparams
             maxIter = 100;
             numStepsNoKL = 0;
-            tolSF = 0.0001;
-            tolKL = 0.1;
 
             validKL = false;
             validSF = false;
@@ -70,7 +67,7 @@ classdef CREPS_Solver < handle
                 if ~validKL || numStepsNoKL > 5 % If we skipped the KL optimization more than 5 times, redo it
                     % Here theta is constant, so we can pass directly V
                     obj.eta = fmincon(@(eta)obj.dual_eta(eta,J,V,W), obj.eta, ...
-                        [], [], [], [], lowerBound_eta, upperBound_eta, [], options_eta);
+                        [], [], [], [], 1e-8, 1e8, [], options_eta);
                     
                     % Compute the weights
                     advantage = J - V;
@@ -82,9 +79,9 @@ classdef CREPS_Solver < handle
                     pWeighting = pWeighting / sum(pWeighting);
                     divKL = kl_mle(pWeighting, qWeighting);
                     error = abs(divKL - obj.epsilon);
-                    validKL = error < tolKL * obj.epsilon;
+                    validKL = error < obj.tolKL * obj.epsilon;
                     featureDiff = sum(bsxfun(@times, Phi, pWeighting),2) - mean(Phi,2);
-                    validSF = max(abs(featureDiff)) < tolSF;
+                    validSF = max(abs(featureDiff)) < obj.tolSF;
                     numStepsNoKL = 0;
                 else
                     % KL is still valid, skip KL optimization
@@ -106,9 +103,9 @@ classdef CREPS_Solver < handle
                     pWeighting = pWeighting / sum(pWeighting);
                     divKL = kl_mle(pWeighting, qWeighting);
                     error = abs(divKL - obj.epsilon);
-                    validKL = error < tolKL * obj.epsilon;
+                    validKL = error < obj.tolKL * obj.epsilon;
                     featureDiff = sum(bsxfun(@times, Phi, pWeighting),2) - mean(Phi,2);
-                    validSF = max(abs(featureDiff)) < tolSF;
+                    validSF = max(abs(featureDiff)) < obj.tolSF;
                 end
                 
                 if validSF && validKL
