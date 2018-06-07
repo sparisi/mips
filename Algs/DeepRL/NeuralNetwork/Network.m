@@ -26,6 +26,10 @@ classdef Network < handle
            end
        end
        
+       function set_output(obj, activation)
+           obj.L = [obj.L, feval(activation)];
+       end
+       
        function update(obj, W)
            if ~isrow(W), W = W'; end
            assert(isrow(W), 'W must be a vector, not a matrix.')
