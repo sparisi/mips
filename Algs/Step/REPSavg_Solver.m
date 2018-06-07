@@ -10,13 +10,14 @@ classdef REPSavg_Solver < handle
 % JMLR (2017)
 
     properties
-        epsilon % KL divergence bound
-        basis   % Basis function to approximate the value function
-        eta     % Lagrangian (KL)
-        theta   % Lagrangian (features)
-        l2_reg  % Regularizer for theta
-        tolKL = 0.1; % Tolerance of the KL error 
+        epsilon       % KL divergence bound
+        basis         % Basis function to approximate the value function
+        eta           % Lagrangian (KL)
+        theta         % Lagrangian (features)
+        l2_reg        % Regularizer for theta
+        tolKL = 0.1;  % Tolerance of the KL error 
         tolSF = 1e-5; % Tolerance of feature matching error
+        verbose = 1;  % 1 to display inner loop statistics
     end
 
     methods
@@ -61,6 +62,8 @@ classdef REPSavg_Solver < handle
             % Iteratively solve fmincon for eta and theta separately
             for iter = 1 : maxIter
                 if ~validKL || numStepsNoKL > 5 % If we skipped the KL optimization more than 5 times, redo it
+                    if obj.verbose, fprintf('     %d | eta   - ', iter); end
+                    
                     % Here theta is constant, so we can pass directly A
                     A = R + obj.theta'*(PhiN-Phi);
                     obj.eta = fmincon(@(eta)obj.dual_eta(eta,A,W), obj.eta, ...
@@ -80,14 +83,18 @@ classdef REPSavg_Solver < handle
                     featureDiff = bsxfun(@rdivide,(Phi - PhiN)*pWeighting',std(Phi,0,2)); % Standardize
                     validSF = max(abs(featureDiff)) < obj.tolSF;
                     numStepsNoKL = 0;
-                    fprintf('     %d | eta   - KL: %.4f / %.4f,  FE: %e / %e\n', ...
-                        iter, divKL, (1+obj.tolKL)*obj.epsilon, max(abs(featureDiff)), obj.tolSF)
+                    if obj.verbose
+                        fprintf('KL: %.4f / %.4f,  FE: %e / %e,   ETA: %e\n', ...
+                            divKL, (1+obj.tolKL)*obj.epsilon, max(abs(featureDiff)), obj.tolSF, obj.eta)
+                    end
                 else
                     % KL is still valid, skip KL optimization
                     numStepsNoKL = numStepsNoKL + 1;
                 end
                 
                 if ~validSF || iter == 1
+                    if obj.verbose, fprintf('     %d | theta - ', iter); end
+
                     % Here theta is the variable to be learned
                     obj.theta = fminunc(@(theta)obj.dual_theta(theta,obj.eta,R,Phi,PhiN,W), ...
                         obj.theta, options_theta);
@@ -106,8 +113,10 @@ classdef REPSavg_Solver < handle
 %                     validKL = divKL < (1+tolKL) * obj.epsilon;
                     featureDiff = bsxfun(@rdivide,(Phi - PhiN)*pWeighting',std(Phi,0,2)); % Standardize
                     validSF = max(abs(featureDiff)) < obj.tolSF;
-                    fprintf('     %d | theta - KL: %.4f / %.4f,  FE: %e / %e\n', ...
-                        iter, divKL, (1+obj.tolKL)*obj.epsilon, max(abs(featureDiff)), obj.tolSF)
+                    if obj.verbose
+                        fprintf('KL: %.4f / %.4f,  FE: %e / %e\n', ...
+                            divKL, (1+obj.tolKL)*obj.epsilon, max(abs(featureDiff)), obj.tolSF)
+                    end
                 end
                 
                 if validSF && validKL
