@@ -38,6 +38,8 @@ classdef REPSavg_Solver2 < handle
             maxIter = 10;
 
             for iter = 1 : maxIter
+                if obj.verbose, fprintf('     %d | ', iter); end
+
                 vars = fmincon(@(vars)obj.dual(vars,R,Phi,PhiN,W), [obj.eta; obj.theta], ...
                             [], [], [], [], 1e-8, inf, [], options);
                 obj.eta = vars(1);
