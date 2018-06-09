@@ -32,6 +32,7 @@ classdef Pendulum < NLinkEnv
 
         %% Simulation
         function state = init(obj, n)
+            if nargin == 1, n = 1; end
             state = repmat([-pi 0]',1,n);
             state = myunifrnd([-pi, -1], [pi, 1], n);
         end

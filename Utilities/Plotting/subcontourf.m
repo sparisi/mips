@@ -28,8 +28,8 @@ if isempty(fig)
         subplot(nrows,ncols,i,'align')
         contourf(X,Y,reshape(Z(i,:),n,m))
         if nplots > 1, title(num2str(i)), end
+        if c, colorbar, end
     end
-    if c, colorbar, end
 else
     axes = findobj(fig,'type','axes');
     for i = nplots : -1 : 1

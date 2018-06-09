@@ -15,7 +15,7 @@ classdef REPSavg_Solver < handle
         eta           % Lagrangian (KL)
         theta         % Lagrangian (features)
         l2_reg        % Regularizer for theta
-        tolKL = 0.1;  % Tolerance of the KL error 
+        tolKL = 0.1;  % Tolerance of the KL error
         tolSF = 1e-5; % Tolerance of feature matching error
         verbose = 1;  % 1 to display inner loop statistics
     end
@@ -77,15 +77,16 @@ classdef REPSavg_Solver < handle
                     pWeighting = d;
                     pWeighting = pWeighting / sum(pWeighting);
                     divKL = kl_mle(pWeighting, qWeighting);
-                    error = abs(divKL - obj.epsilon);
-                    validKL = error < obj.tolKL * obj.epsilon;
+                    errorKL = abs(divKL - obj.epsilon);
+                    validKL = errorKL < obj.tolKL * obj.epsilon;
 %                     validKL = divKL < (1+tolKL) * obj.epsilon;
                     featureDiff = bsxfun(@rdivide,(Phi - PhiN)*pWeighting',std(Phi,0,2)); % Standardize
-                    validSF = max(abs(featureDiff)) < obj.tolSF;
+                    errorSF = max(abs(featureDiff));
+                    validSF = errorSF < obj.tolSF;
                     numStepsNoKL = 0;
                     if obj.verbose
-                        fprintf('KL: %.4f / %.4f,  FE: %e / %e,   ETA: %e\n', ...
-                            divKL, (1+obj.tolKL)*obj.epsilon, max(abs(featureDiff)), obj.tolSF, obj.eta)
+                        fprintf('KL: %.4f / %.4f,  FE: %e / %e,  ETA: %e\n', ...
+                            divKL, (1+obj.tolKL)*obj.epsilon, errorSF, obj.tolSF, obj.eta)
                     end
                 else
                     % KL is still valid, skip KL optimization
@@ -108,21 +109,23 @@ classdef REPSavg_Solver < handle
                     pWeighting = d;
                     pWeighting = pWeighting / sum(pWeighting);
                     divKL = kl_mle(pWeighting, qWeighting);
-                    error = abs(divKL - obj.epsilon);
-                    validKL = error < obj.tolKL * obj.epsilon;
+                    errorKL = abs(divKL - obj.epsilon);
+                    validKL = errorKL < obj.tolKL * obj.epsilon;
 %                     validKL = divKL < (1+tolKL) * obj.epsilon;
                     featureDiff = bsxfun(@rdivide,(Phi - PhiN)*pWeighting',std(Phi,0,2)); % Standardize
-                    validSF = max(abs(featureDiff)) < obj.tolSF;
+                    errorSF = max(abs(featureDiff));
+                    validSF = errorSF < obj.tolSF;
+                    numStepsNoKL = 0;
                     if obj.verbose
-                        fprintf('KL: %.4f / %.4f,  FE: %e / %e\n', ...
-                            divKL, (1+obj.tolKL)*obj.epsilon, max(abs(featureDiff)), obj.tolSF)
+                        fprintf('KL: %.4f / %.4f,  FE: %e / %e,  ETA: %e\n', ...
+                            divKL, (1+obj.tolKL)*obj.epsilon, errorSF, obj.tolSF, obj.eta)
                     end
                 end
                 
-                if validSF && validKL
-                    break
-                end
+                if validSF && validKL, break, end
             end
+            
+            if obj.verbose, fprintf('\n'), end
             
             if iter == maxIter
                 warning('REPS could not satisfy the constraints within max iterations.')
