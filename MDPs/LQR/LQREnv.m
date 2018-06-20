@@ -32,7 +32,7 @@ classdef (Abstract) LQREnv < handle
                 else
                     tolerance = 0.0001;
                     converged = false;
-                    iter = 0; maxiter = 5000;
+                    iter = 0; maxiter = 500;
                     P(:,:,i) = I;
                     Pnew(:,:,i) = Q(:,:,i) + g*A'*P(:,:,i)*A + g*K'*B'*P(:,:,i)*A + g*A'*P(:,:,i)*B*K + g*K'*B'*P(:,:,i)*B*K + K'*R(:,:,i)*K;
                     while ~converged

@@ -6,12 +6,26 @@ close all
 clear all
 
 %% Change entries according to your needs
-folder = 'data/';
-separator = '_';
-filenames = {'alg1', 'alg2'};
-legendnames = {'MY ALG 1', 'OTHER ALG'};
+folder = './';
+separator = '';
+filenames = {'a', 'b'};
+
+if isempty(filenames) % automatically identify algorithms name
+    allfiles = dir(fullfile(folder,'*.mat'));
+    for i = 1 : length(allfiles)
+        tmpname = allfiles(i).name(1:end-4); % remove .mat from string
+        trial_idx = strfind(tmpname, separator); % find separator
+        tmpname = tmpname(1:trial_idx(end)-1); % remove trial idx from string
+        if isempty(filenames) || ~strcmp(filenames{end}, tmpname) % if new name, add it
+            filenames{end+1} = tmpname;
+        end
+    end
+end
+
+legendnames = {'normal', 'reg'}; % if empty, filenames will be used
 colors = {'b', 'r'};
 markers = {'*', 'diamond'};
+
 variable = 'J_history';
 % variable = 'mean(J_history)';
 % variable = '-log(-mean(J_history))';
