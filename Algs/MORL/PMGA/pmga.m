@@ -10,7 +10,7 @@ dim = 2;
 % [theta, rho, t, D_t_theta, D_rho_theta] = feval(['params_' lower(class(mdp))], [], mdp.dreward);
 % policy = GaussianLinearDiag(bfs, mdp.daction, mu0, sigma0);
 
-mdp = LQR(dim); bfs = @(varargin)basis_poly(1,dim,0,varargin{:}); mu0 = -0.5*eye(dim); sigma0 = eye(dim);
+mdp = LQR_MO(dim); bfs = @(varargin)basis_poly(1,dim,0,varargin{:}); mu0 = -0.5*eye(dim); sigma0 = eye(dim);
 [theta, rho, t, D_t_theta, D_rho_theta] = feval(['params_' lower(class(mdp))], 'NN', mdp.dreward);
 policy = GaussianLinearFixedvarDiagmean(bfs, mdp.daction, mu0, sigma0);
 

@@ -3,7 +3,7 @@ clear all
 clc
 
 dim   = 2;
-mdp   = LQR(dim);
+mdp   = LQR_MO(dim);
 robj  = 1;
 gamma = mdp.gamma;
 Q     = mdp.Q;
@@ -26,8 +26,8 @@ theta = nonzeros(K);
 dtheta = length(theta);
 
 for i = 1 : dim
-    P = (Q{i}+K*R{i}*K)*(eye(dim)-gamma*(eye(dim)+2*K+K^2))^-1; % Only when A = B = I
-    J(i) = -transpose(x0)*P*x0 + (1/(1-gamma))*trace(Sigma*(R{i}+gamma*P));
+    P = (Q(:,:,i)+K*R(:,:,i)*K)*(eye(dim)-gamma*(eye(dim)+2*K+K^2))^-1; % Only when A = B = I
+    J(i) = -transpose(x0)*P*x0 + (1/(1-gamma))*trace(Sigma*(R(:,:,i)+gamma*P));
 end
 
 J = J(robj);

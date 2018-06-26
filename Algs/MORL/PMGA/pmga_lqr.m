@@ -7,7 +7,7 @@ clear all
 reset(symengine)
 
 dim = 2;
-mdp = LQR(dim);
+mdp = LQR_MO(dim);
 policy = GaussianLinearFixedvarDiagmean( ...
     @(varargin)basis_poly(1,dim,0,varargin{:}), ...
     dim, -0.5*eye(dim), eye(dim));

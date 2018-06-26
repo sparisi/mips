@@ -1,6 +1,6 @@
-classdef LQR_v3 < MDP & LQREnv
-% As LQR_V2, but with multiple goal states. The agent must go to the
-% closest goal state.
+classdef LQR_MM < MDP & LQREnv
+% Multi-modal LQR. As LQR, but with multiple goal states. 
+% The agent must go to the closest goal state.
     
     %% Properties
     properties
@@ -25,7 +25,7 @@ classdef LQR_v3 < MDP & LQREnv
     methods
 
         %% Constructor
-        function obj = LQR_v3(dim, goals)
+        function obj = LQR_MM(dim, goals)
             obj.A = eye(dim);
             obj.B = eye(dim);
             obj.x0 = 10*ones(dim,1);

@@ -4,9 +4,9 @@ close all
 %% ===================================================================== %%
 %  ======================== LOW LEVEL SETTINGS =========================  %
 dim = 2;
-% mdp = LQR(dim);
-mdp = LQR_v2(dim);
-% mdp = LQR_v3(dim,[-5*ones(dim,1), 5*ones(dim,1)]);
+% mdp = LQR_MO(dim);
+mdp = LQR(dim);
+% mdp = LQR_MM(dim,[-5*ones(dim,1), 5*ones(dim,1)]);
 
 robj = 1;
 

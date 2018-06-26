@@ -4,7 +4,7 @@ close all
 rng(1)
 
 %% Get problem specification
-mdp = LQR_v2(2);
+mdp = LQR(2);
 episodes_eval = 150;
 steps_eval = 150;
 steps_learn = 150;
