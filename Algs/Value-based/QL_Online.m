@@ -75,12 +75,6 @@ for episode = 1 : maxepisodes
         % Evaluation and plotting
         E = data.r(robj,:) + gamma * max(Q(idx_sn,:),[],2)' .* ~data.endsim - Q(linidx);
         E_history(iter) = mean(E.^2);
-%         updateplot('Error',iter,mean(E.^2),1)
-%         [V, opt] = max(Q,[],2);
-%         subimagesc('Q-function',X,Y,Q')
-%         subimagesc('V-function',X,Y,V')
-%         subimagesc('Action',X,Y,opt')
-%         if iter == 1, autolayout, end
         
         iter = iter + 1;
 
@@ -88,10 +82,16 @@ for episode = 1 : maxepisodes
         policy.drawAction = @(s)egreedy( Q(ismember(allstates,s','rows'),:)', 0.1 );
         
     end
-    
+
+    updateplot('MS TD Error',iter,mean(E.^2),1)
+    [V, opt] = max(Q,[],2);
+    subimagesc('Q-function',X,Y,Q')
+    subimagesc('V-function',X,Y,V')
+    subimagesc('Action',X,Y,opt')
+
 end
 
 
 %% Show
 policy_eval.drawAction = @(s)egreedy( Q(ismember(allstates,s','rows'),:)', 0 );
-show_simulation(mdp, policy_eval, 1000, 0.1)
+show_simulation(mdp, policy_eval, 1000, 0.05)

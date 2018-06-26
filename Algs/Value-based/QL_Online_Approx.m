@@ -72,6 +72,7 @@ while iter < 10000000
     
     Q = Qfun(XY,theta);
     V = max(Q,[],1);
+    updateplot('MS TD Error',iter,mean(E.^2),1)
     subimagesc('Q-function',Xnodes,Ynodes,Q)
     subimagesc('V-function',Xnodes,Ynodes,V)
     

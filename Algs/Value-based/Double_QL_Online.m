@@ -86,7 +86,7 @@ for episode = 1 : maxepisodes
         Qavg = (Q1 + Q2) / 2;
         E = data.r(robj,:) + gamma * max(Qavg(idx_sn,:),[],2)' .* ~data.endsim - Qavg(linidx);
         E_history(iter) = mean(E.^2);
-%         updateplot('Error',iter,mean(E.^2),1)
+%         updateplot('MS TD Error',iter,mean(E.^2),1)
 %         [V, opt] = max(Qavg,[],2);
 %         subimagesc('Q-function',X,Y,Qavg')
 %         subimagesc('V-function',X,Y,V')

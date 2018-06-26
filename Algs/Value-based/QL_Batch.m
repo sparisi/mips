@@ -39,7 +39,7 @@ while iter < 10000
     Q(linidx) = Q(linidx) + lrate * E';
     
     % Plot
-    updateplot('Error',iter,mean(E.^2),1)
+    updateplot('MS TD Error',iter,mean(E.^2),1)
     [V, opt] = max(Q,[],2);
     subimagesc('Q-function',X,Y,Q')
     subimagesc('V-function',X,Y,V')

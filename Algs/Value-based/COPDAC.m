@@ -16,11 +16,10 @@ rng(1)
 showplots = 1;
 J_history = [];
 
-mdp = ChainwalkContinuous; sigma = 1; maxsteps = 20;
 % mdp = ChainwalkContinuousMulti(2); sigma = 1; maxsteps = 40;
 % mdp = MCarContinuous; sigma = 4; maxsteps = 100;
 % mdp = CartPoleContinuous; sigma = 4; maxsteps = 1000;
-% mdp = PuddleworldContinuous; sigma = 0.2; maxsteps = 100;
+mdp = PuddleworldContinuous; sigma = 0.2; maxsteps = 100;
 
 robj = 1;
 gamma = mdp.gamma;
@@ -66,10 +65,10 @@ if showplots
     elseif mdp.dstate == 1
         npoints_plot = 10;
         S = linspace(mdp.stateLB(1),mdp.stateUB(1),npoints_plot);
-        figure; hP = plot(S,zeros(1,npoints_plot)); title 'pi(s)';
-        figure; hQ = plot(S,zeros(1,npoints_plot)); title 'Q(s,pi(s))';
+        figure; hP = plot(S,zeros(1,npoints_plot)); title 'Policy';
+        figure; hQ = plot(S,zeros(1,npoints_plot)); title 'V-function - Q(s,pi(s))';
     end
-    mdp.showplot
+%     mdp.showplot
 end
 
 %% Learn
@@ -126,11 +125,11 @@ while iter < 3000000
                 for i = 1 : size(S,2)
                     Q(:,i) = Qfun(S(:,i),P(:,i),w,v,theta);
                 end
-                subimagesc('pi(s)',Xnodes,Ynodes,P,1)
-                subimagesc('Q(s,pi(s))',Xnodes,Ynodes,Q)
+                subimagesc('Policy',Xnodes,Ynodes,P,1)
+                subimagesc('V-functio - Q(s,pi(s))',Xnodes,Ynodes,Q)
             end
-            updateplot('delta',iter,delta^2)
-            updateplot('action',iter,action)
+            updateplot('Delta',iter,delta^2)
+            updateplot('Action',iter,action)
             if iter == 2, autolayout, end
         end
         
@@ -138,7 +137,7 @@ while iter < 3000000
     
     policy_eval.drawAction = @(s) mu(s,theta);
     J_history(end+1) = evaluate_policies(mdp, 100, maxsteps, policy_eval);
-    if showplots, updateplot('J',iter,J_history(end)); end
+    if showplots, updateplot('Return',iter,J_history(end)); end
 
 end
 

@@ -75,8 +75,8 @@ while iter < 100000
     diff = norm(theta-theta_old);
     
     % Plot
-    updateplot('Error',iter,mean(E.^2),1)
-    updateplot('Diff',iter,diff,1)
+    updateplot('MS TD Error',iter,mean(E.^2),1)
+    updateplot('Policy Parameters Diff',iter,diff,1)
     Q = Qfun(XY,theta);
     V = max(Q,[],1);
     subimagesc('Q-function',Xnodes,Ynodes,Q)
