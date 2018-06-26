@@ -16,7 +16,7 @@ classdef DDPG_Solver < handle
         gamma = 0.99;       % Discount factor
         maxsteps = 1e3;     % Max steps per episode
         tau = 1e-2          % Update coefficient for the target networks
-        sigma = 0.05        % Noise on the action (std)
+        sigma = 2           % Noise on the action (std)
         noise_decay = 0.9999; % Decay of the exploration during an episode
         
         %% Functions
@@ -44,7 +44,7 @@ classdef DDPG_Solver < handle
     methods
 
         %% Constructor
-        function obj = DDPG_Solver(nnP, nnQ, optimP, optimQ, dimA, dimO)
+        function obj = DDPG_Solver(nnP, nnQ, optimP, optimQ, dimA, dimO, mdp)
             obj.dimA        = dimA;
             obj.optimP      = optimP;
             obj.optimQ      = optimQ;
@@ -53,7 +53,13 @@ classdef DDPG_Solver < handle
             obj.data.r      = NaN(obj.dsize,1);
             obj.data.o_next = NaN(obj.dsize,dimO);
             obj.data.term   = NaN(obj.dsize,1);
+            obj.mdp         = mdp;
             obj.nnP         = nnP;
+            % If MDP action is bounded in [-A,A], add a tanh final layer to 
+            % the policy network to bound its output
+            if ~any(isinf(obj.mdp.actionUB))
+                nnP.set_output('Tanh');
+            end
             obj.nnQ         = nnQ;
             obj.nnPt        = copy(nnP);
             obj.nnQt        = copy(nnQ);
@@ -79,7 +85,13 @@ classdef DDPG_Solver < handle
                 noise = mymvnrnd(0, obj.sigma.^2, obj.dimA);
                 action = action + noise;
 
-                [nextstate, reward, terminal] = obj.mdp.simulator(state, action');
+                % If MDP action is bounded in [-A,A], the policy network 
+                % has a tanh final layer to bound its output
+                if any(isinf(obj.mdp.actionUB))
+                    [nextstate, reward, terminal] = obj.mdp.simulator(state, action');
+                else
+                    [nextstate, reward, terminal] = obj.mdp.simulator(state, obj.mdp.actionUB.*action');
+                end
                 obs_next = obj.preprocessS(nextstate);
                 reward = obj.preprocessR(reward);
                 

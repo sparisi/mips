@@ -22,8 +22,7 @@ optimQ.epsilon = 0.01;
 
 
 %% Learner
-learner = DDPG_Solver(nnP,nnQ,optimP,optimQ,dimA,dimO);
-learner.mdp = mdp;
+learner = DDPG_Solver(nnP,nnQ,optimP,optimQ,dimA,dimO,mdp);
 learner.gamma = mdp.gamma;
 learner.maxsteps = steps_learn;
 learner.preprocessS = preprocessS;
@@ -50,7 +49,11 @@ end
 %% Learning
 while learner.t < 1e6
     
-    policy.drawAction = @(s)learner.nnP.forward(preprocessS(s))';
+    if any(isinf(mdp.actionUB))
+        policy.drawAction = @(s)learner.nnP.forward(preprocessS(s))';
+    else
+        policy.drawAction = @(s)bsxfun(@times, learner.nnP.forward(preprocessS(s))', mdp.actionUB);
+    end
     J = evaluate_policies(mdp, episodes_eval, steps_eval, policy);
 
     [~, ep_loss] = learner.train();
@@ -61,10 +64,14 @@ while learner.t < 1e6
 
     % Plotting
     if mdp.dstate == 2
-    P_plot = learner.nnP.forward(XY)';
-    Q_plot = learner.nnQ.forward([P_plot;XY']')';
-    subimagesc('Policy',Xnodes,Ynodes,P_plot)
-    subimagesc('Q-function - Q(s,pi(s))',Xnodes,Ynodes,Q_plot)
+        if any(isinf(mdp.actionUB))
+            P_plot = learner.nnP.forward(XY)';
+        else
+            P_plot = bsxfun(@times, learner.nnP.forward(XY)', mdp.actionUB);
+        end
+        Q_plot = learner.nnQ.forward([P_plot;XY']')';
+        subimagesc('Policy',Xnodes,Ynodes,P_plot)
+        subimagesc('V-function - Q(s,pi(s))',Xnodes,Ynodes,Q_plot)
     end
     
     if episode == 1, autolayout, end
@@ -74,5 +81,9 @@ end
 
 
 %% Show policy
-policy.drawAction = @(s)learner.nnP.forward(preprocessS(s))';
+if any(isinf(mdp.actionUB))
+    policy.drawAction = @(s)learner.nnP.forward(preprocessS(s))';
+else
+    policy.drawAction = @(s)bsxfun(@times, learner.nnP.forward(preprocessS(s))', mdp.actionUB);
+end
 show_simulation(mdp, policy, steps_eval, 0.01)

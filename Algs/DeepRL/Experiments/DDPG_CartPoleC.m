@@ -18,4 +18,4 @@ preprocessS = @(s)bsxfun(@times, bsxfun(@minus,s,m), 1./range_centered(:,2))';
 % Normalization in [0,1]
 preprocessR = @(r)r;
 
-noise_std = 10;
+noise_std = 2; % Action is bounded, so the policy network output is bounded in [-1,1] by a tanh layer
