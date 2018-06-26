@@ -66,10 +66,10 @@ Policies are modeled as objects. Their most important method is `drawAction`, bu
 <details>
 <summary><b>MDPs</b></summary>
   <p>
-Each MDP is modeled as an object (<code>MDP.m</code>) and requires some properties (dimension of state and action spaces, bounds, etc...) and methods (for simulating and plotting).  
-There are also some extension, that are <i>Contextual MDPs</i> (<code>CMDP.m</code>), <i>Multi-objective MDPs</i> (<code>MOMDP.m</code>), and <i>Average-reward MDPs</i> (<code>MDP_avg.m</code>).  
+Each MDP is modeled as an object (<code>MDP.m</code>) and requires some properties (dimension of state and action spaces, bounds, etc...) and methods (for state transitions and plots).  
+There are also some extensions, i.e., <i>Contextual MDPs</i> (<code>CMDP.m</code>), <i>Multi-objective MDPs</i> (<code>MOMDP.m</code>), and <i>Average-reward MDPs</i> (<code>MDP_avg.m</code>).  
 For MDPs sharing the same environment (e.g., Mountain Car with continuous or discrete actions, Cart-pole with or without swing-up, ...), there are common <i>Environment</i> (<code>Env</code>) classes.
-This classes define common variables and the transition function, while the subclasses define the remainder functions (reward, action parsing, terminal conditions, ...).
+This classes define common variables and the transition function, while the subclasses define other functions (reward, action parsing, terminal conditions, ...).
 
 > **IMPORTANT!** To allow parallel execution of multiple episodes, `simulator` functions need to support vectorized operations, i.e., they need to deal with states and actions represented as `S x N` and `A x N` matrices, respectively.
   </p>
@@ -97,12 +97,12 @@ Utility functions used for matrix operations, plotting and sampling are stored i
 ## How to make plots and show animations
 
 
-Here is a list with examples of all ways of visualizing a particular data / animation. Please note that not all MDPs support an animation.
+Here is a list with examples of all ways for visualizing your data or rendering an animation. Please note that not all MDPs support an animation.
 
 <details>
 <summary><b>Real time data plotting</b></summary>
   <p>
-During the learning, it is possible to plot in real time a desired data (e.g., the return `J`) by using `updateplot`. 
+During the learning, it is possible to plot in real time a desired variable (e.g., the expected return <code>J</code>) by using <code>updateplot</code>. 
 
 ```
 updateplot('Return',iter,J,1)
@@ -137,7 +137,7 @@ Launch <code>mdp.showplot</code> to initialize the plotting and an animation of 
 As `collect_samples` returns a low-level dataset of the episodes, you just have to call `mdp.plotepisode`
 
 ```
-data = collect_samples(mdp,policy,episodes,steps,policy)
+data = collect_samples(mdp,episodes,steps,policy)
 mdp.plotepisode(data(1),0.001)
 ```
 

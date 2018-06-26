@@ -7,7 +7,6 @@ ___
 **Policy Randomization in PFA**
 
 PFA (usually) needs to randomize the policy after the optimization of each objective. Such randomization is needed to guarantee enough exploration to optimize the remaining objectives and depends on the policy used. 
-
-For instance: 
-- for a Gibbs policy we can reduce the temperature or scale theta with a constant factor (e.g., we can halve theta),
-- for a Gaussian policy we can reset the covariance matrix at its initial value or we can, again, scale it.
+For instance,
+- For a Gibbs policy we can reduce the temperature or scale theta with a constant factor (e.g., we can halve theta),
+- For a Gaussian policy we can reset the covariance matrix at its initial value or we can, again, scale it.
