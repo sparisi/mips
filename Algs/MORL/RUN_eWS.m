@@ -4,7 +4,7 @@
 
 N = 25;
 N_MAX = N * 1;
-if makeDet, policy = policy.makeDeterministic; end
+policy = policy.makeDeterministic; % Learn deterministic low-level policy
 
 % solver = REPSep_Solver(0.9);
 % solver = NES_Solver(0.1);
@@ -79,23 +79,13 @@ for i = 1 : size(W,1)
         iter = iter + 1;
     end
     
-    front_pol(i) = current_pol;
+    front_pol(i,:) = current_pol;
     
 end
 
 
-%% Eval
-if makeDet
-    for i = 1 : length(front_pol)
-        p(i) = policy.update(front_pol(i).makeDeterministic.drawAction);
-    end
-    front_pol = p;
-    fr = evaluate_policies(mdp, episodes_eval, steps_eval, front_pol);
-else
-    fr = evaluate_policies_high(mdp, episodes_eval, steps_eval, policy, front_pol);
-end
-
-%% Plot
+%% Eval and plot
+fr = evaluate_policies_high(mdp, episodes_eval, steps_eval, policy, front_pol);
 [f, p] = pareto(fr', front_pol);
 mdp.plotfront(mdp.truefront,'o','DisplayName','True frontier');
 hold all

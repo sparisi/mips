@@ -23,8 +23,7 @@ policy = GaussianLinearDiag(bfs, mdp.daction, A0, Sigma0);
 
 %% ===================================================================== %%
 %  ======================= HIGH LEVEL SETTINGS =========================  %
-makeDet = 1; % 1 to learn deterministic low level policies
-n_params = policy.dparams*~makeDet + numel(A0)*makeDet;
+n_params = numel(A0);
 mu0 = policy.theta(1:n_params);
 Sigma0high = 100 * eye(n_params);
 Sigma0high = Sigma0high + diag(abs(mu0)).^2;

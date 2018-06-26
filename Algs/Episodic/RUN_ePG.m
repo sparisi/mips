@@ -1,6 +1,6 @@
 N = 20;
 N_MAX = N * 10;
-if makeDet, policy = policy.makeDeterministic; end
+policy = policy.makeDeterministic; % Learn deterministic low-level policy
 
 iter = 1;
 lrate = 0.1;

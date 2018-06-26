@@ -3,7 +3,7 @@
 N = 20;
 N_MAX = N * 10;
 W = ones(1, N_MAX);
-if makeDet, policy = policy.makeDeterministic; end
+policy = policy.makeDeterministic; % Learn deterministic low-level policy
 
 iter = 1;
 

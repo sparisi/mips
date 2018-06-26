@@ -38,7 +38,7 @@ for name = filenames
     dataMatrix = [];
     for trial = 1 : 999
         try
-            load([folder name{:} separator num2str(trial)])
+            load([folder name{:} separator num2str(trial) '.mat'])
             dataMatrix(counter,:) = eval(variable);
             counter = counter + 1;
         catch

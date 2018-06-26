@@ -8,7 +8,7 @@ N_MAX = N * 5;
 solver = NES_Solver(0.1); distance = 'Norm';
 % solver = MORE_Solver(0.9,0.99,-75,policy_high);
 
-if makeDet, policy = policy.makeDeterministic; end
+policy = policy.makeDeterministic; % Learn deterministic low-level policy
 
 utopia = mdp.utopia;
 antiutopia = mdp.antiutopia;
@@ -108,7 +108,7 @@ N_EVAL = 200;
 Theta_eval = policy_high.drawAction(N_EVAL);
 
 for i = 1 : N_EVAL
-    pol_eval(i) = policy.update(Theta_eval(:,i));
+    pol_eval(i,:) = policy.update(Theta_eval(:,i));
 end
 
 f_eval = evaluate_policies(mdp, episodes_eval, steps_eval, pol_eval)';

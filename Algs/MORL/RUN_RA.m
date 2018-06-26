@@ -25,7 +25,7 @@ tolerance = 0.1; % Tolerance for the norm of the gradient
 maxIter = 200; % Max number of policy gradient steps in the same direction
 minS = 1.5; % Min entropy of the policy (stopping condition)
 lrate = 1;
-if makeDet, policy = policy.makeDeterministic; end
+policy = policy.makeDeterministic; % Learn deterministic low-level policy
 
 target_policy = policy_high; % Learn the high-level policy
 gradient = @(policy, data, lrate) NESbase(policy, data, lrate);
@@ -81,7 +81,7 @@ for k = 1 : ndir
         
         if dev < tolerance
             fprintf('Cannot proceed any further in this direction!\n\n');
-            front_pol(k) = curr_pol;
+            front_pol(k,:) = curr_pol;
             break
         end
         
@@ -91,19 +91,19 @@ for k = 1 : ndir
         
         if devPareto < tolerance
             fprintf('Pareto front reached!\n\n');
-            front_pol(k) = curr_pol;
+            front_pol(k,:) = curr_pol;
             break
         end
         
         if S < minS
             fprintf('Deterministic policy found!\n\n');
-            front_pol(k) = curr_pol;
+            front_pol(k,:) = curr_pol;
             break
         end
         
         if iter_dir > maxIter
             fprintf('Iteration limit reached!\n\n');
-            front_pol(k) = curr_pol;
+            front_pol(k,:) = curr_pol;
             break
         end
         

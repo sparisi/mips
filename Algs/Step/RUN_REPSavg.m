@@ -16,7 +16,7 @@ bfsV = @(varargin)basis_poly(2,mdp.dstate,0,varargin{:});
 bfsV = @(varargin)basis_krbf(6, [mdp.stateLB, mdp.stateUB], 0, varargin{:});
 bfsV = bfs;
 
-solver = REPSavg_Solver(0.1,bfsV);
+solver = REPSavg_Solver2(0.1,bfsV);
 
 data = [];
 varnames = {'r','s','nexts','a','endsim'};
@@ -52,9 +52,9 @@ while iter < 1000
     
     iter = iter + 1;
     
+    %%
     solver.plotV(mdp.stateLB, mdp.stateUB)
     policy.plotmean(mdp.stateLB, mdp.stateUB)
-    updatescatter('Weights', data.s(1,:), data.s(2,:), [], d, 1)
     
 end
 

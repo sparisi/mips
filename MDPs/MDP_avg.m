@@ -1,11 +1,9 @@
 classdef MDP_avg < MDP
-% Introduces state resets to learn average reward MDPs.
+% Introduces state resets to learn average reward MDPs as if they were
+% discounted.
 %
 % =========================================================================
 % REFERENCE
-% J Peters, K Muelling, Y Altun
-% Relative Entropy Policy Search (2010)
-%
 % H van Hoof, G Neumann, J Peters
 % Non-parametric Policy Search with Limited Information Loss (2017)
 

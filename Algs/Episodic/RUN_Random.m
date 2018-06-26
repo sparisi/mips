@@ -6,7 +6,7 @@
 % https://arxiv.org/pdf/1803.07055.pdf
 
 N = 20; % Number of samples collected per iteration
-if makeDet, policy = policy.makeDeterministic; end
+policy = policy.makeDeterministic; % Learn deterministic low-level policy
 
 theta = policy_high.mu;
 lrate = 0.0005;

@@ -41,7 +41,7 @@ show_simulation(mdp,policy.makeDeterministic,1000,0.1) % visualize learned polic
 ```
 
 Notice that, in the case of episodic (black box) RL, these scripts define both the *low level policy* (the one used by the agent) and the *high level policy* (the sampling distribution used to draw the low level policy parameters).
-In this setting, it is important to set the variable `makeDet`: if `true`, the low level policy is deterministic (e.g., the covariance of a Gaussian is zeroed and the high level policy only draws its mean).
+In this setting, the exploration noise is given by the high level policy, while the low level policy is deterministic (e.g., the covariance of a Gaussian is zeroed and the high level policy only draws its mean).
   </p>
 </details>
 

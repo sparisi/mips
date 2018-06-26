@@ -15,7 +15,6 @@ policy = Gibbs(bfs, zeros((bfs()+1)*(mdp.actionUB-1),1), mdp.actionLB:mdp.action
 
 %% ===================================================================== %%
 %  ======================= HIGH LEVEL SETTINGS =========================  %
-makeDet = 0; % 1 to learn deterministic low level policies
 n_params = policy.dparams;
 mu0 = policy.theta(1:n_params);
 Sigma0high = 10 * eye(n_params);

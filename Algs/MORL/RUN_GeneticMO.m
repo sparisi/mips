@@ -1,5 +1,5 @@
 %% Settings
-if makeDet, policy = policy.makeDeterministic; end
+policy = policy.makeDeterministic; % Learn deterministic low-level policy
 
 max_pop_size = 20;
 min_pop_size = 10;
