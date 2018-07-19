@@ -13,7 +13,6 @@ options = optimoptions(@fminunc, 'Algorithm', 'trust-region', ...
     'TolX', 10^-8, 'TolFun', 10^-12, 'MaxIter', 100);
 
 lrate = 0.05;
-gamma = mdp.gamma;
 lambda_trace = 0.95;
 
 bfsV = @(varargin)basis_poly(2,mdp.dstate,0,varargin{:});
@@ -44,7 +43,7 @@ while iter < 1000
     
     % Estimate A
     V = omega'*data.phiV;
-    A = gae(data,V,gamma,lambda_trace);
+    A = gae(data,V,mdp.gamma,lambda_trace);
 
     % Update V
     omega = fminunc(@(omega)learn_V(omega,data.phiV,data.Q), omega, options);
