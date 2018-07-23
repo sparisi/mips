@@ -23,13 +23,15 @@ sampling = GaussianLinearChol(@(varargin)basis_poly(1,dim_bfs,0,varargin{:}), di
 
 solver = CMORE_Solver(0.9,0.99,-75,sampling);
 solver.lambda_l1 = 0;
-solver.lambda_l2 = 0.01;
-solver.lambda_nn = 0.01;
+solver.lambda_l2 = 0;
+solver.lambda_nn = 0;
 solver.alg_name = 'fista';
 
-G = rand(dim_bfs,dim_action);
+% solver = CREPS_Solver(0.9,bfs);
+
+G = randn(dim_bfs,dim_action);
 f = @(action,ctx)rosenbrock_ctx(action,ctx,G);
-f = @(action,ctx)quadcost(action,ctx); % For the quadratic cost you need to use dim_ctx = dim_action and poly(1) features
+% f = @(action,ctx)quadcost(action,ctx); % For the quadratic cost you need to use dim_ctx = dim_action and poly(1) features
 
 iter = 1;
 
@@ -69,7 +71,7 @@ while iter < maxiter
         
     iter = iter + 1;
     
-    solver.plotR(ctx_lb, ctx_ub, ctx_lb, ctx_ub)
+%     solver.plotR(ctx_lb, ctx_ub, ctx_lb, ctx_ub)
     
 end
 

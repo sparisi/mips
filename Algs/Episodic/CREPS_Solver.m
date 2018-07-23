@@ -32,6 +32,12 @@ classdef CREPS_Solver < handle
         end
         
         %% CORE
+        function [sampling, divKL] = step(obj, J, Actions, Phi, sampling, W)
+            if nargin < 6, W = ones(1, size(J,2)); end % IS weights
+            [d, divKL] = obj.optimize(J, Phi, W);
+            sampling = sampling.weightedMLUpdate(d, Actions, [ones(1,size(Phi,2)); Phi]);
+        end
+        
         function [d, divKL] = optimize(obj, J, Phi, W)
             if nargin < 4, W = ones(1, size(J,2)); end % IS weights
             
