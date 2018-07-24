@@ -3,21 +3,21 @@ clear all
 rng(1)
 
 maxiter = 100;
-N = 100;
+N = 1000;
 N_MAX = N * 1;
 N_eval = 1000;
 
 dim_ctx = 10;
 dim_action = 10;
-% bfs = @(varargin) basis_fourier(50, dim_ctx, 0.2, 0, varargin{:});
-bfs = @(varargin) basis_poly(1, dim_ctx, 0, varargin{:});
+bfs = @(varargin) basis_fourier(25, dim_ctx, 0.2, 0, varargin{:});
+% bfs = @(varargin) basis_poly(1, dim_ctx, 0, varargin{:});
 dim_bfs = bfs();
 
 ctx_lb = 1*ones(dim_ctx,1);
 ctx_ub = 2*ones(dim_ctx,1);
 ctx = @(varargin) myunifrnd(ctx_lb, ctx_ub, varargin{:});
 
-a0 = 1 * rand(dim_action,dim_bfs+1);
+a0 = zeros(dim_action,dim_bfs+1);
 sigma0 = 10 * eye(dim_action);
 sampling = GaussianLinearChol(@(varargin)basis_poly(1,dim_bfs,0,varargin{:}), dim_action, a0, sigma0);
 
