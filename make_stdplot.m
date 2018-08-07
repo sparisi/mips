@@ -6,9 +6,13 @@ close all
 clear all
 
 %% Change entries according to your needs
-folder = './';
-separator = '';
-filenames = {'a', 'b'};
+folder = './data_ppo_slow/';
+separator = '_';
+filenames = {'ddpg.ddpg0_Pendulum-v0', 'ddpg.ddpg_tdreg1_Pendulum-v0', 'ddpg.ddpg_tdreg2_Pendulum-v0', 'ddpg.ddpg_tdreg3_Pendulum-v0', 'ddpg.ddpg_tdreg4_Pendulum-v0'};
+filenames = {'ddpg.ddpg_tdreg1_Pendulum-v0', 'ddpg.ddpg_tdreg3_Pendulum-v0', 'ddpg.ddpg_tdreg4_Pendulum-v0'};
+filenames = {'ddpg.ddpg0_Pendulum-v0', 'ddpg.ddpg_tdreg4_Pendulum-v0'};
+filenames = {'ppo.ppo0_HalfCheetah-v2', 'ppo.ppo1_HalfCheetah-v2'};
+filenames = {};
 
 if isempty(filenames) % automatically identify algorithms name
     allfiles = dir(fullfile(folder,'*.mat'));
@@ -22,9 +26,9 @@ if isempty(filenames) % automatically identify algorithms name
     end
 end
 
-legendnames = {'normal', 'reg'}; % if empty, filenames will be used
-colors = {'b', 'r'};
-markers = {'*', 'diamond'};
+legendnames = {}; % if empty, filenames will be used
+colors = {};
+markers = {};
 
 variable = 'J_history';
 % variable = 'mean(J_history)';
@@ -36,7 +40,7 @@ for name = filenames
     
     counter = 1;
     dataMatrix = [];
-    for trial = 1 : 999
+    for trial = 0 : 999
         try
             load([folder name{:} separator num2str(trial) '.mat'])
             dataMatrix(counter,:) = eval(variable);
@@ -44,7 +48,7 @@ for name = filenames
         catch
         end
     end
-    % dataMatrix = moving(dataMatrix',2)';
+%     dataMatrix = moving(dataMatrix',10)';
     
     if ~isempty(dataMatrix)
         hold all
