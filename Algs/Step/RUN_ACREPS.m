@@ -22,7 +22,7 @@ solver = REPSdisc_Solver(0.5);
 
 data = [];
 varnames = {'r','s','nexts','a','endsim','Q'};
-bfsnames = { {'phiP', @(s)policy.basis_bias(s)}, {'phiV', bfsV} };
+bfsnames = { {'phiP', @(s)policy.get_basis(s)}, {'phiV', bfsV} };
 iter = 1;
 
 max_reuse = 1; % Reuse all samples from the past X iterations

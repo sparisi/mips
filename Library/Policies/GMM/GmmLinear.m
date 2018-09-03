@@ -42,6 +42,7 @@ classdef GmmLinear < Policy
             assert(d1 == d & d2 == d & d3 == k);
             assert(m == obj.basis()+1);
             obj.daction = size(obj.A,1);
+            obj.no_bias = false;
         end
         
         %% GMM.RANDOM
@@ -49,7 +50,7 @@ classdef GmmLinear < Policy
             n = size(States,2);
             components = mymnrnd(obj.p,n); % Select the Gaussians for drawing the samples
             action = zeros(obj.daction,n);
-            phi = obj.basis_bias(States);
+            phi = obj.get_basis(States);
             for i = 1 : length(obj.p)
                 idx = components == i;
                 action(:,idx) = mymvnrnd(obj.A(:,:,i) * phi(:,idx),obj.Sigma(:,:,i));
@@ -59,7 +60,7 @@ classdef GmmLinear < Policy
         %% GMM.PDF
         function probability = evaluate(obj, States, Actions)
             probability = zeros(1,size(Actions,2));
-            phi = obj.basis_bias(States);
+            phi = obj.get_basis(States);
             for i = 1 : length(obj.p)
                 probability = probability + obj.p(i) * ...
                     exp(loggausspdf(Actions, obj.A(:,:,i) * phi, obj.Sigma(:,:,i)));

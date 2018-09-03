@@ -6,9 +6,11 @@ classdef GaussianLinearDiag < GaussianLinear
     methods
 
         %% Constructor
-        function obj = GaussianLinearDiag(basis, dim, initA, initSigma)
+        function obj = GaussianLinearDiag(basis, dim, initA, initSigma, no_bias)
+            if nargin == 4, no_bias = false; end
+            obj.no_bias = no_bias; 
             assert(isscalar(dim) && ...
-            	size(initA,2) == basis()+1 && ...
+            	size(initA,2) == basis()+1*~no_bias && ...
             	size(initA,1) == dim && ...
                 size(initSigma,1) == dim && ...
             	size(initSigma,2) == dim, ...
@@ -26,7 +28,7 @@ classdef GaussianLinearDiag < GaussianLinear
         
         %% Derivative of the logarithm of the policy
         function dlogpdt = dlogPidtheta(obj, state, action)
-            phi = obj.basis_bias(state);
+            phi = obj.get_basis(state);
             A = obj.A;
             mu = A*phi;
             std = sqrt(diag(obj.Sigma));
@@ -41,7 +43,7 @@ classdef GaussianLinearDiag < GaussianLinear
         %% Hessian of the logarithm of the policy
         function hlogpdt = hlogPidtheta(obj, state, action)
             nsamples = size(state,2);
-            phi = obj.basis_bias(state);
+            phi = obj.get_basis(state);
             dphi = size(phi,1);
             A = obj.A;
             mu = A*phi;

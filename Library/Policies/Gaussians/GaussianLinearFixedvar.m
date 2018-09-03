@@ -6,9 +6,11 @@ classdef GaussianLinearFixedvar < GaussianLinear
     methods
         
         %% Constructor
-        function obj = GaussianLinearFixedvar(basis, dim, initA, Sigma)
+        function obj = GaussianLinearFixedvar(basis, dim, initA, Sigma, no_bias)
+            if nargin == 4, no_bias = false; end
+            obj.no_bias = no_bias; 
             assert(isscalar(dim) && ...
-            	size(initA,2) == basis()+1 && ...
+            	size(initA,2) == basis()+1*~no_bias && ...
             	size(initA,1) == dim && ...
                 size(Sigma,1) == dim && ...
             	size(Sigma,2) == dim, ...
@@ -27,14 +29,14 @@ classdef GaussianLinearFixedvar < GaussianLinear
         
         %% Derivative of the logarithm of the policy
         function dlpdt = dlogPidtheta(obj, state, action)
-            phi = obj.basis_bias(state);
+            phi = obj.get_basis(state);
             dlpdt = mtimescolumn((obj.Sigma) \ (action - obj.A*phi), phi);
         end
         
         %% Hessian matrix of the logarithm of the policy
         function hlpdt = hlogPidtheta(obj, state, action)
             nsamples = size(state,2);
-            phi = obj.basis_bias(state);
+            phi = obj.get_basis(state);
             phimat = kron(phi',eye(obj.daction));
             invSigma = inv(obj.Sigma);
             hlpdt = zeros(obj.dparams,obj.dparams,nsamples);

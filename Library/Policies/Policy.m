@@ -5,6 +5,7 @@ classdef (Abstract) Policy
         daction % Size of the action drawn by the policy
         dparams % Size of the parameters of the policy
         theta   % Policy parameters
+        no_bias % If true, the basis functions will not have the bias (no feature 1)
     end
     
     methods
@@ -38,9 +39,13 @@ classdef (Abstract) Policy
             end
         end
         
-        %% Adds the constant feature 1 (bias) to the basis function
-        function phi_bias = basis_bias(obj, States)
-            phi_bias = [ones(1,size(States,2)); obj.basis(States)];
+        %% 
+        function phi = get_basis(obj, States)
+            if obj.no_bias
+                phi = obj.basis(States);
+            else % Add the constant feature 1 (bias) to the basis functions
+                phi = [ones(1,size(States,2)); obj.basis(States)];
+            end
         end
     end
     

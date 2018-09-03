@@ -20,7 +20,7 @@ solver = REPSavg_Solver2(0.1,bfsV);
 
 data = [];
 varnames = {'r','s','nexts','a','endsim'};
-bfsnames = { {'phiP', @(s)policy.basis_bias(s)}, {'phiV', bfsV} };
+bfsnames = { {'phiP', @(s)policy.get_basis(s)}, {'phiV', bfsV} };
 iter = 1;
 
 max_reuse = 1; % Reuse all samples from the past X iterations

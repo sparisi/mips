@@ -5,7 +5,9 @@ classdef GaussianLinearFixedvarDiagmean < GaussianLinear
     
     methods
         
+        %% Constructor
         function obj = GaussianLinearFixedvarDiagmean(basis, dim, initA, Sigma)
+            obj.no_bias = true; % The mean is diagonal and depends only on the state, there is no bias
             assert(isscalar(dim) && ...
                 basis() == dim && ...
                 size(initA,2) == dim && ...
@@ -19,15 +21,10 @@ classdef GaussianLinearFixedvarDiagmean < GaussianLinear
             obj.daction = dim;
             obj.theta = diag(initA);
             obj.basis = basis;
-            obj.dparams = length(obj.theta);
             obj.Sigma = Sigma;
+            obj.dparams = length(obj.theta);
             obj.U = initU;
             obj.A = initA;
-        end
-        
-        %% OVERRIDE! DO NOT add the constant feature 1 (bias) to the basis function
-        function phi_bias = basis_bias(obj, States)
-            phi_bias = obj.basis(States);
         end
         
         %% Derivative of the logarithm of the policy

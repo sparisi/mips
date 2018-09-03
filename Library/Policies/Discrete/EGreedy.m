@@ -12,10 +12,12 @@ classdef EGreedy < PolicyDiscrete
     methods
         
         %% Constructor
-        function obj = EGreedy(basis, theta, action_list, epsilon)
+        function obj = EGreedy(basis, theta, action_list, epsilon, no_bias)
+            if nargin == 4, no_bias = false; end
+            obj.no_bias = no_bias; 
             assert(isvector(action_list), ...
                 'Action list is not a vector.')
-            assert((basis()+1)*length(action_list) == length(theta), ...
+            assert((basis()+1*~no_bias)*length(action_list) == length(theta), ...
                 'Wrong number of initial parameters.')
 
             obj.basis = basis;
@@ -45,7 +47,7 @@ classdef EGreedy < PolicyDiscrete
         % for all possible actions.
             nstates = size(States,2);
             lactions = length(obj.action_list);
-            phi = obj.basis_bias(States);
+            phi = obj.get_basis(States);
             dphi = size(phi,1);
 
             Q = reshape(obj.theta,dphi,lactions)'*phi;

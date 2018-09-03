@@ -13,10 +13,12 @@ classdef Gibbs < PolicyDiscrete
     methods
         
         %% Constructor
-        function obj = Gibbs(basis, theta, action_list)
+        function obj = Gibbs(basis, theta, action_list, no_bias)
+            if nargin == 3, no_bias = false; end
+            obj.no_bias = no_bias; 
             assert(isvector(action_list), ...
                 'Action list is not a vector.')
-            assert((basis()+1)*(length(action_list)-1) == length(theta), ...
+            assert((basis()+1*~no_bias)*(length(action_list)-1) == length(theta), ...
                 'Wrong number of initial parameters.')
 
             obj.basis = basis;
@@ -42,7 +44,7 @@ classdef Gibbs < PolicyDiscrete
         % for all possible actions.
             nstates = size(States,2);
             lactions = length(obj.action_list);
-            phi = obj.basis_bias(States);
+            phi = obj.get_basis(States);
             dphi = size(phi,1);
 
             Q = [reshape(obj.theta,dphi,lactions-1)'*phi;
@@ -61,7 +63,7 @@ classdef Gibbs < PolicyDiscrete
             found = (ismember(Actions,obj.action_list));
             assert(min(found) == 1, 'Unknown action.');
 
-            phi = obj.basis_bias(States);
+            phi = obj.get_basis(States);
             dphi = size(phi,1);
             prob_list = obj.distribution(States);
 

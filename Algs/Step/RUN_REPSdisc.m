@@ -9,7 +9,7 @@ solver = REPSdisc_Solver(0.1);
 nmax = episodes_learn*steps_learn*5;
 data = [];
 varnames = {'r','s','nexts','a','Q'};
-bfsnames = { {'phi', @(s)policy.basis_bias(s)} };
+bfsnames = { {'phi', @(s)policy.get_basis(s)} };
 iter = 1;
 
 %% Learning

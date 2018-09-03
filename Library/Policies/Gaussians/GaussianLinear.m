@@ -19,7 +19,7 @@ classdef (Abstract) GaussianLinear < Gaussian
                 || na == 1 ... % logprob(i) = prob of drawing a single action in States(i)
                 || ns == 1, ... % logprob(i) = prob of drawing Actions(i) in a single state
                 'Number of states and actions is not consistent.')
-            phi = obj.basis_bias(States);
+            phi = obj.get_basis(States);
             mu = obj.A*phi;
             Actions = bsxfun(@minus, Actions, mu);
             Q = obj.U' \ Actions;
@@ -36,7 +36,7 @@ classdef (Abstract) GaussianLinear < Gaussian
         %% MVNRND
         function Actions = drawAction(obj, States)
             % Draw N samples, one for each state
-            phi = obj.basis_bias(States);
+            phi = obj.get_basis(States);
             mu = obj.A*phi;
             Actions = obj.U'*randn(obj.daction, size(States,2)) + mu;
         end
@@ -50,7 +50,7 @@ classdef (Abstract) GaussianLinear < Gaussian
             xlabel 'x'
             ylabel 'pdf(x)'
             
-            phi = obj.basis_bias(States);
+            phi = obj.get_basis(States);
             mu = obj.A*phi;
             range = ndlinspace(mu - 3*diag(obj.Sigma), mu + 3*diag(obj.Sigma), 100);
             
@@ -68,7 +68,7 @@ classdef (Abstract) GaussianLinear < Gaussian
             if length(stateLB) == 1
                 n = 100;
                 s = linspace(stateLB(1),stateUB(1),n);
-                mu = obj.A*obj.basis_bias(s);
+                mu = obj.A*obj.get_basis(s);
                 ncols = min(5,size(mu,1));
                 nrows = ceil(size(mu,1)/ncols);
                 fig = findobj('type','figure','name','Mean action');
@@ -91,7 +91,7 @@ classdef (Abstract) GaussianLinear < Gaussian
                 y = linspace(stateLB(2),stateUB(2),n);
                 [X, Y] = meshgrid(x,y);
                 s = [X(:), Y(:)]';
-                mu = obj.A*obj.basis_bias(s);
+                mu = obj.A*obj.get_basis(s);
                 subcontourf('Mean action', X, Y, mu, 1)
             end
         end
