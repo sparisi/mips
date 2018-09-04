@@ -38,9 +38,9 @@ for trial = 1 : 999
     catch
     end
 end
-% dataMatrix = moving(dataMatrix',2)';
 
 if ~isempty(dataMatrix)
+%     dataMatrix = moving(dataMatrix',2)';
     hold all
     tmp = shadedErrorBar( ...
         1:size(dataMatrix,2), ...

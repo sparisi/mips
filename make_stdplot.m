@@ -48,9 +48,9 @@ for name = filenames
         catch
         end
     end
-%     dataMatrix = moving(dataMatrix',10)';
     
     if ~isempty(dataMatrix)
+%     dataMatrix = moving(dataMatrix',10)';
         hold all
         lineprops = { 'LineWidth', 2, 'DisplayName', name{:} };
         if ~isempty(colors)
