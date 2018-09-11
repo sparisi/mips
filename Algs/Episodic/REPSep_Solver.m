@@ -36,13 +36,13 @@ classdef REPSep_Solver < handle
             if nargin < 3, W = ones(1,size(J,2)); end % IS weights
             
             % Optimization problem settings
-            options = optimset('GradObj', 'on', ...
+            options = optimoptions('fmincon', ...
+                'Algorithm', 'trust-region-reflective', ...
+                'GradObj', 'on', ...
                 'Display', 'off', ...
-                'MaxFunEvals', 300 * 5, ...
-                'Algorithm', 'interior-point', ...
-                'TolX', 10^-8, ...
-                'TolFun', 10^-12, ...
-                'MaxIter', 300);
+                'Hessian', 'on', ...
+                'MaxFunEvals', 500, ...
+                'TolX', 10^-8, 'TolFun', 10^-12, 'MaxIter', 100);
 
             obj.eta = fmincon(@(eta)obj.dual(eta,J,W), ...
                 obj.eta, [], [], [], [], 1e-8, 1e8, [], options);
@@ -57,18 +57,19 @@ classdef REPSep_Solver < handle
         end
         
         %% DUAL FUNCTION
-        function [g, gd] = dual(obj, eta, J, W)
-            if nargin < 4, W = ones(1,size(J,2)); end % IS weights
+        function [g, gd, h] = dual(obj, eta, R, W)
+            if nargin < 4, W = ones(1,size(R,2)); end % IS weights
+            n = sum(W);
             
-            % Numerical trick
-            maxJ = max(J);
-            J = J - maxJ;
-            
-            A = sum(W .* exp(J / eta)) / sum(W);
-            B = sum(W .* exp(J / eta) .* J) / sum(W);
-            
-            g = eta * obj.epsilon + eta * log(A) + maxJ; % dual function
-            gd = obj.epsilon + log(A) - B / (eta * A);   % gradient
+            maxR = max(R);
+            weights = W .* exp( ( R - maxR ) / eta ); % Numerical trick
+            sumWeights = sum(weights);
+            sumWeightsR = sum( weights .* (R - maxR) );
+            sumWeightsRR = sum( weights .* (R - maxR).^2 );
+
+            g = eta * obj.epsilon + eta * log(sumWeights/n) + maxR; % dual
+            gd = obj.epsilon + log(sumWeights/n) - sumWeightsR / (eta * sumWeights); % gradient
+            h = ( sumWeightsRR * sumWeights - sumWeightsR^2 ) / ( eta^3 * sumWeights^2 ); % hessian
         end
 
     end

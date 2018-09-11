@@ -1,5 +1,5 @@
-classdef REPSavg_Solver2 < handle
-% LIKE REPSavg_Solver, but eta and theta are optimized together.
+classdef REPS_Solver2 < handle
+% Like REPS_Solver, but eta and theta are optimized together.
 
     properties
         epsilon       % KL divergence bound
@@ -15,7 +15,7 @@ classdef REPSavg_Solver2 < handle
     methods
 
         %% CLASS CONSTRUCTOR
-        function obj = REPSavg_Solver2(epsilon, bfs)
+        function obj = REPS_Solver2(epsilon, bfs)
             obj.epsilon = epsilon;
             obj.basis = bfs;
             obj.eta = 1e3;

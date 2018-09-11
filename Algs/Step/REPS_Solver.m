@@ -1,10 +1,14 @@
-classdef REPSavg_Solver < handle
+classdef REPS_Solver < handle
 % Step-based Relative Entropy Policy Search for average reward MDPs.
+% This is the original REPS.
 % The value function is linear in the parameters: V(s) = theta' * Phi(s).
 % It supports Importance Sampling (IS).
 %
 % =========================================================================
 % REFERENCE
+% J Peters, K Muelling, Y Altun
+% Relative Entropy Policy Search (2010)
+%
 % H van Hoof, G Neumann, J Peters
 % Non-parametric Policy Search with Limited Information Loss
 % JMLR (2017)
@@ -23,7 +27,7 @@ classdef REPSavg_Solver < handle
     methods
 
         %% CLASS CONSTRUCTOR
-        function obj = REPSavg_Solver(epsilon, bfs)
+        function obj = REPS_Solver(epsilon, bfs)
             obj.epsilon = epsilon;
             obj.basis = bfs;
             obj.eta = 1e3;

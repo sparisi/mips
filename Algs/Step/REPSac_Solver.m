@@ -1,6 +1,11 @@
-classdef REPSdisc_Solver < handle
-% Step-based Relative Entropy Policy Search for discounted reward. 
-% The Q-function is approximated by samples.
+classdef REPSac_Solver < handle
+% Step-based Relative Entropy Policy Search with actor-critic.
+% It does not constrain on the state distribution and thus it does not
+% learn the value funciton, which is instead learned separately outside 
+% this class.
+% It maximizes E_pi[R] where R can be the Q-function, Monte-Carlo estimates
+% of the return, or the advantage function, depending on which algorithm
+% calls the optimizer.
 % It supports Importance Sampling (IS).
 %
 % =========================================================================
@@ -20,7 +25,7 @@ classdef REPSdisc_Solver < handle
     methods
         
         %% CLASS CONSTRUCTOR
-        function obj = REPSdisc_Solver(epsilon)
+        function obj = REPSac_Solver(epsilon)
             obj.epsilon = epsilon;
             obj.eta = 1e3;
         end

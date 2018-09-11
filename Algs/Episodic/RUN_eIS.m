@@ -7,9 +7,9 @@ policy = policy.makeDeterministic; % Learn deterministic low-level policy
 
 iter = 1;
 
-solver = REPSep_Solver(0.9);
-solver = NES_Solver(0.1);
-% solver = MORE_Solver(0.9,0.99,-75,policy_high);
+solver = REPSep_Solver(0.9); div_str = 'KL (Weights)';
+% solver = NES_Solver(0.1); div_str = 'Grad Norm';
+% solver = MORE_Solver(0.9,0.99,-75,policy_high); div_str = 'KL';
 
 %% Learning
 while true
@@ -32,21 +32,24 @@ while true
 %     W = mixtureIS(policy_high, Policies, N, Theta);
 
     % Eval current policy
-%     [data, avgRew] = collect_episodes(mdp, episodes_eval, steps_eval, policy_high.makeDeterministic, policy);
     awgRew = evaluate_policies(mdp, episodes_eval, steps_eval, policy.update(policy_high.mu));
+    J_history(:,iter) = awgRew;
 
     % Perform a policy update step
+    policy_high_old = policy_high;
     [policy_high, div] = solver.step(J, Theta, policy_high, W);
 
     % Store and print info
-    J_history(:,iter) = data.J(robj,:);
-    fprintf( 'Iter: %d, Avg Reward: %.4f, Div: %.2f, Entropy: %.4f\n', ...
+    fprintf( ['Iter: %d, Avg Reward: %.4f, ' div_str ': %.2f, Entropy: %.4f'], ...
         iter, avgRew(robj), div, policy_high.entropy(data.Theta) );
+    if isa(policy_high,'Gaussian')
+        fprintf(', KL: %.4f', kl_mvn(policy_high, policy_high_old));
+    end
+    fprintf('\n');
 
     iter = iter + 1;
     
 end
 
 %%
-plothistory(J_history)
 show_simulation(mdp, policy.update(policy_high.mu), 1000, 0.01)

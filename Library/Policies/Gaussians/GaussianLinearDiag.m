@@ -76,7 +76,7 @@ classdef GaussianLinearDiag < GaussianLinear
         %% WML
         function obj = weightedMLUpdate(obj, weights, Action, Phi)
             assert(min(weights)>=0, 'Weights cannot be negative.')
-            assert(size(Phi,1) == obj.basis()+1)
+            assert(size(Phi,1) == obj.basis()+1*~obj.no_bias)
             weights = weights / sum(weights);
             PhiW = bsxfun(@times,Phi,weights);
             tmp = PhiW * Phi';

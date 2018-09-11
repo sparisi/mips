@@ -7,6 +7,7 @@ rng(1)
 options = optimoptions(@fminunc, 'Algorithm', 'trust-region', ...
     'GradObj', 'on', ...
     'Display', 'off', ...
+    'Hessian', 'on', ...
     'MaxFunEvals', 100, ...
     'TolX', 10^-8, 'TolFun', 10^-12, 'MaxIter', 100);
 
@@ -18,7 +19,7 @@ bfsV = @(varargin)basis_poly(2,mdp.dstate,0,varargin{:});
 bfsV = bfs;
 
 omega = (rand(bfsV(),1)-0.5)*2;
-solver = REPSdisc_Solver(0.5);
+solver = REPSac_Solver(0.3);
 
 data = [];
 varnames = {'r','s','nexts','a','endsim','Q'};
@@ -52,22 +53,29 @@ while iter < 1000
     
     % Print info
     J = evaluate_policies(mdp, episodes_eval, steps_eval, policy.makeDeterministic);
-    fprintf('%d) Entropy: %.2f,   KL: %.2f,   J: %e \n', ...
-        iter, entropy, divKL, J);
     J_history(iter) = J;
     
     % Update pi
+    policy_old = policy;
     policy = policy.weightedMLUpdate(d, data.a, data.phiP);
+    
+    fprintf('%d) Entropy: %.4f,  KL (Weights): %.4f,  J: %e', ...
+        iter, entropy, divKL, J);
+    if isa(policy,'Gaussian')
+        fprintf(',  KL: %.4f', kl_mvn2(policy, policy_old, policy.basis(data.s)));
+    end
+    fprintf('\n');
     
     iter = iter + 1;
 end
 
 
 %%
-function [g, gd] = learn_V(omega, Phi, T)
+function [g, gd, h] = learn_V(omega, Phi, T)
 % Mean squared TD error
 V = omega'*Phi;
 TD = V - T; % T are the targets (constant)
 g = 0.5*mean(TD.^2);
 gd = Phi*TD'/size(T,2);
+h = Phi*Phi'/size(T,2);
 end

@@ -10,6 +10,7 @@ options = optimoptions(@fminunc, 'Algorithm', 'trust-region', ...
     'GradObj', 'on', ...
     'Display', 'off', ...
     'MaxFunEvals', 100, ...
+    'Hessian', 'on', ...
     'TolX', 10^-8, 'TolFun', 10^-12, 'MaxIter', 100);
 
 lrate = 0.05;
@@ -75,10 +76,11 @@ end
 
 
 %%
-function [g, gd] = learn_V(omega, Phi, T)
+function [g, gd, h] = learn_V(omega, Phi, T)
 % Mean squared TD error
 V = omega'*Phi;
 TD = V - T; % T are the targets (constant)
 g = 0.5*mean(TD.^2);
 gd = Phi*TD'/size(T,2);
+h = Phi*Phi'/size(T,2);
 end

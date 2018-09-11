@@ -27,11 +27,11 @@ solver.lambda_l2 = 0;
 solver.lambda_nn = 0;
 solver.alg_name = 'fista';
 
-% solver = CREPS_Solver(0.9,bfs);
+solver = CREPS_Solver(0.9,bfs);
 
 G = randn(dim_bfs,dim_action);
 f = @(action,ctx)rosenbrock_ctx(action,ctx,G);
-% f = @(action,ctx)quadcost(action,ctx); % For the quadratic cost you need to use dim_ctx = dim_action and poly(1) features
+% f = @(action,ctx)quadcost(action,ctx); % For quadratic cost you need to use dim_ctx = dim_action and poly(1) features
 
 iter = 1;
 
@@ -42,13 +42,12 @@ while iter < maxiter
     C_iter = bfs(ctx(N));
     A_iter = sampling.drawAction(C_iter);
     R_iter = f(A_iter,C_iter);
-    avgY = mean(R_iter,2);
     
     % Eval samples
     C_eval = bfs(ctx(N_eval));
     A_eval = sampling.makeDeterministic.drawAction(C_eval);
     R_eval = f(A_eval,C_eval);
-    avgY = mean(R_eval,2);
+    J_history(:,iter) = R_eval;
 
     % First, fill the pool to maintain the samples distribution
     if iter == 1
@@ -63,11 +62,15 @@ while iter < maxiter
     C = [C_iter, C(:, 1:N_MAX-N)];
 
     % Perform an update step
+    sampling_old = sampling;
     [sampling, divKL] = solver.step(R,A,C,sampling);
     
-    J_history(:,iter) = R_eval;
-    fprintf( ['Iter: %d, Avg Value: %.4f, KL: %.2f, Entropy: %.4f \n'], ...
-        iter, avgY, divKL, sampling.entropy );
+    fprintf( 'Iter: %d, Avg Value: %.4f, KL: %.4f, Entropy: %.4f', ...
+        iter, mean(R_eval), divKL, sampling.entropy );
+    if isa(sampling,'Gaussian')
+        fprintf(', KL: %.4f', kl_mvn2(sampling, sampling_old, sampling.basis(C)));
+    end
+    fprintf('\n');
         
     iter = iter + 1;
     
@@ -76,7 +79,7 @@ while iter < maxiter
 end
 
 %%
-J_history(:,end+1:maxiter) = avgY;
+J_history(:,end+1:maxiter) = mean(R_eval);
 if N_eval == 1
     plot(J_history)
 else

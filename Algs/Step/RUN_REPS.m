@@ -16,7 +16,8 @@ bfsV = @(varargin)basis_poly(2,mdp.dstate,0,varargin{:});
 bfsV = @(varargin)basis_krbf(6, [mdp.stateLB, mdp.stateUB], 0, varargin{:});
 bfsV = bfs;
 
-solver = REPSavg_Solver2(0.1,bfsV);
+solver = REPS_Solver2(0.1,bfsV);
+solver.verbose = 0;
 
 data = [];
 varnames = {'r','s','nexts','a','endsim'};
@@ -44,17 +45,24 @@ while iter < 1000
         bsxfun(@plus, (1-mdp_avg.reset_prob).*data.phiV_nexts, ... 
         mdp_avg.reset_prob.*mean(data.phiV(:,idx_init),2)));
     
+    policy_old = policy;
     policy = policy.weightedMLUpdate(d, data.a, data.phiP);
 
     J = evaluate_policies(mdp, episodes_eval, steps_eval, policy.makeDeterministic);
     J_history(iter) = J;
-    fprintf('%d ) Entropy: %.3f,  KL: %.4f,  J: %e\n', iter, entropy, divKL, J)
+    fprintf('%d ) Entropy: %.3f,  KL (Weights): %.4f,  J: %e', iter, entropy, divKL, J)
+    if isa(policy,'Gaussian')
+        fprintf(',  KL: %.4f', kl_mvn2(policy, policy_old, policy.basis(data.s)));
+    end
+    fprintf('\n');
     
     iter = iter + 1;
     
     %%
-    solver.plotV(mdp.stateLB, mdp.stateUB)
-    policy.plotmean(mdp.stateLB, mdp.stateUB)
+    if solver.verbose
+        solver.plotV(mdp.stateLB, mdp.stateUB)
+        policy.plotmean(mdp.stateLB, mdp.stateUB)
+    end
     
 end
 
