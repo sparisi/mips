@@ -2,7 +2,7 @@ clear all
 
 rng(10)
 
-N = 1500;
+N = 300;
 N_MAX = N * 1;
 N_eval = 1;
 robj = 1;
@@ -17,10 +17,11 @@ solver = MORE_Solver(0.9,0.99,-75000,sampling); divStr = 'KL';
 % solver = MORE2_Solver(0.9,sampling); divStr = 'KL';
 % solver = NES_Solver(0.1); divStr = 'Grad Norm';
 % solver = REPSep_Solver(0.9); divStr = 'KL (Weights)';
+solver = REPSep_constrained_Solver(0.9,1); divStr = 'KL (Weights)';
 
 f = @(x)rosenbrock(x);
 % f = @(x)rastrigin(x);
-f = @(x)noisysphere(x); N_eval = 1000;
+% f = @(x)noisysphere(x); N_eval = 1000;
 
 iter = 1;
 
