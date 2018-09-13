@@ -57,15 +57,15 @@ classdef REPSep_Solver < handle
         end
         
         %% DUAL FUNCTION
-        function [g, gd, h] = dual(obj, eta, R, W)
-            if nargin < 4, W = ones(1,size(R,2)); end % IS weights
+        function [g, gd, h] = dual(obj, eta, J, W)
+            if nargin < 4, W = ones(1,size(J,2)); end % IS weights
             n = sum(W);
             
-            maxR = max(R);
-            weights = W .* exp( ( R - maxR ) / eta ); % Numerical trick
+            maxR = max(J);
+            weights = W .* exp( ( J - maxR ) / eta ); % Numerical trick
             sumWeights = sum(weights);
-            sumWeightsR = sum( weights .* (R - maxR) );
-            sumWeightsRR = sum( weights .* (R - maxR).^2 );
+            sumWeightsR = sum( weights .* (J - maxR) );
+            sumWeightsRR = sum( weights .* (J - maxR).^2 );
 
             g = eta * obj.epsilon + eta * log(sumWeights/n) + maxR; % dual
             gd = obj.epsilon + log(sumWeights/n) - sumWeightsR / (eta * sumWeights); % gradient
