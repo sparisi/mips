@@ -2,8 +2,8 @@
 It mostly focuses on policy search, especially REPS and policy gradient, and includes multi-objective RL algorithms.  
 It also provides benchmark MDPs and optimization problems, and common policies classes.
 
-Some algorithms require the *Optimization Toolbox*.  
-Some utility functions are imported from File Exchange (original authors are always acknowledged).
+Some algorithms require the [Optimization Toolbox](https://www.mathworks.com/products/optimization.html).  
+Some utility functions are imported from [File Exchange](https://www.mathworks.com/matlabcentral/fileexchange/) (original authors are always acknowledged).
 
 
 ## Summary
@@ -96,10 +96,10 @@ Utility functions used for matrix operations, plotting and sampling are stored i
 </details>
 
 
-## How to make plots and show animations
+## How to make plots and render environments
 
 
-Here is a list with examples of all ways for visualizing your data or rendering an animation. Please note that not all MDPs support an animation.
+Here is a list with examples of all ways for visualizing your data or rendering an environment. Please note that not all MDPs support rendering.
 
 <details>
 <summary><b>Real time data plotting</b></summary>
@@ -122,9 +122,9 @@ If you are interested on evaluating an algorithm on several trials you can use t
 
 
 <details>
-<summary><b>Real time animation</b></summary>
+<summary><b>Real time rendering</b></summary>
   <p>
-Launch <code>mdp.showplot</code> to initialize the plotting and an animation of the agent-environment interaction will be shown during the learning. To stop plotting use <code>mdp.closeplot</code>.
+Launch <code>mdp.showplot</code> to initialize the rendering of the agent-environment interaction will be shown during the learning. To stop plotting use <code>mdp.closeplot</code>.
 
 > **IMPORTANT!** This is possible only if you are learning using one episode per iteration.
   </p>
@@ -132,7 +132,7 @@ Launch <code>mdp.showplot</code> to initialize the plotting and an animation of 
 
 
 <details>
-<summary><b>Offline animation</b></summary>
+<summary><b>Offline rendering</b></summary>
   <p>
 
 - For step-based algorithms, you can directly use the built-in plotting function of the MDPs.
@@ -143,7 +143,7 @@ data = collect_samples(mdp,episodes,steps,policy)
 mdp.plotepisode(data(1),0.001)
 ```
 
-- For episode-based algorithms, the low-level dataset is not returned. In this case, you can call `show_simulation`, which executes only one episode and shows an animation. This visualization can be used also in step-based algorithms.
+- For episode-based algorithms, the low-level dataset is not returned. In this case, you can call `show_simulation`, which executes only one episode and renders it. This visualization can be used also in step-based algorithms.
 
 ```
 show_simulation(mdp,policy,100,0.001)
