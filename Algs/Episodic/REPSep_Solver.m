@@ -61,15 +61,15 @@ classdef REPSep_Solver < handle
             if nargin < 4, W = ones(1,size(J,2)); end % IS weights
             n = sum(W);
             
-            maxR = max(J);
-            weights = W .* exp( ( J - maxR ) / eta ); % Numerical trick
+            maxJ = max(J);
+            weights = W .* exp( ( J - maxJ ) / eta ); % Numerical trick
             sumWeights = sum(weights);
-            sumWeightsR = sum( weights .* (J - maxR) );
-            sumWeightsRR = sum( weights .* (J - maxR).^2 );
+            sumWeightsJ = sum( weights .* (J - maxJ) );
+            sumWeightsJJ = sum( weights .* (J - maxJ).^2 );
 
-            g = eta * obj.epsilon + eta * log(sumWeights/n) + maxR; % dual
-            gd = obj.epsilon + log(sumWeights/n) - sumWeightsR / (eta * sumWeights); % gradient
-            h = ( sumWeightsRR * sumWeights - sumWeightsR^2 ) / ( eta^3 * sumWeights^2 ); % hessian
+            g = eta * obj.epsilon + eta * log(sumWeights/n) + maxJ; % dual
+            gd = obj.epsilon + log(sumWeights/n) - sumWeightsJ / (eta * sumWeights); % gradient
+            h = ( sumWeightsJJ * sumWeights - sumWeightsJ^2 ) / ( eta^3 * sumWeights^2 ); % hessian
         end
 
     end

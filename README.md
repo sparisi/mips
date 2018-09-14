@@ -1,4 +1,6 @@
-**Mi**nimal **P**olicy **S**earch is a toolbox for Matlab providing the implementation of some of the most famous policy search algorithms, as well as some recent multi-objective methods and benchmark problems in reinforcement learning.
+**Mi**nimal **P**olicy **S**earch is a toolbox for Matlab providing the implementation of RL algorithms.  
+It mostly focuses on policy search, especially REPS and policy gradient, and includes multi-objective RL algorithms.  
+It also provides benchmark MDPs and optimization problems, and common policies classes.
 
 Some algorithms require the *Optimization Toolbox*.  
 Some utility functions are imported from File Exchange (original authors are always acknowledged).

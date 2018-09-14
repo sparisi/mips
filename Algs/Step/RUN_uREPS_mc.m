@@ -1,18 +1,24 @@
-% Step-based REPS maximizing Monte-Carlo estimates of the return.
+% Unconstrained REPS. Like ACREPS, but it does not constrain on the state 
+% distribution and thus it does not learn the value funciton by minimizing 
+% the dual. Instead, Monte-Carlo estimates of Q are maximized.
 
-solver = REPSac_Solver(0.1);
-nmax = episodes_learn*steps_learn*5;
+solver = REPSep_Solver(0.1);
+
 data = [];
 varnames = {'r','s','nexts','a','Q'};
 bfsnames = { {'phi', @(s)policy.get_basis(s)} };
 iter = 1;
+
+max_reuse = 1; % Reuse all samples from the past X iterations
+max_samples = zeros(1,max_reuse);
 
 %% Learning
 while iter < 1500
     
     [ds, J] = collect_samples(mdp, episodes_learn, steps_learn, policy);
     entropy = policy.entropy([ds.s]);
-    data = getdata(data,ds,nmax,varnames,bfsnames);
+    max_samples(mod(iter-1,max_reuse)+1) = size([ds.s],2);
+    data = getdata(data,ds,sum(max_samples),varnames,bfsnames);
 
     [d, divKL] = solver.optimize(data.Q);
     policy_old = policy;
