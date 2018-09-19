@@ -4,14 +4,13 @@
 
 close all
 clear all
+figure(), title('My Title')
+h = {};
 
 %% Change entries according to your needs
-folder = './data_ppo_slow/';
+folder = './data/';
 separator = '_';
-filenames = {'ddpg.ddpg0_Pendulum-v0', 'ddpg.ddpg_tdreg1_Pendulum-v0', 'ddpg.ddpg_tdreg2_Pendulum-v0', 'ddpg.ddpg_tdreg3_Pendulum-v0', 'ddpg.ddpg_tdreg4_Pendulum-v0'};
-filenames = {'ddpg.ddpg_tdreg1_Pendulum-v0', 'ddpg.ddpg_tdreg3_Pendulum-v0', 'ddpg.ddpg_tdreg4_Pendulum-v0'};
-filenames = {'ddpg.ddpg0_Pendulum-v0', 'ddpg.ddpg_tdreg4_Pendulum-v0'};
-filenames = {'ppo.ppo0_HalfCheetah-v2', 'ppo.ppo1_HalfCheetah-v2'};
+filenames = {'alg1', 'alg2'};
 filenames = {};
 
 if isempty(filenames) % automatically identify algorithms name
@@ -35,7 +34,6 @@ variable = 'J_history';
 % variable = '-log(-mean(J_history))';
 
 %% Plot
-h = {};
 for name = filenames
     
     counter = 1;
@@ -50,7 +48,7 @@ for name = filenames
     end
     
     if ~isempty(dataMatrix)
-%     dataMatrix = moving(dataMatrix',10)';
+%         dataMatrix = moving(dataMatrix',10)';
         hold all
         lineprops = { 'LineWidth', 2, 'DisplayName', name{:} };
         if ~isempty(colors)

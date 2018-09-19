@@ -5,6 +5,8 @@
 
 close all
 clear all
+figure(), title('My Alg')
+h = {};
 
 %% Change entries according to your needs
 folder = 'data/';
@@ -21,7 +23,6 @@ variable = 'J_history';
 % variable = '-log(-mean(J_history))';
 
 %% Plot
-h = {};
 for hp1 = hp1_list
     for hp2 = hp2_list
         for hp3 = hp3_list

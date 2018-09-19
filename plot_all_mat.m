@@ -6,7 +6,7 @@ close all
 Files = dir(fullfile('.','*.mat'));
 
 varname = 'mean(J_history,1)';
-varbound = -1500;
+varbound = -inf;
 
 figure, hold all, title('Average Return')
 for current_file = {Files.name}
