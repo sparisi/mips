@@ -32,8 +32,8 @@ classdef REPS_Solver2 < handle
                 'Algorithm', 'trust-region-reflective', ...
                 'GradObj', 'on', ...
                 'Display', 'off', ...
-                'MaxFunEvals', 300, ...
-                'TolX', 10^-12, 'TolFun', 10^-12, 'MaxIter', 300);
+                'MaxFunEvals', 500, ...
+                'TolX', 10^-12, 'TolFun', 10^-12, 'MaxIter', 500);
             
             maxIter = 10;
 
@@ -95,7 +95,7 @@ classdef REPS_Solver2 < handle
             g = eta * obj.epsilon + eta * log(sumWeights/n) + maxA + obj.l2_reg*sum(theta.^2);
             % Gradient wrt eta and theta
             gd = [obj.epsilon + log(sumWeights/n) - sumWeightsA / (eta * sumWeights)
-                sumPhiWeights / sumWeights + obj.l2_reg/2*theta];
+                sumPhiWeights / sumWeights + obj.l2_reg*2*theta];
         end
         
         %% GET V-FUNCTION

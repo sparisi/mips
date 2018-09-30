@@ -170,7 +170,7 @@ classdef REPS_Solver < handle
             % Dual function
             g = eta * obj.epsilon + eta * log(sumWeights/n) + maxA + obj.l2_reg*sum(theta.^2);
             % Gradient wrt theta
-            gd = sumPhiWeights / sumWeights + obj.l2_reg/2*theta;
+            gd = sumPhiWeights / sumWeights + obj.l2_reg*2*theta;
             % Hessian
             h = ( sumPhiWeightsPhi * sumWeights - sumPhiWeights * sumPhiWeights') / sumWeights^2 / eta + obj.l2_reg/2;
         end
