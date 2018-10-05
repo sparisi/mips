@@ -1,7 +1,6 @@
 clear
 close all
 
-rng(1)
 
 %% Get problem specification
 mdp = LQR(2);

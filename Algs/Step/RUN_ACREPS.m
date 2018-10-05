@@ -2,8 +2,6 @@
 % using Monte-Carlo samples (as in this script) works just fine (or even
 % better).
 
-rng(1)
-
 mdp.gamma = 0.99;
 
 bfsV = @(varargin)basis_poly(2,mdp.dstate,0,varargin{:});

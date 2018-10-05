@@ -8,8 +8,6 @@
 % H van Hoof, G Neumann, J Peters
 % Non-parametric Policy Search with Limited Information Loss (2017)
 
-rng(1)
-
 mdp_avg = MDP_avg(mdp,0.02);
 
 bfsV = @(varargin)basis_poly(2,mdp.dstate,0,varargin{:});

@@ -3,8 +3,6 @@
 % Then, V is updated by minimizing the TD-error (targets are Monte-Carlo estimates).
 % Finally, the policy is updated by natural gradient on A.
 
-rng(1)
-
 % To learn V
 options = optimoptions(@fminunc, 'Algorithm', 'trust-region', ...
     'GradObj', 'on', ...

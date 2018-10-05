@@ -1,6 +1,3 @@
-rng(1)
-
-
 %% Neural networks layout
 dimA = mdp.actionUB;
 dimO = mdp.dstate;
