@@ -1,7 +1,4 @@
-% Actor-critic policy gradient, as described by https://arxiv.org/pdf/1703.02660.pdf
-% First, the generalized advantage A is estimated using V.
-% Then, V is updated by minimizing the TD-error (targets are Monte-Carlo estimates).
-% Finally, the policy is updated by natural gradient on A.
+% Proximal policy optimization https://arxiv.org/abs/1707.06347
 
 % To learn V
 options = optimoptions(@fminunc, 'Algorithm', 'trust-region', ...
@@ -13,6 +10,9 @@ options = optimoptions(@fminunc, 'Algorithm', 'trust-region', ...
 
 lrate = 0.05;
 lambda_trace = 0.95;
+e_clip = 0.2;
+batch_size = 64;
+max_epochs = 20;
 
 bfsV = @(varargin)basis_poly(2,mdp.dstate,0,varargin{:});
 % bfsV = @(varargin)basis_krbf(4, [mdp.stateLB, mdp.stateUB], 0, varargin{:});
@@ -27,6 +27,7 @@ iter = 1;
 
 max_reuse = 1; % Reuse all samples from the past X iterations
 max_samples = zeros(1,max_reuse);
+
 
 %% Learning
 while iter < 200
@@ -46,32 +47,27 @@ while iter < 200
 
     % Update V
     omega = fminunc(@(omega)learn_V(omega,data.phiV,data.Q), omega, options);
-    
-    % Estimate natural gradient
-    dlogpi = policy.dlogPidtheta(data.s,data.a);
-    grad = mean(bsxfun(@times,dlogpi,A),2);
-    F = dlogpi * dlogpi' / length(A);
-    rankF = rank(F);
-    if rankF == size(F,1)
-        grad_nat = F \ grad;
-    else
-        grad_nat = pinv(F) * grad;
+
+    % Estimate gradient
+    old_probs = policy.evaluate(data.a, data.s);
+    for epoch = 1 : max_epochs
+            ratio = policy.evaluate(data.a, data.s) ./ old_probs;
+            clipped = min(max(ratio, 1-e_clip), 1+e_clip);
+            idx = ratio.*A <= clipped.*A;
+            ratio(~idx) = 0; % Gradient of clip(ratio)*A is 0
+            dlogpi = policy.dlogPidtheta(data.s,data.a);
+            grad = mean(bsxfun(@times,dlogpi,ratio.*A),2);
+            norm_g = norm(grad);
+            policy = policy.update(policy.theta + lrate*grad/norm(grad));
     end
-    stepsize = sqrt(lrate / (grad'*grad_nat));
-    
+
     % Print info
-    norm_g = norm(grad);
-    norm_ng = norm(grad_nat);
     J = evaluate_policies(mdp, episodes_eval, steps_eval, policy.makeDeterministic);
-    fprintf('%d) Entropy: %.2f,   Norm (G): %e,   Norm (NG): %e,   J: %e \n', ...
-        iter, entropy, norm_g, norm_ng, J);
+    fprintf('%d) Entropy: %.2f,   Norm: %e,   J: %e \n', ...
+        iter, entropy, norm_g, J);
     J_history(iter) = J;
     
-    % Update pi
-    policy = policy.update(policy.theta + grad_nat * stepsize);
-    
     iter = iter + 1;
-
 end
 
 
