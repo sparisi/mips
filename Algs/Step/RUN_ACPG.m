@@ -11,6 +11,7 @@ options = optimoptions(@fminunc, 'Algorithm', 'trust-region', ...
     'Hessian', 'on', ...
     'TolX', 10^-8, 'TolFun', 10^-12, 'MaxIter', 100);
 
+mdp.gamma = 0.99;
 lrate = 0.05;
 lambda_trace = 0.95;
 
@@ -21,7 +22,7 @@ bfsV = bfs;
 omega = (rand(bfsV(),1)-0.5)*2;
 
 data = [];
-varnames = {'r','s','nexts','a','endsim','Q'};
+varnames = {'r','s','nexts','a','endsim'};
 bfsnames = { {'phiP', @(s)policy.get_basis(s)}, {'phiV', bfsV} };
 iter = 1;
 
@@ -34,7 +35,7 @@ while iter < 200
     % Collect data
     [ds, J] = collect_samples(mdp, episodes_learn, steps_learn, policy);
     for i = 1 : numel(ds)
-        ds(i).endsim(end) = 1;
+        ds(i).endsim(end) = 1; % To separate episodes for GAE
     end
     entropy = policy.entropy([ds.s]);
     max_samples(mod(iter-1,max_reuse)+1) = size([ds.s],2);
@@ -45,7 +46,7 @@ while iter < 200
     A = gae(data,V,mdp.gamma,lambda_trace);
 
     % Update V
-    omega = fminunc(@(omega)learn_V(omega,data.phiV,data.Q), omega, options);
+    omega = fminunc(@(omega)learn_V(omega,data.phiV,V+A), omega, options);
     
     % Estimate natural gradient
     dlogpi = policy.dlogPidtheta(data.s,data.a);

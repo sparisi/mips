@@ -5,7 +5,7 @@
 solver = REPSep_Solver(0.1);
 
 data = [];
-varnames = {'r','s','nexts','a','Q'};
+varnames = {'r','s','nexts','a','endsim'};
 bfsnames = { {'phi', @(s)policy.get_basis(s)} };
 iter = 1;
 
@@ -16,11 +16,15 @@ max_samples = zeros(1,max_reuse);
 while iter < 1500
     
     [ds, J] = collect_samples(mdp, episodes_learn, steps_learn, policy);
+    for i = 1 : numel(ds)
+        ds(i).endsim(end) = 1; % To separate episodes for MC returns
+    end
     entropy = policy.entropy([ds.s]);
     max_samples(mod(iter-1,max_reuse)+1) = size([ds.s],2);
     data = getdata(data,ds,sum(max_samples),varnames,bfsnames);
-
-    [d, divKL] = solver.optimize(data.Q);
+    Q = mc_ret(data,mdp.gamma);
+    
+    [d, divKL] = solver.optimize(Q);
     policy_old = policy;
     policy = policy.weightedMLUpdate(d, data.a, data.phi);
 

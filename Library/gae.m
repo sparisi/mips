@@ -9,11 +9,10 @@ function A = gae(data, V, gamma, lambda)
 
 A = zeros(size(V));
 r = [data.r];
-done = [data.endsim];
-n = size(V,2);
+terminal = [data.endsim]; % Be sure that the last step of each episode has endsim=true!
 
-for k = n : -1 : 1
-    if done(k)
+for k = size(V,2) : -1 : 1
+    if terminal(k)
         A(k) = r(k) - V(k);
     else
         A(k) = r(k) + gamma*V(k+1) - V(k) + gamma*lambda*A(k+1);

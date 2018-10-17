@@ -1,17 +1,16 @@
 % In the original paper by Wirth et al., Q is learned by LSTD. However,
-% using Monte-Carlo samples (as in this script) works just fine (or even
-% better).
+% using Monte-Carlo samples (as in this script) works just fine.
 
 mdp.gamma = 0.99;
 
 bfsV = @(varargin)basis_poly(2,mdp.dstate,0,varargin{:});
 % bfsV = @(varargin)basis_krbf(4, [mdp.stateLB, mdp.stateUB], 0, varargin{:});
-% bfsV = bfs;
+bfsV = bfs;
 
 solver = ACREPS_Solver(0.3,bfsV);
 
 data = [];
-varnames = {'r','s','nexts','a','endsim','Q'};
+varnames = {'r','s','nexts','a','endsim'};
 bfsnames = { {'phiP', @(s)policy.get_basis(s)}, {'phiV', bfsV} };
 iter = 1;
 
@@ -23,12 +22,16 @@ while iter < 200
     
     % Collect data
     [ds, J] = collect_samples(mdp, episodes_learn, steps_learn, policy);
+    for i = 1 : numel(ds)
+        ds(i).endsim(end) = 1; % To separate episodes for MC returns
+    end
     entropy = policy.entropy([ds.s]);
     max_samples(mod(iter-1,max_reuse)+1) = size([ds.s],2);
     data = getdata(data,ds,sum(max_samples),varnames,bfsnames);
+    Q = mc_ret(data,mdp.gamma);
     
     % Get REPS weights
-    [d, divKL] = solver.optimize(data.Q,data.phiV);
+    [d, divKL] = solver.optimize(Q,data.phiV);
     
     % Print info
     J = evaluate_policies(mdp, episodes_eval, steps_eval, policy.makeDeterministic);
