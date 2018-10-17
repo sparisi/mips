@@ -18,8 +18,6 @@ function [data, J] = collect_samples(mdp, episodes, maxsteps, policy, contexts)
 %                   * nexts  : next state
 %                   * r      : immediate reward
 %                   * gammar : discounted immediate reward, gamma^(t-1)*r
-%                   * Q      : approximation of the Q function, that is
-%                              Q(s_t,a_t) = sum_(h=t)^T gamma^(h-1)*r(s_h,a_h)
 %                   * endsim : 1 if the state is terminal, 0 otherwise
 %                   * length : length of the episode
 %     - J        : returns averaged over all the episodes
@@ -99,7 +97,6 @@ ds.nexts = permute(ds.nexts, [1 3 2]);
 ds.gammar = permute(ds.gammar, [1 3 2]);
 ds.r = permute(ds.r, [1 3 2]);
 ds.endsim = permute(ds.endsim, [1 3 2]);
-ds.Q = cumsum(ds.gammar,2,'reverse'); % Because allocated (but not run) steps have value 0
 
 % Convert dataset to struct to allow storage of episodes with different length
 data = struct( ...
@@ -108,7 +105,6 @@ data = struct( ...
     'r', num2cell(ds.r,[1 2]), ...
     'nexts', num2cell(ds.nexts,[1 2]), ...
     'gammar', num2cell(ds.gammar,[1 2]), ...
-    'Q', num2cell(ds.Q,[1 2]), ...
     'length', num2cell(permute(endingstep,[3 1 2]),1), ...
     'endsim', num2cell(ds.endsim,[1 2]) ...
     );
@@ -121,7 +117,6 @@ for i = find(endingstep < max(endingstep))
     data(i).gammar = data(i).gammar(:,1:endingstep(i));
     data(i).a = data(i).a(:,1:endingstep(i));
     data(i).nexts = data(i).nexts(:,1:endingstep(i));
-    data(i).Q = data(i).Q(:,1:endingstep(i));
     data(i).length = endingstep(i);
     data(i).endsim = data(i).endsim(:,1:endingstep(i));
 end

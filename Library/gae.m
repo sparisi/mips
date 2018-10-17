@@ -1,5 +1,5 @@
 function A = gae(data, V, gamma, lambda)
-% Computes generalized advantages from potentially off-policy data.
+% Computes generalized advantage estimates from potentially off-policy data.
 %
 % =========================================================================
 % REFERENCE
@@ -12,8 +12,7 @@ r = [data.r];
 done = [data.endsim];
 n = size(V,2);
 
-for rev_k = 1 : n
-    k = n - rev_k + 1;
+for k = n : -1 : 1
     if done(k)
         A(k) = r(k) - V(k);
     else
