@@ -8,7 +8,8 @@
 % H van Hoof, G Neumann, J Peters
 % Non-parametric Policy Search with Limited Information Loss (2017)
 
-mdp_avg = MDP_avg(mdp,0.02);
+reset_prob = 0.01;
+mdp_avg = MDP_avg(mdp,reset_prob);
 
 bfsV = @(varargin)basis_poly(2,mdp.dstate,0,varargin{:});
 bfsV = @(varargin)basis_krbf(6, [mdp.stateLB, mdp.stateUB], 0, varargin{:});
@@ -28,9 +29,10 @@ max_samples = zeros(1,max_reuse);
 %% Learning
 while iter < 1000
     
-    [ds, J] = collect_samples(mdp_avg, episodes_learn, steps_learn, policy);
+%     tic, [ds, J] = collect_samples(mdp_avg, episodes_learn, steps_learn, policy); toc
+    tic, [ds] = collect_samples_inf(mdp, steps_learn*episodes_learn, policy, reset_prob); toc
     for i = 1 : numel(ds)
-        ds(i).endsim(end) = 1;
+        ds(i).endsim(end) = 1; % To separate episodes to get initial states
     end
     entropy = policy.entropy([ds.s]);
 
@@ -48,7 +50,8 @@ while iter < 1000
 
     J = evaluate_policies(mdp, episodes_eval, steps_eval, policy.makeDeterministic);
     J_history(iter) = J;
-    fprintf('%d ) Entropy: %.3f,  KL (Weights): %.4f,  J: %e', iter, entropy, divKL, J)
+    fprintf('%d ) Entropy: %.3f,  Eta: %e,  KL (Weights): %.4f,  J: %e', ...
+        iter, entropy, solver.eta, divKL, J)
     if isa(policy,'Gaussian')
         fprintf(',  KL: %.4f', kl_mvn2(policy, policy_old, policy.basis(data.s)));
     end

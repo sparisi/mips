@@ -18,7 +18,6 @@ classdef ACREPS_Solver < handle
         theta         % Lagrangian (features)
         l2_reg        % Regularizer for theta
         tolKL = 0.1;  % Tolerance of the KL error 
-        verbose = 1;  % 1 to display inner loop statistics
     end
 
     methods
@@ -41,11 +40,11 @@ classdef ACREPS_Solver < handle
                 'Algorithm', 'trust-region-reflective', ...
                 'GradObj', 'on', ...
                 'Display', 'off', ...
-                'MaxFunEvals', 500, ...
-                'TolX', 10^-12, 'TolFun', 10^-12, 'MaxIter', 500);
+                'MaxFunEvals', 300, ...
+                'TolX', 10^-12, 'TolFun', 10^-12, 'MaxIter', 300);
             
             vars = fmincon(@(vars)obj.dual(vars,Q,Phi,W), [obj.eta; obj.theta], ...
-                [], [], [], [], 1e-8, inf, [], options);
+                [], [], [], [], 1e-8, 1e8, [], options);
             obj.eta = vars(1);
             obj.theta = vars(2:end);
             
@@ -79,7 +78,7 @@ classdef ACREPS_Solver < handle
             g = eta * obj.epsilon + eta * log(sumWeights/n) + theta'*avgPhi + maxA + obj.l2_reg*sum(theta.^2);
             % Gradient wrt eta and theta
             gd = [obj.epsilon + log(sumWeights/n) - sumWeightsA / (eta * sumWeights)
-                sumPhiWeights / sumWeights - avgPhi + obj.l2_reg*2*theta];
+                sumPhiWeights / sumWeights + avgPhi + obj.l2_reg*2*theta];
         end
         
         %% GET V-FUNCTION

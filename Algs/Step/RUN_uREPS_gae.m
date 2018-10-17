@@ -59,8 +59,8 @@ while iter < 1000
     policy_old = policy;
     policy = policy.weightedMLUpdate(d, data.a, data.phiP);
     
-    fprintf('%d) Entropy: %.4f,  KL (Weights): %.4f,  J: %e', ...
-        iter, entropy, divKL, J);
+    fprintf('%d) Entropy: %.4f,  Eta: %e,  KL (Weights): %.4f,  J: %e', ...
+        iter, entropy, solver.eta, divKL, J);
     if isa(policy,'Gaussian')
         fprintf(',  KL: %.4f', kl_mvn2(policy, policy_old, policy.basis(data.s)));
     end

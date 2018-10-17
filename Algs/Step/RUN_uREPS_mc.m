@@ -30,7 +30,8 @@ while iter < 1500
 
     J = evaluate_policies(mdp, episodes_eval, steps_eval, policy.makeDeterministic);
     J_history(iter) = J(robj);
-    fprintf('%d ) Entropy: %.2f,  KL (Weights): %.2f,  J: %.4f', iter, entropy, divKL, J(robj))
+    fprintf('%d ) Entropy: %.2f,  Eta: %e,  KL (Weights): %.2f,  J: %.4f', ...
+        iter, entropy, solver.eta, divKL, J(robj))
     if isa(policy,'Gaussian')
         fprintf(',  KL: %.4f', kl_mvn2(policy, policy_old, policy.basis(data.s)));
     end

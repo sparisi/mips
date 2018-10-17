@@ -1,6 +1,7 @@
 classdef REPS_Solver < handle
 % Step-based Relative Entropy Policy Search for average reward MDPs.
 % This is the original REPS.
+% Eta and theta are optimized separately.
 % The value function is linear in the parameters: V(s) = theta' * Phi(s).
 % It supports Importance Sampling (IS).
 %
