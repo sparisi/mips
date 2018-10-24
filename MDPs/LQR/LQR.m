@@ -9,6 +9,7 @@ classdef LQR < MDP & LQREnv
         dreward
         isAveraged = 0;
         gamma = 0.9;
+        noisy_trans = false;
         
         % Upper/Lower Bounds
         stateLB
@@ -52,6 +53,9 @@ classdef LQR < MDP & LQREnv
             nstate = size(state,2);
             absorb = false(1,nstate);
             nextstate = obj.A*state + obj.B*action;
+            if obj.noisy_trans
+                nextstate = nextstate + 0.1*normrnd(0,ones(size(state)));
+            end
             reward = -sum(bsxfun(@times, state'*obj.Q, state'), 2)' ...
                 -sum(bsxfun(@times, action'*obj.R, action'), 2)';
         end
