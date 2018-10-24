@@ -54,7 +54,7 @@ classdef LQR < MDP & LQREnv
             absorb = false(1,nstate);
             nextstate = obj.A*state + obj.B*action;
             if obj.noisy_trans
-                nextstate = nextstate + 0.1*normrnd(0,ones(size(state)));
+                nextstate = nextstate + 0.1*randn(size(state));
             end
             reward = -sum(bsxfun(@times, state'*obj.Q, state'), 2)' ...
                 -sum(bsxfun(@times, action'*obj.R, action'), 2)';
