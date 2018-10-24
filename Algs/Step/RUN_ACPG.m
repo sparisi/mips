@@ -1,6 +1,6 @@
 % Actor-critic policy gradient, as described by https://arxiv.org/pdf/1703.02660.pdf
 % First, the generalized advantage A is estimated using V.
-% Then, V is updated by minimizing the TD-error (targets are Monte-Carlo estimates).
+% Then, V is updated by minimizing the generalized TD-error.
 % Finally, the policy is updated by natural gradient on A.
 
 % To learn V
