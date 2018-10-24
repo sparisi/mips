@@ -2,8 +2,8 @@ classdef ACREPS_Solver < handle
 % Actor-critic REPS. Unlike REPS, it constrains that the new state 
 % distribution is the same as the old one, not that the new policy complies
 % the MDP dynamics.
-% The algorithm first learns Q (passed to the optimizer). The, REPS learns
-% V as a baseline and the usual eta.
+% The algorithm first learns Q (passed to the optimizer). Then, REPS learns
+% V (seen as a baseline) and the usual eta.
 % No state resets are needed.
 %
 % =========================================================================
@@ -40,8 +40,8 @@ classdef ACREPS_Solver < handle
                 'Algorithm', 'trust-region-reflective', ...
                 'GradObj', 'on', ...
                 'Display', 'off', ...
-                'MaxFunEvals', 300, ...
-                'TolX', 10^-12, 'TolFun', 10^-12, 'MaxIter', 300);
+                'MaxFunEvals', 20, ...
+                'TolX', 10^-12, 'TolFun', 10^-12, 'MaxIter', 20);
             
             vars = fmincon(@(vars)obj.dual(vars,Q,Phi,W), [obj.eta; obj.theta], ...
                 [], [], [], [], 1e-8, 1e8, [], options);
