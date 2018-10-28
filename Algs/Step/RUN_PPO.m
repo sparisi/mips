@@ -47,7 +47,7 @@ while iter < 200
     A = gae(data,V,mdp.gamma,lambda_trace);
 
     % Update V
-    omega = fminunc(@(omega)learn_V(omega,data.phiV,A+V), omega, options);
+    omega = fminunc(@(omega)mstde_v(omega,data.phiV,A+V), omega, options);
 
     % Estimate gradient
     old_probs = policy.evaluate(data.a, data.s);
@@ -69,15 +69,4 @@ while iter < 200
     J_history(iter) = J;
     
     iter = iter + 1;
-end
-
-
-%%
-function [g, gd, h] = learn_V(omega, Phi, T)
-% Mean squared TD error
-V = omega'*Phi;
-TD = V - T; % T are the targets (constant)
-g = 0.5*mean(TD.^2);
-gd = Phi*TD'/size(T,2);
-h = Phi*Phi'/size(T,2);
 end

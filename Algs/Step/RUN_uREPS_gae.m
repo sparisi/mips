@@ -46,7 +46,7 @@ while iter < 1000
     A = gae(data,V,mdp.gamma,lambda_trace);
 
     % Update V
-    omega = fminunc(@(omega)learn_V(omega,data.phiV,V+A), omega, options);
+    omega = fminunc(@(omega)mstde_v(omega,data.phiV,V+A), omega, options);
     
     % Get REPS weights
     [d, divKL] = solver.optimize(A);
@@ -67,15 +67,4 @@ while iter < 1000
     fprintf('\n');
     
     iter = iter + 1;
-end
-
-
-%%
-function [g, gd, h] = learn_V(omega, Phi, T)
-% Mean squared TD error
-V = omega'*Phi;
-TD = V - T; % T are the targets (constant)
-g = 0.5*mean(TD.^2);
-gd = Phi*TD'/size(T,2);
-h = Phi*Phi'/size(T,2);
 end
