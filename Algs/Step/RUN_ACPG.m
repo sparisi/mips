@@ -52,7 +52,7 @@ while iter < 200
     
     % Estimate natural gradient
     dlogpi = policy.dlogPidtheta(data.s,data.a);
-    grad = mean(bsxfun(@times,dlogpi,A/std(A)-0.1*0.999^iter*TD.^2/std(TD.^2)),2);
+    grad = mean(bsxfun(@times,dlogpi,A),2);
     F = dlogpi * dlogpi' / length(A);
     rankF = rank(F);
     if rankF == size(F,1)

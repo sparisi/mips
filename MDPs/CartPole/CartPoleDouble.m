@@ -36,7 +36,7 @@ classdef CartPoleDouble < CartPoleEnv
             
         function reward = reward(obj, state, action, nextstate)
             reward = zeros(1,size(state,2));
-            reward(obj.isterminal(nextstate)) = -1;
+            reward(obj.isterminal(state)) = -1;
         end
         
         function absorb = isterminal(obj, state)
