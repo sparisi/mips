@@ -1,8 +1,9 @@
-% https://arxiv.org/pdf/1502.05477.pdf
-% It is basically ACPG, but the stepsize is computed by line seach.
-% (For linear approximator with few parameters, we do not have to use
-% conjugate gradient to approximate the natural gradient as in the paper, 
-% since inverting the FIM is not excessively hard).
+% Trust Region Policy Optimization https://arxiv.org/pdf/1502.05477.pdf
+% Like ACPG, but 
+%   1) Instead of GRAD_NAT = F \ GRAD, the natural gradient is computed by 
+%      conjugate gradient, knowing that F * GRAD_NAT = GRAD; and
+%   2) The actual stepsize is computed by line seach, to check that the KL
+%      bound is satisfied.
 
 % To learn V
 options = optimoptions(@fminunc, 'Algorithm', 'trust-region', ...
@@ -36,6 +37,7 @@ while iter < 200
     % Collect data
     [ds, J] = collect_samples(mdp, episodes_learn, steps_learn, policy);
     for i = 1 : numel(ds)
+        ds(i).terminal = ds(i).endsim;
         ds(i).endsim(end) = 1; % To separate episodes for GAE
     end
     entropy = policy.entropy([ds.s]);
@@ -54,11 +56,8 @@ while iter < 200
     grad = mean(bsxfun(@times,dlogpi,A),2);
     F = dlogpi * dlogpi' / length(A);
     rankF = rank(F);
-    if rankF == size(F,1)
-        grad_nat = F \ grad;
-    else
-        grad_nat = pinv(F) * grad;
-    end
+    [grad_nat,~,~,~,~] = pcg(F,grad,1e-10,50); % Use conjugate gradient (~ are to avoid messages)
+%     [grad_nat,~,~,~,~] = cgs(F,grad,1e-10,50);
 
     % Line search
     stepsize = sqrt(kl_bound / (0.5*grad'*grad_nat));
