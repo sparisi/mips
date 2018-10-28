@@ -4,14 +4,13 @@
 
 close all
 clear all
-figure(), title('My Title')
+figure()
 h = {};
 
 %% Change entries according to your needs
 folder = './data/';
 separator = '_';
 filenames = {'alg1', 'alg2'};
-filenames = {};
 
 if isempty(filenames) % automatically identify algorithms name
     allfiles = dir(fullfile(folder,'*.mat'));
@@ -32,10 +31,10 @@ markers = {};
 variable = 'J_history';
 % variable = 'mean(J_history)';
 % variable = '-log(-mean(J_history))';
+title(variable, 'Interpreter', 'none')
 
 %% Plot
 for name = filenames
-    
     counter = 1;
     dataMatrix = [];
     for trial = 0 : 999

@@ -5,18 +5,18 @@
 
 close all
 clear all
-figure(), title('My Alg')
+figure()
 h = {};
 
 %% Change entries according to your needs
 folder = 'data/';
-base_name = 'alg';
+base_name = 'alg'; title(base_name, 'Interpreter', 'none')
 separator = '_';
 
 hp1_list = {0.1, 0.5, 1}; % hyperparameter lists
 hp2_list = {0.01, 0.1, 0.2};
 hp3_list = {'False'};
-filenames = {};
+legendnames = {};
 
 variable = 'J_history';
 % variable = 'mean(J_history)';
@@ -28,7 +28,7 @@ for hp1 = hp1_list
         for hp3 = hp3_list
 
             
-name = [base_name, separator, num2str(hp1{:}), separator, num2str(hp2{:}), separator, num2str(hp3{:})];
+name = [num2str(hp1{:}), separator, num2str(hp2{:}), separator, num2str(hp3{:})];
 counter = 1;
 dataMatrix = [];
 for trial = 1 : 999
@@ -50,7 +50,7 @@ if ~isempty(dataMatrix)
         { 'LineWidth', 3, 'DisplayName', name }, ...
         0.1, 0 );
         h{end+1} = tmp.mainLine;
-    filenames = [filenames, name];
+    legendnames = [legendnames, name];
 end
 
 
@@ -58,6 +58,6 @@ end
     end
 end
 
-legend([h{:}], filenames, 'Interpreter', 'none')
+legend([h{:}], legendnames, 'Interpreter', 'none')
 
 leg.Position = [0.2 0.7 0 0];

@@ -5,17 +5,17 @@ close all
 
 Files = dir(fullfile('.','*.mat'));
 
-varname = 'mean(J_history,1)';
+varname = 'mean(h.J_history,1)';
 varbound = -inf;
 
 figure, hold all, title('Average Return')
 for current_file = {Files.name}
-    load(current_file{:});
+    h = load(current_file{:});
     try
-        plot(max(eval(varname), varbound), 'displayname', current_file{:})
+        plot(max(eval(varname), varbound))
     catch
         warning(['Variable "' varname '" does not exist in file "' current_file{:} '".'])
     end
 end
 
-legend show
+legend({Files.name}, 'Interpreter', 'none')
