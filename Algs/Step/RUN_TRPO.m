@@ -47,7 +47,7 @@ while iter < 200
     A = gae(data,V,mdp.gamma,lambda_trace);
 
     % Update V
-    omega = fminunc(@(omega)mstde0(omega,data.phiV,V+A), omega, options);
+    omega = fminunc(@(omega)mse_linear(omega,data.phiV,V+A), omega, options);
     
     % Estimate natural gradient
     dlogpi = policy.dlogPidtheta(data.s,data.a);
