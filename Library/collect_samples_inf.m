@@ -11,16 +11,16 @@ function [data, J] = collect_samples_inf(mdp, minsamples, reset_prob, policy)
 %     - policy     : policy followed by the agent
 %
 %    OUTPUT
-%     - data       : struct with the following fields (one per episode)
+%     - data       : struct with the following fields
 %                     * s        : state
 %                     * a        : action
 %                     * nexts    : next state
 %                     * r        : immediate reward
 %                     * endsim   : 1 if the state is terminal or a reset 
 %                                  happens, 0 otherwise
-%                     * length   : length of the episode
+%                     * length   : length of each episode
 %                     * episodes : number of episodes collected
-%     - J          : returns averaged over all the episodes
+%     - J          : expected returns averaged over all episodes
 
 data.s = nan(mdp.dstate, 0);
 data.nexts = nan(mdp.dstate, 0);

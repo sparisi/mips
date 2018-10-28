@@ -48,7 +48,7 @@ while iter < 200
     TD = [data.r] + mdp.gamma*omega'*data.phiV_nexts.*~data.terminal - V;
 
     % Update V
-    omega = fminunc(@(omega)mstde_v(omega,data.phiV,V+A), omega, options);
+    omega = fminunc(@(omega)mstde0(omega,data.phiV,V+A), omega, options);
     
     % Estimate natural gradient
     dlogpi = policy.dlogPidtheta(data.s,data.a);

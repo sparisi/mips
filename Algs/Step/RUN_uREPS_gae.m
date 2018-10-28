@@ -46,7 +46,7 @@ while iter < 1000
     A = gae(data,V,mdp.gamma,lambda_trace);
 
     % Update V
-    omega = fminunc(@(omega)mstde_v(omega,data.phiV,V+A), omega, options);
+    omega = fminunc(@(omega)mstde0(omega,data.phiV,V+A), omega, options);
     
     % Get REPS weights
     [d, divKL] = solver.optimize(A);

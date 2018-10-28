@@ -47,7 +47,7 @@ while iter < 200
     A = gae(data,V,mdp.gamma,lambda_trace);
 
     % Update V
-    omega = fminunc(@(omega)mstde_v(omega,data.phiV,A+V), omega, options);
+    omega = fminunc(@(omega)mstde0(omega,data.phiV,A+V), omega, options);
 
     % Estimate gradient
     old_probs = policy.evaluate(data.a, data.s);
