@@ -1,6 +1,8 @@
 clear all
 close all
 
+rng(1)
+
 %% ===================================================================== %%
 %  ======================== LOW LEVEL SETTINGS =========================  %
 mdp = CartPoleSwingUpContinuous;
