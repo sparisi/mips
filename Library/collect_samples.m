@@ -27,24 +27,17 @@ assert(numel(policy) == 1, ...
     'For collecting samples with multiple policies, see COLLECT_EPISODES. ' ...
     'For evaluating multiple policies, see EVALUATE_POLICIES'])
 
-% Get MDP characteristics
-nvar_state = mdp.dstate;
-nvar_action = mdp.daction;
-nvar_reward = mdp.dreward;
-gamma = mdp.gamma;
-isAveraged = mdp.isAveraged;
-
 % Initialize variables
 state = mdp.initstate(episodes);
-totrew = zeros(nvar_reward,episodes);
+totrew = zeros(mdp.dreward,episodes);
 step = 0;
 
 % Allocate memory
-ds.s = nan(nvar_state, episodes, 1);
-ds.nexts = nan(nvar_state, episodes, 1);
-ds.a = nan(nvar_action, episodes, 1);
-ds.r = nan(nvar_reward, episodes, 1);
-ds.gammar = nan(nvar_reward, episodes, 1);
+ds.s = nan(mdp.dstate, episodes, 1);
+ds.nexts = nan(mdp.dstate, episodes, 1);
+ds.a = nan(mdp.daction, episodes, 1);
+ds.r = nan(mdp.dreward, episodes, 1);
+ds.gammar = nan(mdp.dreward, episodes, 1);
 ds.endsim = nan(1, episodes, 1);
 
 % Keep track of the states which did not terminate
@@ -70,12 +63,12 @@ while ( (step < maxsteps) && sum(ongoing) > 0 )
     end
     
     % Update the total reward
-    totrew(:,ongoing) = totrew(:,ongoing) + (gamma)^(step-1) .* reward;
+    totrew(:,ongoing) = totrew(:,ongoing) + (mdp.gamma)^(step-1) .* reward;
     
     % Record sample
     ds.a(:,ongoing,step) = action;
     ds.r(:,ongoing,step) = reward;
-    ds.gammar(:,ongoing,step) = (gamma)^(step-1) .* reward;
+    ds.gammar(:,ongoing,step) = (mdp.gamma)^(step-1) .* reward;
     ds.s(:,ongoing,step) = running_states;
     ds.nexts(:,ongoing,step) = nextstate;
     ds.endsim(:,ongoing,step) = endsim;
@@ -122,7 +115,7 @@ for i = find(endingstep < max(endingstep))
 end
 
 % If we are in the average reward setting, then normalize the return
-if isAveraged && gamma == 1, totrew = bsxfun(@times, totrew, 1./ endingstep); end
+if mdp.isAveraged && mdp.gamma == 1, totrew = bsxfun(@times, totrew, 1./ endingstep); end
 
 J = mean(totrew,2);
 

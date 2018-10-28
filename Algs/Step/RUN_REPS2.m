@@ -1,15 +1,7 @@
-% Step-based REPS for average reward MDPs.
-%
-% =========================================================================
-% REFERENCE
-% J Peters, K Muelling, Y Altun
-% Relative Entropy Policy Search (2010)
-%
-% H van Hoof, G Neumann, J Peters
-% Non-parametric Policy Search with Limited Information Loss (2017)
+% This version of REPS never ends an episode unless a terminal state is
+% reached or a reset occurs. See COLLECT_SAMPLES_INF for more info.
 
 reset_prob = 0.01;
-mdp_avg = MDP_avg(mdp,reset_prob);
 
 bfsV = @(varargin)basis_poly(2,mdp.dstate,0,varargin{:});
 bfsV = @(varargin)basis_krbf(6, [mdp.stateLB, mdp.stateUB], 0, varargin{:});
@@ -29,10 +21,7 @@ max_samples = zeros(1,max_reuse);
 %% Learning
 while iter < 1000
     
-    [ds, J] = collect_samples(mdp_avg, episodes_learn, steps_learn, policy);
-    for i = 1 : numel(ds)
-        ds(i).endsim(end) = 1; % To separate episodes to get initial states
-    end
+    [ds, J] = collect_samples_inf(mdp, steps_learn*episodes_learn, reset_prob, policy);
     entropy = policy.entropy([ds.s]);
 
     max_samples(mod(iter-1,max_reuse)+1) = size([ds.s],2);
@@ -41,8 +30,8 @@ while iter < 1000
     idx_init(end) = [];
 
     [d, divKL] = solver.optimize(data.r, data.phiV, ...
-        bsxfun(@plus, (1-mdp_avg.reset_prob).*data.phiV_nexts, ... 
-        mdp_avg.reset_prob.*mean(data.phiV(:,idx_init),2)));
+        bsxfun(@plus, (1-reset_prob).*data.phiV_nexts, ... 
+        reset_prob.*mean(data.phiV(:,idx_init),2)));
     
     policy_old = policy;
     policy = policy.weightedMLUpdate(d, data.a, data.phiP);
