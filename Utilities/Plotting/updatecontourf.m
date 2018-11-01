@@ -26,8 +26,7 @@ if isempty(fig)
 end
 
 % Update Z values
-dataObj = findobj(fig,'Type','Surface');
-set(dataObj, 'CData', newZ);
+dataObj = findobj(fig,'Type','Contour');
 set(dataObj, 'ZData', newZ);
 
 drawnow limitrate
