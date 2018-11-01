@@ -1,4 +1,4 @@
-% Proximal policy optimization https://arxiv.org/abs/1707.06347
+% Proximal Policy Optimization https://arxiv.org/abs/1707.06347
 
 % To learn V
 options = optimoptions(@fminunc, 'Algorithm', 'trust-region', ...
@@ -22,7 +22,7 @@ bfsV = bfs;
 omega = (rand(bfsV(),1)-0.5)*2;
 
 data = [];
-varnames = {'r','s','nexts','a','endsim'};
+varnames = {'r','s','nexts','a','t'};
 bfsnames = { {'phiP', @(s)policy.get_basis(s)}, {'phiV', bfsV} };
 iter = 1;
 
@@ -35,9 +35,6 @@ while iter < 200
     
     % Collect data
     [ds, J] = collect_samples(mdp, episodes_learn, steps_learn, policy);
-    for i = 1 : numel(ds)
-        ds(i).endsim(end) = 1; % To separate episodes for GAE
-    end
     entropy = policy.entropy([ds.s]);
     max_samples(mod(iter-1,max_reuse)+1) = size([ds.s],2);
     data = getdata(data,ds,sum(max_samples),varnames,bfsnames);

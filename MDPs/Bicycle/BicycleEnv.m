@@ -124,13 +124,13 @@ classdef (Abstract) BicycleEnv < MDP
         end            
         
         %% Reward functions for the balancing problem
-        function reward = rewardRandlovCustom(obj, nextstate)
+        function reward = rewardRandlovCustom(obj, state)
         % Reward function used in the original implementation. See the code 
         % linked at the beginning of the class for more info.
-            xf        = nextstate(6,:);
-            yf        = nextstate(7,:);
-            xb        = nextstate(8,:);
-            yb        = nextstate(9,:);
+            xf        = state(6,:);
+            yf        = state(7,:);
+            xb        = state(8,:);
+            yb        = state(9,:);
 
             psi_goal = (xf-xb) .* (obj.goal(1)-xf) + (yf-yb) .* (obj.goal(2)-yf);
             scalar = psi_goal ./ ( obj.l .* sqrt( (obj.goal(1)-xf).^2 + (obj.goal(2)-yf).^2 ) );
@@ -144,12 +144,12 @@ classdef (Abstract) BicycleEnv < MDP
             reward = (0.95 - psi_goal.^2) * 0.0001;
         end         
         
-        function reward = rewardRandlov(obj, nextstate)
+        function reward = rewardRandlov(obj, state)
         % Reward function defined in the original paper.
-            xf = nextstate(6,:);
-            yf = nextstate(7,:);
-            xb = nextstate(8,:);
-            yb = nextstate(9,:);
+            xf = state(6,:);
+            yf = state(7,:);
+            xb = state(8,:);
+            yb = state(9,:);
 
             v1 = [xf-xb; yf-yb];
             v2 = [obj.goal(1)-xb; obj.goal(2)-yb];

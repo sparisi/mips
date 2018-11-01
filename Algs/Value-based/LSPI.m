@@ -9,8 +9,6 @@ clear all
 close all
 
 mdp = MCar;
-% mdp = DeepSeaTreasure;
-% mdp = Gridworld;
 % mdp = Puddleworld;
 % mdp = CartPole;
 % mdp = BicycleDrive;
@@ -20,8 +18,13 @@ gamma = mdp.gamma;
 allactions = 1 : size(mdp.allactions,2);
 nactions = length(allactions);
 
+% Choose bfs carefully, as have major impact on the learning.
 bfs = @(varargin)basis_krbf(7, [mdp.stateLB, mdp.stateUB], 1, varargin{:});
 % bfs = @(varargin)basis_poly(2, mdp.dstate, 1, varargin{:});
+% tmp_policy.drawAction = @(x)randi(mdp.actionUB,[1,size(x,2)]);
+% ds = collect_samples(mdp, 100, 100, tmp_policy);
+% BW = avg_pairwise_dist([ds.s]);
+% bfs = @(varargin) basis_fourier(50, mdp.dstate, BW, 0, varargin{:});
 
 d = bfs();
 Qfun = @(s,theta)reshape(theta,d,nactions)'*bfs(s);
@@ -33,7 +36,6 @@ epsilon = 1;
 policy_type = 'softmax';
 A = 0;
 b = 0;
-lambda = 1;
 expl_rate = 1; % If <1, it decreases the exploration while learning
 iter = 1;
 
@@ -71,16 +73,20 @@ while iter < 100000
     A = A + phi * (phi - gamma * phi_nexts)';
     b = b + phi * data.r(robj,:)';
     theta_old = theta;
-    theta = (A + lambda * eye(size(A))) \ b;
+    if rank(A) == size(A,1)
+        theta = A \ b;
+    else
+        theta = pinv(A) * b;
+    end
     diff = norm(theta-theta_old);
     
     % Plot
     updateplot('MS TD Error',iter,mean(E.^2),1)
-    updateplot('Policy Parameters Diff',iter,diff,1)
-    Q = Qfun(XY,theta);
-    V = max(Q,[],1);
-    subimagesc('Q-function',Xnodes,Ynodes,Q)
-    subimagesc('V-function',Xnodes,Ynodes,V)
+%     updateplot('Policy Parameters Diff',iter,diff,1)
+%     Q = Qfun(XY,theta);
+%     V = max(Q,[],1);
+%     subimagesc('Q-function',Xnodes,Ynodes,Q)
+%     subimagesc('V-function',Xnodes,Ynodes,V)
     if iter == 1, autolayout, end
 
     iter = iter + 1;

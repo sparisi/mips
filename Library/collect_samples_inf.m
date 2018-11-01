@@ -1,7 +1,7 @@
 function [data, J] = collect_samples_inf(mdp, minsamples, reset_prob, policy)
 % COLLECT_SAMPLES_INF Runs single "neverending" episodes until at least 
 % MINSAMPLES are collected. An episode resets randomly with probability
-% PROB_RESET, or if a terminal state occurs. If MINSAMPLES have been 
+% RESET_PROB, or if a terminal state occurs. If MINSAMPLES have been 
 % collected when a reset occurs, the data collection is over.
 %
 %    INPUT
@@ -16,9 +16,10 @@ function [data, J] = collect_samples_inf(mdp, minsamples, reset_prob, policy)
 %                     * a        : action
 %                     * nexts    : next state
 %                     * r        : immediate reward
-%                     * endsim   : 1 if the state is terminal or a reset 
+%                     * terminal : 1 if the state is terminal or a reset 
 %                                  happens, 0 otherwise
 %                     * length   : length of each episode
+%                     * t        : time index
 %                     * episodes : number of episodes collected
 %     - J          : expected returns averaged over all episodes
 
@@ -26,13 +27,14 @@ data.s = nan(mdp.dstate, 0);
 data.nexts = nan(mdp.dstate, 0);
 data.a = nan(mdp.daction, 0);
 data.r = nan(mdp.dreward, 0);
-data.endsim = nan(1, 0);
+data.terminal = nan(1, 0);
+data.t = nan(1, 0);
 data.length = nan(0, 0);
 
 totsamples = 0;
 step = 0;
 J = 0;
-episodes = 1;
+episode = 1;
 state = mdp.initstate(1);
 
 while true
@@ -40,31 +42,34 @@ while true
     totsamples = totsamples + 1;
     step = step + 1;
     action = policy.drawAction(state);
-    [nextstate, reward, endsim] = mdp.simulator(state, action);
-    endsim = endsim || rand() < reset_prob;
+    [nextstate, reward, terminal] = mdp.simulator(state, action);
+    terminal = terminal || rand() < reset_prob;
     
     data.a(:,end+1) = action;
     data.r(:,end+1) = reward;
     data.s(:,end+1) = state;
     data.nexts(:,end+1) = nextstate;
-    data.endsim(:,end+1) = endsim;
-
-    J(episodes) = J(episodes) + mdp.gamma^(step-1)*reward;
+    data.terminal(:,end+1) = terminal;
+    data.t(:,end+1) = step;
     
-    if endsim
+    state = nextstate;
+
+    J(episode) = J(episode) + mdp.gamma^(step-1)*reward;
+    
+    if terminal
         data.length(:,end+1) = step;
         if totsamples >= minsamples
             break
         else
             state = mdp.initstate(1);
-            episodes = episodes + 1;
-            J(episodes) = 0;
+            episode = episode + 1;
+            J(episode) = 0;
             step = 0;
         end
     end
 
 end
 
-data.episodes = episodes;
+data.episodes = episode;
 
 J = mean(J);

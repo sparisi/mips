@@ -16,4 +16,4 @@ preprocessS = @(s)bsxfun(@times, bsxfun(@minus,s,m), 1./range_centered(:,2))';
 % Reward is in [-1,0]
 preprocessR = @(r)r;
 
-dimL1 = 30;
+dimL1 = 100;

@@ -9,7 +9,7 @@ nnP = Network([dimO, 40, 30, dimA], {'ReLU', 'ReLU'});
 
 %% Gradient descent optimizers
 optimP = RMSprop(numel(nnP.W));
-optimP.alpha = 0.000025;
+optimP.alpha = 0.00005;
 optimP.beta = 0.95;
 optimP.gamma = 0.95;
 optimP.epsilon = 0.01;
@@ -54,11 +54,12 @@ while learner.t < 1e6
     else
         policy.drawAction = @(s)bsxfun(@times, learner.nnP.forward(preprocessS(s))', mdp.actionUB);
     end
+    
+    [J, TDE] = learner.train();
     J = evaluate_policies(mdp, episodes_eval, steps_eval, policy);
-
-    [~, ep_loss] = learner.train();
+    
     updateplot('Expected Return', learner.t, J, 1)
-    updateplot('TD Error', learner.t, ep_loss, 1)
+    updateplot('TD Error', learner.t, TDE, 1)
 %     updateplot('Q-network Parameters', learner.t, learner.nnQ.W)
 %     updateplot('P-network Parameters', learner.t, learner.nnP.W)
 

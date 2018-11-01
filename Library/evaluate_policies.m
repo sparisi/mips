@@ -17,13 +17,8 @@ function J = evaluate_policies(mdp, episodes, maxsteps, policies, contexts)
 npolicy = numel(policies);
 totepisodes = episodes * npolicy;
 
-% Get MDP characteristics
-nvar_reward = mdp.dreward;
-gamma = mdp.gamma;
-isAveraged = mdp.isAveraged;
-
 % Initialize variables
-J = zeros(nvar_reward,totepisodes);
+J = zeros(mdp.dreward,totepisodes);
 step = 0;
 
 % Initialize simulation
@@ -56,27 +51,27 @@ while ( (step < maxsteps) && sum(ongoing) > 0 )
 
     % Simulate one step of all running episodes at the same time
     if nargin < 5
-        [nextstate, reward, endsim] = feval(simulator, state(:,ongoing), action(:,ongoing));
+        [nextstate, reward, terminal] = feval(simulator, state(:,ongoing), action(:,ongoing));
     else
-        [nextstate, reward, endsim] = feval(simulator, state(:,ongoing), action(:,ongoing), contexts(:,ongoing));
+        [nextstate, reward, terminal] = feval(simulator, state(:,ongoing), action(:,ongoing), contexts(:,ongoing));
     end
     state(:,ongoing) = nextstate;
     
     % Update the total reward
-    J(:,ongoing) = J(:,ongoing) + (gamma)^(step-1) .* reward;
+    J(:,ongoing) = J(:,ongoing) + (mpd.gamma)^(step-1) .* reward;
     
     % Continue
     idx = 1:totepisodes;
     idx = idx(ongoing);
-    idx = idx(endsim);
+    idx = idx(terminal);
     endingstep(idx) = step;
-    ongoing(ongoing) = ~endsim;
+    ongoing(ongoing) = ~terminal;
     
 end
 
 % If we are in the average reward setting, then normalize the return
-if isAveraged && gamma == 1, J = bsxfun(@times, J, 1 ./ endingstep); end
+if mdp.isAveraged && mdp.gamma == 1, J = bsxfun(@times, J, 1 ./ endingstep); end
 
-J = permute( mean( reshape(J,[nvar_reward episodes npolicy]), 2), [1 3 2] );
+J = permute( mean( reshape(J,[mdp.dreward episodes npolicy]), 2), [1 3 2] );
 
 return

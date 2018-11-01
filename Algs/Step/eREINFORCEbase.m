@@ -15,7 +15,8 @@ totepisodes = numel(data);
 idx = cumsum(episodeslength);
 
 sumdlog = cumsumidx(policy.dlogPidtheta([data.s],[data.a]),idx);
-sumrew = cumsumidx([data.gammar],idx);
+gammar = bsxfun(@times, [data.r], gamma.^([data.t]-1));
+sumrew = cumsumidx(gammar,idx);
 
 % Compute optimal baseline
 bden = sum(sumdlog.^2,2);

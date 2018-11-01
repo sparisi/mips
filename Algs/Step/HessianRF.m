@@ -21,7 +21,8 @@ totepisodes = numel(data);
 sumdlog = cumsumidx(dlogpi,cumsum(episodeslength));
 sumdlog2 = bsxfun(@times,permute(sumdlog,[1 3 2]),permute(sumdlog,[3 1 2]));
 sumhlog = cumsumidx3(hlogpi,cumsum(episodeslength));
-sumrew = cumsumidx([data.gammar],cumsum(episodeslength));
+gammar = bsxfun(@times, [data.r], gamma.^([data.t]-1));
+sumrew = cumsumidx(gammar,cumsum(episodeslength));
 
 h = squeeze( sum( bsxfun(@times, sumdlog2 + sumhlog, reshape(sumrew',[1 1 size(sumrew')])), 3) );
 

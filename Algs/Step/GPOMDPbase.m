@@ -23,10 +23,10 @@ for i = 1 : totepisodes
     idx2 = idx1 + episodeslength(i)-1;
     sumdlog2 = cumsum(dlogpi(:,idx1:idx2),2).^2;
     steps = data(i).length;
-    gammar = data(i).gammar;
+    data(i).gammar = bsxfun(@times, data(i).r, gamma.^(data(i).t-1));
     bden(:,1:steps) = bden(:,1:steps) + sumdlog2;
     bnum(:,1:steps,:) = bnum(:,1:steps,:) + ...
-        bsxfun(@times,sumdlog2,reshape(gammar',[1 size(gammar')]));
+        bsxfun(@times,sumdlog2,reshape(data(i).gammar',[1 size(data(i).gammar')]));
 end
 bden = repmat(bden,1,1,dreward);
 b = bnum ./ bden;
@@ -39,12 +39,11 @@ for i = 1 : totepisodes
     idx2 = idx1 + episodeslength(i)-1;
     sumdlog = cumsum(dlogpi(:,idx1:idx2),2);
     steps = data(i).length;
-    gammar = data(i).gammar;
-    grad = grad + squeeze(sum(bsxfun(@times, sumdlog, bsxfun(@plus,permute(gammar,[3 2 1]),-b(:,1:steps,:))),2));
+    grad = grad + squeeze(sum(bsxfun(@times, sumdlog, bsxfun(@plus,permute(data(i).gammar,[3 2 1]),-b(:,1:steps,:))),2));
 end
     
 if gamma == 1
-    grad = grad / totstep;
+    grad = grad / totstep; % Avg reward MDP
 else
     grad = grad / totepisodes;
 end

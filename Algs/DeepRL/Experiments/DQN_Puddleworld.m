@@ -5,7 +5,7 @@ close all
 mdp = Puddleworld;
 episodes_eval = 500;
 steps_eval = 50;
-steps_learn = 50;
+steps_learn = 100;
 
 % Normalization in [-1,1]
 range = [mdp.stateLB, mdp.stateUB];
@@ -14,6 +14,6 @@ range_centered = bsxfun(@minus,range,m);
 preprocessS = @(s)bsxfun(@times, bsxfun(@minus,s,m), 1./range_centered(:,2))';
 
 % Normalization in [-1,0]
-preprocessR = @(r)(r(1,:)/41);
+preprocessR = @(r)r(1,:);
 
-dimL1 = 30;
+dimL1 = 250;

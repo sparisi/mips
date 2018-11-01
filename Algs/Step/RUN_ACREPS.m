@@ -10,7 +10,7 @@ bfsV = bfs;
 solver = ACREPS_Solver(0.3,bfsV);
 
 data = [];
-varnames = {'r','s','nexts','a','endsim'};
+varnames = {'r','s','nexts','a','t'};
 bfsnames = { {'phiP', @(s)policy.get_basis(s)}, {'phiV', bfsV} };
 iter = 1;
 
@@ -21,10 +21,8 @@ max_samples = zeros(1,max_reuse);
 while iter < 200
     
     % Collect data
-    [ds, J] = collect_samples(mdp, episodes_learn, steps_learn, policy);
-    for i = 1 : numel(ds)
-        ds(i).endsim(end) = 1; % To separate episodes for MC returns
-    end
+%     [ds, J] = collect_samples(mdp, episodes_learn, steps_learn, policy);
+    [ds, J] = collect_samples3(mdp, 5000, steps_learn, policy);
     entropy = policy.entropy([ds.s]);
     max_samples(mod(iter-1,max_reuse)+1) = size([ds.s],2);
     data = getdata(data,ds,sum(max_samples),varnames,bfsnames);
@@ -44,7 +42,7 @@ while iter < 200
     fprintf('%d) Entropy: %.4f,  Eta: %e,  KL (Weights): %.4f,  J: %e', ...
         iter, entropy, solver.eta, divKL, J);
     if isa(policy,'Gaussian')
-        fprintf(',  KL: %.4f', kl_mvn2(policy, policy_old, policy.basis(data.s)));
+        fprintf(',  KL (Pi): %.4f', kl_mvn2(policy, policy_old, policy.basis(data.s)));
     end
     fprintf('\n');
     

@@ -13,13 +13,13 @@ function [data, J] = collect_samples(mdp, episodes, maxsteps, policy, contexts)
 %
 %    OUTPUT
 %     - data     : struct with the following fields (one per episode)
-%                   * s      : state
-%                   * a      : action
-%                   * nexts  : next state
-%                   * r      : immediate reward
-%                   * gammar : discounted immediate reward, gamma^(t-1)*r
-%                   * endsim : 1 if the state is terminal, 0 otherwise
-%                   * length : length of the episode
+%                   * s        : state
+%                   * a        : action
+%                   * nexts    : next state
+%                   * r        : immediate reward
+%                   * terminal : 1 if the state is terminal, 0 otherwise
+%                   * t        : time index
+%                   * length   : length of the episode
 %     - J        : returns averaged over all the episodes
 
 assert(numel(policy) == 1, ...
@@ -37,8 +37,8 @@ ds.s = nan(mdp.dstate, episodes, 1);
 ds.nexts = nan(mdp.dstate, episodes, 1);
 ds.a = nan(mdp.daction, episodes, 1);
 ds.r = nan(mdp.dreward, episodes, 1);
-ds.gammar = nan(mdp.dreward, episodes, 1);
-ds.endsim = nan(1, episodes, 1);
+ds.terminal = nan(1, episodes, 1);
+ds.t = nan(1, episodes, 1);
 
 % Keep track of the states which did not terminate
 ongoing = true(1,episodes);
@@ -57,9 +57,9 @@ while ( (step < maxsteps) && sum(ongoing) > 0 )
     
     % Simulate one step of all running episodes at the same time
     if nargin < 5
-        [nextstate, reward, endsim] = mdp.simulator(running_states, action);
+        [nextstate, reward, terminal] = mdp.simulator(running_states, action);
     else
-        [nextstate, reward, endsim] = mdp.simulator(running_states, action, contexts(:,ongoing));
+        [nextstate, reward, terminal] = mdp.simulator(running_states, action, contexts(:,ongoing));
     end
     
     % Update the total reward
@@ -68,17 +68,17 @@ while ( (step < maxsteps) && sum(ongoing) > 0 )
     % Record sample
     ds.a(:,ongoing,step) = action;
     ds.r(:,ongoing,step) = reward;
-    ds.gammar(:,ongoing,step) = (mdp.gamma)^(step-1) .* reward;
     ds.s(:,ongoing,step) = running_states;
     ds.nexts(:,ongoing,step) = nextstate;
-    ds.endsim(:,ongoing,step) = endsim;
+    ds.terminal(:,ongoing,step) = terminal;
+    ds.t(:,ongoing,step) = step;
     
     % Continue
     idx = 1:episodes;
     idx = idx(ongoing);
-    idx = idx(endsim);
+    idx = idx(terminal);
     state(:,ongoing) = nextstate;
-    ongoing(ongoing) = ~endsim;
+    ongoing(ongoing) = ~terminal;
     endingstep(idx) = step;
     
 end
@@ -87,9 +87,9 @@ end
 ds.s = permute(ds.s, [1 3 2]);
 ds.a = permute(ds.a, [1 3 2]);
 ds.nexts = permute(ds.nexts, [1 3 2]);
-ds.gammar = permute(ds.gammar, [1 3 2]);
 ds.r = permute(ds.r, [1 3 2]);
-ds.endsim = permute(ds.endsim, [1 3 2]);
+ds.terminal = permute(ds.terminal, [1 3 2]);
+ds.t = permute(ds.t, [1 3 2]);
 
 % Convert dataset to struct to allow storage of episodes with different length
 data = struct( ...
@@ -97,9 +97,9 @@ data = struct( ...
     'a', num2cell(ds.a,[1 2]), ...
     'r', num2cell(ds.r,[1 2]), ...
     'nexts', num2cell(ds.nexts,[1 2]), ...
-    'gammar', num2cell(ds.gammar,[1 2]), ...
     'length', num2cell(permute(endingstep,[3 1 2]),1), ...
-    'endsim', num2cell(ds.endsim,[1 2]) ...
+    'terminal', num2cell(ds.terminal,[1 2]), ...
+    't', num2cell(ds.t,[1 2]) ...
     );
 data = squeeze(data);
 
@@ -107,11 +107,11 @@ data = squeeze(data);
 for i = find(endingstep < max(endingstep)) 
     data(i).s = data(i).s(:,1:endingstep(i));
     data(i).r = data(i).r(:,1:endingstep(i));
-    data(i).gammar = data(i).gammar(:,1:endingstep(i));
     data(i).a = data(i).a(:,1:endingstep(i));
     data(i).nexts = data(i).nexts(:,1:endingstep(i));
     data(i).length = endingstep(i);
-    data(i).endsim = data(i).endsim(:,1:endingstep(i));
+    data(i).terminal = data(i).terminal(:,1:endingstep(i));
+    data(i).t = data(i).t(:,1:endingstep(i));
 end
 
 % If we are in the average reward setting, then normalize the return

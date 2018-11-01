@@ -44,12 +44,13 @@ classdef Chainwalk < MDP
         end
         
         function reward = reward(obj, state, action, nextstate)
-            reward = zeros(1,size(state,2));
-            reward(ismember(nextstate,obj.reward_states)) = 1;
+%             reward = zeros(1,size(state,2));
+%             reward(ismember(state,obj.reward_states)) = 1;
 
-            dist = abs(bsxfun(@minus,nextstate,obj.reward_states'));
 %             reward = zeros(1,size(state,2));
 %             reward(min(dist,[],1)<=1) = 1;
+
+            dist = abs(bsxfun(@minus,state,obj.reward_states'));
             reward = -min(dist,[],1);
         end
         

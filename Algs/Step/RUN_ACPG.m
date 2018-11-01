@@ -1,6 +1,6 @@
 % Actor-critic policy gradient, as described by https://arxiv.org/pdf/1703.02660.pdf
 % First, the generalized advantage A is estimated using V.
-% Then, V is updated by minimizing the generalized TD-error.
+% Then, V is updated by minimizing the generalized TD error.
 % Finally, the policy is updated by natural gradient on A.
 
 % To learn V
@@ -22,7 +22,7 @@ bfsV = bfs;
 omega = (rand(bfsV(),1)-0.5)*2;
 
 data = [];
-varnames = {'r','s','nexts','a','endsim','terminal'};
+varnames = {'r','s','nexts','a','t','terminal'};
 bfsnames = { {'phiP', @(s)policy.get_basis(s)}, {'phiV', bfsV} };
 iter = 1;
 
@@ -34,10 +34,6 @@ while iter < 200
     
     % Collect data
     [ds, J] = collect_samples(mdp, episodes_learn, steps_learn, policy);
-    for i = 1 : numel(ds)
-        ds(i).terminal = ds(i).endsim;
-        ds(i).endsim(end) = 1; % To separate episodes for GAE
-    end
     entropy = policy.entropy([ds.s]);
     max_samples(mod(iter-1,max_reuse)+1) = size([ds.s],2);
     data = getdata(data,ds,sum(max_samples),varnames,bfsnames);

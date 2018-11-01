@@ -7,7 +7,7 @@ mdp = MCar;
 % mdp = DeepSeaTreasure;
 % mdp = Gridworld;
 % mdp = Puddleworld;
-% mdp = CartPole;
+mdp = CartPole;
 % mdp = BicycleDrive;
 
 robj = 1;
@@ -18,14 +18,18 @@ nactions = length(allactions);
 
 bfs = @(varargin)basis_krbf(7, [mdp.stateLB, mdp.stateUB], 1, varargin{:});
 % bfs = @(varargin)basis_poly(2, mdp.dstate, 1, varargin{:});
+tmp_policy.drawAction = @(x)randi(mdp.actionUB,[1,size(x,2)]);
+ds = collect_samples(mdp, 100, 100, tmp_policy);
+BW = avg_pairwise_dist([ds.s]);
+bfs = @(varargin) basis_fourier(50, mdp.dstate, BW, 0, varargin{:});
 
 d = bfs();
 Qfun = @(s,theta)reshape(theta,d,nactions)'*bfs(s);
 theta = zeros(d*nactions,1);
 
 maxsteps = 100;
-epsilon = 1;
-policy_type = 'softmax';
+epsilon = .1;
+policy_type = 'egreedy';
 lrate = 0.01;
 iter = 1;
 data = [];
@@ -43,16 +47,19 @@ XY = [X(:)';Y(:)'];
 while iter < 10000000
     
     state = mdp.initstate(1);
-    endsim = 0;
+    terminal = 0;
     step = 0;
     
-    while (step < maxsteps) && ~endsim
+    % Animation
+    mdp.showplot
+    
+    while (step < maxsteps) && ~terminal
         step = step + 1;
     
         % Execute action and compute Q
         epsilon = max(0.1, epsilon * 0.9995);
         action = feval(policy_type,Qfun(state,theta),epsilon);
-        [nextstate, reward, endsim] = mdp.simulator(state, action);
+        [nextstate, reward, terminal] = mdp.simulator(state, action);
         Qn = Qfun(nextstate,theta);
         Q = Qfun(state,theta);
 
@@ -70,11 +77,12 @@ while iter < 10000000
         iter = iter + 1;
     end
     
-    Q = Qfun(XY,theta);
-    V = max(Q,[],1);
     updateplot('MS TD Error',iter,mean(E.^2),1)
-    subimagesc('Q-function',Xnodes,Ynodes,Q)
-    subimagesc('V-function',Xnodes,Ynodes,V)
+%     Q = Qfun(XY,theta);
+%     V = max(Q,[],1);
+%     subimagesc('Q-function',Xnodes,Ynodes,Q)
+%     subimagesc('V-function',Xnodes,Ynodes,V)
+%     autolayout
     
 end
 

@@ -72,7 +72,9 @@ classdef Resource < MOMDP
             hasEnemy = obj.enemy(size(obj.enemy,1)*(nextstate(2,:)-1) + nextstate(1,:));
             fightLost = rand(1,size(state,2)) < 0.1;
             backHome = fightLost & hasEnemy;
-            nextstate(:,backHome) = obj.initstate(sum(backHome));
+            if sum(backHome) > 0
+                nextstate(:,backHome) = obj.initstate(sum(backHome));
+            end
 
             % Reward function
             reward = zeros(obj.dreward,size(state,2));

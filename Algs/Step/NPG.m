@@ -5,8 +5,7 @@ function [nat_grad, stepsize] = NPG(policy, data, gamma, lrate)
 R = mc_ret(data,gamma);
 R = R - mean(R,2);
 dlogpi = policy.dlogPidtheta([data.s],[data.a]);
-grad = dlogpi * R' /size(R,2);
-grad = mean(grad,2);
+grad = dlogpi * R' / size(R,2);
 
 F = dlogpi * dlogpi' / size(R,2);
 

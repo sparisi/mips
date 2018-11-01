@@ -34,7 +34,7 @@ linidx = sub2ind(size(Q),idx_s,idx_a);
 iter = 1;
 
 while iter < 10000
-    E = data.r(robj,:) + gamma * max(Q(idx_sn,:),[],2)' .* ~data.endsim - Q(linidx)';
+    E = data.r(robj,:) + gamma * max(Q(idx_sn,:),[],2)' .* ~data.terminal - Q(linidx)';
     E_history(iter) = mean(E.^2);
     Q(linidx) = Q(linidx) + lrate * E';
     

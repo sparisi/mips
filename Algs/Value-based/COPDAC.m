@@ -16,32 +16,34 @@ rng(1)
 showplots = 1;
 J_history = [];
 
-% mdp = ChainwalkContinuousMulti(2); sigma = 1; maxsteps = 40;
-% mdp = MCarContinuous; sigma = 4; maxsteps = 100;
-% mdp = CartPoleContinuous; sigma = 4; maxsteps = 1000;
-mdp = PuddleworldContinuous; sigma = 0.2; maxsteps = 100;
+mdp = MCarContinuous; sigma = 4*2; maxsteps = 100;
+% mdp = CartPoleContinuous; sigma = 10*2; maxsteps = 1000;
+% mdp = PuddleworldContinuous; sigma = 1*2; maxsteps = 100;
 
 robj = 1;
 gamma = mdp.gamma;
-noise = @() mvnrnd(zeros(mdp.daction,1),sigma*eye(mdp.daction))';
-lrate_theta = 0.01;
-lrate_v = 0.001;
-lrate_w = 0.001;
+noise = @() (rand(mdp.daction,1) - 0.5) * 2 * sigma;
+lrate_theta = 0.001;
+lrate_v = 0.0001;
+lrate_w = 0.0001;
 iter = 1;
 
 
 %% Setup actor and critic
 % Policy
-bfs_mu = @(varargin)basis_krbf(4, [mdp.stateLB, mdp.stateUB], 1, varargin{:});
+bfs_mu = @(varargin)basis_krbf(7, [mdp.stateLB, mdp.stateUB], 1, varargin{:});
 % bfs_mu = @(varargin)basis_poly(2, mdp.dstate, 1, varargin{:});
+tmp_policy.drawAction = @(x)mymvnrnd(zeros(mdp.daction,1), sigma*eye(mdp.daction), size(x,2));
+ds = collect_samples(mdp, 100, 100, tmp_policy);
+B = avg_pairwise_dist([ds.s]);
+bfs_mu = @(varargin) basis_fourier(75, mdp.dstate, B, 0, varargin{:});
+
 theta = zeros(bfs_mu()*mdp.daction,1);
-mu = @(s,theta) kron(eye(mdp.daction),bfs_mu(s))' * theta;
 mu = @(s,theta) reshape(theta,bfs_mu(),mdp.daction)' * bfs_mu(s);
 d_policy = @(s) kron(eye(mdp.daction),bfs_mu(s));
 
 % V-function
-bfs_v = @(varargin)basis_krbf(4, [mdp.stateLB, mdp.stateUB], 1, varargin{:});
-% bfs_v = @(varargin)basis_poly(2, mdp.dstate, 1, varargin{:});
+bfs_v = bfs_mu;
 v = zeros(bfs_v(),1);
 Vfun = @(s,v) v'*bfs_v(s);
 
@@ -52,6 +54,10 @@ Qfun = @(s,a,w,v,theta) bfs_q(s,a,theta)' * w + Vfun(s,v);
 
 u = zeros(size(w));
 lrate_u = lrate_v;
+
+% Update rules
+natural = true;
+gradient = false;
 
 %% Prepare plots
 if showplots
@@ -68,39 +74,44 @@ if showplots
         figure; hP = plot(S,zeros(1,npoints_plot)); title 'Policy';
         figure; hQ = plot(S,zeros(1,npoints_plot)); title 'V-function - Q(s,pi(s))';
     end
-%     mdp.showplot
+    mdp.showplot
 end
 
 %% Learn
 while iter < 3000000
     
     state = mdp.initstate(1);
-    endsim = 0;
+    terminal = 0;
     step = 0;
     
-    while (step < maxsteps) && ~endsim
+    while (step < maxsteps) && ~terminal
         step = step + 1;
     
         action = mu(state,theta) + noise();
-        [nextstate, reward, endsim] = mdp.simulator(state, action);
+        [nextstate, reward, terminal] = mdp.simulator(state, action);
         Qn = Qfun(nextstate, mu(nextstate,theta), w, v, theta); % Off-policy
         Q = Qfun(state, action, w, v, theta);
 
         % Actor and critic update
-        delta = reward(robj) + gamma * Qn * ~endsim - Q;
-%         theta = theta + lrate_theta * d_policy(state) * (d_policy(state)' * w); % Vanilla
+        delta = reward(robj) + gamma * Qn * ~terminal - Q;
+        if natural
         theta = theta + lrate_theta * w; % Natural
+        else
+        theta = theta + lrate_theta * d_policy(state) * (d_policy(state)' * w); % Vanilla
+        end
 
-        % Q-learning critic
-%         w = w + lrate_w * delta * bfs_q(state,action,theta);
-%         v = v + lrate_v * delta * bfs_v(state);
-
+        if gradient
         % Gradient Q-learning critic
         w = w + lrate_w * delta * bfs_q(state,action,theta) - ...
             lrate_w * gamma * bfs_q(nextstate,mu(nextstate,theta),theta) * (bfs_q(state,action,theta)' * u);
         v = v + lrate_v * delta * bfs_v(state) - ...
             lrate_v * gamma * bfs_v(nextstate) * (bfs_q(state,action,theta)' * u);
         u = u + lrate_u * (delta - (bfs_q(state,action,theta)' * u)) * bfs_q(state,action,theta);
+        else
+        % Q-learning critic
+        w = w + lrate_w * delta * bfs_q(state,action,theta);
+        v = v + lrate_v * delta * bfs_v(state);
+        end
         
         if any(isnan(theta)) || any(isnan(w)) || any(isnan(v)) || ...
                 any(isinf(theta)) || any(isinf(w)) || any(isinf(v))
@@ -126,7 +137,7 @@ while iter < 3000000
                     Q(:,i) = Qfun(S(:,i),P(:,i),w,v,theta);
                 end
                 subimagesc('Policy',Xnodes,Ynodes,P,1)
-                subimagesc('V-functio - Q(s,pi(s))',Xnodes,Ynodes,Q)
+                subimagesc('V-function - Q(s,pi(s))',Xnodes,Ynodes,Q)
             end
             updateplot('Delta',iter,delta^2)
             updateplot('Action',iter,action)
@@ -144,5 +155,4 @@ end
 
 %% Show
 policy_eval.drawAction = @(s) mu(s,theta);
-[J, ds] = show_simulation(mdp, policy_eval, 100, 0.01);
-J
+show_simulation(mdp, policy_eval, 100, 0.01)

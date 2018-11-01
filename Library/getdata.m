@@ -2,13 +2,8 @@ function data = getdata(data, data_iter, nmax, vars, bfs)
 % Organizes collected data. It adds new data to previous data, keeping only
 % up to NMAX samples. 
 %
-% VARS must be a cell array of variables string names. Possible names are:
-% - s (states)
-% - a (actions)
-% - nexts (next states)
-% - r (rewards)
-% - Q (Monte Carlo estimates of Q-function)
-% - gammar (discounted rewards)
+% VARS must be a cell array of variables string names. For the possible 
+% names, please check COLLECT_SAMPLES.
 % 
 % BFS is a cell array of pairs {name, function handle} of basis functions
 % depending on the state.

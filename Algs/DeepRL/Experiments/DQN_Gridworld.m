@@ -16,4 +16,4 @@ preprocessS = @(s)bsxfun(@times, bsxfun(@minus,s,m), 1./range_centered(:,2))';
 % Normalization in [-1,1]
 preprocessR = @(r)(normalize_data(r,mdp.rewardLB,mdp.rewardUB) - 0.5)*2;
 
-dimL1 = 30;
+dimL1 = 150;

@@ -24,7 +24,7 @@ data.s = nan(mdp.dstate, 0);
 data.nexts = nan(mdp.dstate, 0);
 data.a = nan(mdp.daction, 0);
 data.r = nan(mdp.dreward, 0);
-data.endsim = nan(1, 0);
+data.terminal = nan(1, 0);
 Q = zeros(size(allstates,1),nactions);
 idx_s = [];
 idx_sn = [];
@@ -38,21 +38,26 @@ policy.drawAction = @(s)myunidrnd(mdp.actionLB,mdp.actionUB,size(s,2));
 maxepisodes = 10000;
 maxsteps = 100;
 iter = 1;
+epsilon = 0.2;
 
 for episode = 1 : maxepisodes
     
     step = 0;
     state = mdp.initstate(1);
-    endsim = 0;
+    terminal = 0;
+    
+    % Animation + print counter
+    disp(episode)
+    mdp.showplot
     
     % Run the episodes until maxsteps or terminal state
-    while (step < maxsteps) && ~endsim
+    while (step < maxsteps) && ~terminal
         
         step = step + 1;
         action = policy.drawAction(state);
         
         % Simulate one step
-        [nextstate, reward, endsim] = feval(simulator, state, action);
+        [nextstate, reward, terminal] = feval(simulator, state, action);
         [~, idx_s(end+1)] = ismember(state',allstates,'rows');
         [~, idx_sn(end+1)] = ismember(nextstate',allstates,'rows');
         [~, idx_a(end+1)] = ismember(action',allactions);
@@ -63,23 +68,23 @@ for episode = 1 : maxepisodes
         data.r(:,end+1) = reward;
         data.s(:,end+1) = state;
         data.nexts(:,end+1) = nextstate;
-        data.endsim(:,end+1) = endsim;
+        data.terminal(:,end+1) = terminal;
         
         % Continue
         state = nextstate;
         
         % Q-learning
-        E = reward(robj) + gamma * max(Q(idx_sn(end),:),[],2)' .* ~endsim - Q(idx_s(end),idx_a(end));
+        E = reward(robj) + gamma * max(Q(idx_sn(end),:),[],2)' .* ~terminal - Q(idx_s(end),idx_a(end));
         Q(idx_s(end),idx_a(end)) = Q(idx_s(end),idx_a(end)) + lrate * E;
         
         % Evaluation and plotting
-        E = data.r(robj,:) + gamma * max(Q(idx_sn,:),[],2)' .* ~data.endsim - Q(linidx);
+        E = data.r(robj,:) + gamma * max(Q(idx_sn,:),[],2)' .* ~data.terminal - Q(linidx);
         E_history(iter) = mean(E.^2);
         
         iter = iter + 1;
 
         % Update policy as well
-        policy.drawAction = @(s)egreedy( Q(ismember(allstates,s','rows'),:)', 0.1 );
+        policy.drawAction = @(s)egreedy( Q(ismember(allstates,s','rows'),:)', epsilon );
         
     end
 
@@ -88,6 +93,7 @@ for episode = 1 : maxepisodes
     subimagesc('Q-function',X,Y,Q')
     subimagesc('V-function',X,Y,V')
     subimagesc('Action',X,Y,opt')
+    autolayout
 
 end
 

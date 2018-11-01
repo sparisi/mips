@@ -1,7 +1,6 @@
-% Unconstrained REPS. Like ACREPS, but it does not constrain on the state 
-% distribution and thus it does not learn the value funciton by minimizing 
-% the dual. Instead, GAE is used to learn V and get estimates of the 
-% advantage function.
+% Unconstrained REPS. The KL constraint is over pi(a|s) and not over p(s,a).
+% Thus it does not learn the V-funciton by minimizing the dual. Instead, 
+% GAE is used to learn V and to get estimates of the advantage function.
 
 % To learn V
 options = optimoptions(@fminunc, 'Algorithm', 'trust-region', ...
@@ -22,7 +21,7 @@ omega = (rand(bfsV(),1)-0.5)*2;
 solver = REPSep_Solver(0.3);
 
 data = [];
-varnames = {'r','s','nexts','a','endsim'};
+varnames = {'r','s','nexts','a','t'};
 bfsnames = { {'phiP', @(s)policy.get_basis(s)}, {'phiV', bfsV} };
 iter = 1;
 
@@ -34,9 +33,6 @@ while iter < 1000
     
     % Collect data
     [ds, J] = collect_samples(mdp, episodes_learn, steps_learn, policy);
-    for i = 1 : numel(ds)
-        ds(i).endsim(end) = 1; % To separate episodes for GAE
-    end
     entropy = policy.entropy([ds.s]);
     max_samples(mod(iter-1,max_reuse)+1) = size([ds.s],2);
     data = getdata(data,ds,sum(max_samples),varnames,bfsnames);

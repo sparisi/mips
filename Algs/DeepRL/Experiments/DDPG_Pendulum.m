@@ -5,7 +5,7 @@ close all
 mdp = Pendulum;
 episodes_eval = 500;
 steps_eval = 100;
-steps_learn = 50;
+steps_learn = 250;
 
 % Normalization in [-1,1]
 range = [mdp.stateLB, mdp.stateUB];

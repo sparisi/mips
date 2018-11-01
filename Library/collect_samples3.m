@@ -9,14 +9,7 @@ function [data, J] = collect_samples3(mdp, minsamples, maxsteps, policy)
 %     - policy     : policy followed by the agent
 %
 %    OUTPUT
-%     - data       : struct with the following fields (one per episode)
-%                     * s      : state
-%                     * a      : action
-%                     * nexts  : next state
-%                     * r      : immediate reward
-%                     * gammar : discounted immediate reward, gamma^(t-1)*r
-%                     * endsim : 1 if the state is terminal, 0 otherwise
-%                     * length : length of the episode
+%     - data       : see COLLECT_SAMPLES
 %     - J          : returns averaged over all the episodes
 
 episodes = floor(minsamples / maxsteps);

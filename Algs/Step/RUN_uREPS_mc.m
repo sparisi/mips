@@ -1,11 +1,11 @@
-% Unconstrained REPS. Like ACREPS, but it does not constrain on the state 
-% distribution and thus it does not learn the value funciton by minimizing 
-% the dual. Instead, Monte-Carlo estimates of Q are maximized.
+% Unconstrained REPS. The KL constraint is over pi(a|s) and not over p(s,a).
+% Thus it does not learn the V-funciton by minimizing the dual. Instead, 
+% Monte Carlo estimates of the expected return are maximized.
 
 solver = REPSep_Solver(0.1);
 
 data = [];
-varnames = {'r','s','nexts','a','endsim'};
+varnames = {'r','s','nexts','a','t'};
 bfsnames = { {'phi', @(s)policy.get_basis(s)} };
 iter = 1;
 
@@ -16,15 +16,12 @@ max_samples = zeros(1,max_reuse);
 while iter < 1500
     
     [ds, J] = collect_samples(mdp, episodes_learn, steps_learn, policy);
-    for i = 1 : numel(ds)
-        ds(i).endsim(end) = 1; % To separate episodes for MC returns
-    end
     entropy = policy.entropy([ds.s]);
     max_samples(mod(iter-1,max_reuse)+1) = size([ds.s],2);
     data = getdata(data,ds,sum(max_samples),varnames,bfsnames);
-    Q = mc_ret(data,mdp.gamma);
+    R = mc_ret(data,mdp.gamma);
     
-    [d, divKL] = solver.optimize(Q);
+    [d, divKL] = solver.optimize(R);
     policy_old = policy;
     policy = policy.weightedMLUpdate(d, data.a, data.phi);
 

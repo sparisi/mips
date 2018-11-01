@@ -37,7 +37,7 @@ linidx = sub2ind(size(Q),idx_s,idx_a);
 iter = 1;
 
 while iter < 10000
-    T = data.r(robj,:) + gamma * max(Q(idx_sn,:),[],2)' .* ~data.endsim;
+    T = data.r(robj,:) + gamma * max(Q(idx_sn,:),[],2)' .* ~data.terminal;
     E = T - Q(linidx)';
     Q(linidx) = T;
     

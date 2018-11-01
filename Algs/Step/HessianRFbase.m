@@ -23,7 +23,8 @@ dreward = size(data(1).r,1);
 sumdlog = cumsumidx(dlogpi,cumsum(episodeslength));
 sumdlog2 = bsxfun(@times,permute(sumdlog,[1 3 2]),permute(sumdlog,[3 1 2]));
 sumhlog = cumsumidx3(hlogpi,cumsum(episodeslength));
-sumrew = cumsumidx([data.gammar],cumsum(episodeslength));
+gammar = bsxfun(@times, [data.r], gamma.^([data.t]-1));
+sumrew = cumsumidx(gammar,cumsum(episodeslength));
 
 % Compute the optimal baseline
 tmp = (sumdlog2 + sumhlog).^2;

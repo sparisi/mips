@@ -12,16 +12,14 @@ dlogpi = policy.dlogPidtheta([data.s],[data.a]);
 totepisodes = numel(data);
 
 idx = cumsum([data.length]);
-ii = zeros(1,sum([data.length]));
-ii(idx(1:end-1)+1) = 1;
-timesteps = cumsummove(ones(1,sum([data.length])),ii);
 
-allgamma = gamma.^(timesteps-1);
+allgamma = gamma.^([data.t]-1);
 
 sumdlog = cumsumidx(bsxfun(@times,dlogpi,allgamma),idx);
 sumdlog = [sumdlog; ones(1,totepisodes)];
 F = sumdlog * sumdlog';
-sumrew = cumsumidx([data.gammar],idx);
+gammar = bsxfun(@times, [data.r], gamma.^([data.t]-1));
+sumrew = cumsumidx(gammar,idx);
 g = sumdlog * sumrew';
 
 F = F / totepisodes;

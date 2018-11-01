@@ -11,17 +11,17 @@ function data = collect_samples2(mdp, episodes, maxsteps, policy)
 %
 %    OUTPUT
 %     - data     : struct with the following fields
-%                   * s      : states
-%                   * a      : actions
-%                   * nexts  : next states
-%                   * r      : immediate rewards
-%                   * endsim : 1 if the state is terminal, 0 otherwise
+%                   * s        : states
+%                   * a        : actions
+%                   * nexts    : next states
+%                   * r        : immediate rewards
+%                   * terminal : 1 if the state is terminal, 0 otherwise
 
 data.s = nan(mdp.dstate, 0);
 data.nexts = nan(mdp.dstate, 0);
 data.a = nan(mdp.daction, 0);
 data.r = nan(mdp.dreward, 0);
-data.endsim = nan(1, 0);
+data.terminal = nan(1, 0);
 
 ongoing = true(1,episodes);
 step = 0;
@@ -34,15 +34,15 @@ while ( (step < maxsteps) && sum(ongoing) > 0 )
     n = sum(ongoing);
     action = policy.drawAction(running_states);
     
-    [nextstate, reward, endsim] = mdp.simulator(running_states, action);
+    [nextstate, reward, terminal] = mdp.simulator(running_states, action);
     
     data.a(:,end+1:end+n) = action;
     data.r(:,end+1:end+n) = reward;
     data.s(:,end+1:end+n) = running_states;
     data.nexts(:,end+1:end+n) = nextstate;
-    data.endsim(:,end+1:end+n) = endsim;
+    data.terminal(:,end+1:end+n) = terminal;
     
     state(:,ongoing) = nextstate;
-    ongoing(ongoing) = ~endsim;
+    ongoing(ongoing) = ~terminal;
     
 end

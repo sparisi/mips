@@ -35,8 +35,8 @@ classdef CartPoleSwingUp < CartPoleEnv
             
         function reward = reward(obj, state, action, nextstate)
             reward = cos(state(3,:)); % - state(4,:).^2*0.001 - action.^2*0.0001;
-            reward(obj.isterminal(state)) = -100;
 %             reward = exp(-(state(3,:).^2) - 0.1*state(4,:).^2 - 0.0001*action.^2 - 0.05*state(1,:).^2 - 0.005*state(2,:).^2);
+            reward(obj.isterminal(nextstate)) = -100;
         end
         
         function absorb = isterminal(obj, state)

@@ -29,7 +29,7 @@ data.s = nan(mdp.dstate, 0);
 data.nexts = nan(mdp.dstate, 0);
 data.a = nan(mdp.daction, 0);
 data.r = nan(mdp.dreward, 0);
-data.endsim = nan(1, 0);
+data.terminal = nan(1, 0);
 Q1 = zeros(size(allstates,1),nactions);
 Q2 = zeros(size(allstates,1),nactions);
 idx_s = [];
@@ -44,21 +44,25 @@ policy.drawAction = @(s)myunidrnd(mdp.actionLB,mdp.actionUB,size(s,2));
 maxepisodes = 10000;
 maxsteps = 100;
 iter = 1;
+epsilon = 0.2;
 
 for episode = 1 : maxepisodes
-    
     step = 0;
     state = mdp.initstate(1);
-    endsim = 0;
+    terminal = 0;
+
+    % Animation + print counter
+    disp(episode)
+    mdp.showplot
     
     % Run the episodes until maxsteps or terminal state
-    while (step < maxsteps) && ~endsim
+    while (step < maxsteps) && ~terminal
         
         step = step + 1;
         action = policy.drawAction(state);
         
         % Simulate one step
-        [nextstate, reward, endsim] = feval(simulator, state, action);
+        [nextstate, reward, terminal] = feval(simulator, state, action);
         [~, idx_s(end+1)] = ismember(state',allstates,'rows');
         [~, idx_sn(end+1)] = ismember(nextstate',allstates,'rows');
         [~, idx_a(end+1)] = ismember(action',allactions);
@@ -69,22 +73,22 @@ for episode = 1 : maxepisodes
         data.r(:,end+1) = reward;
         data.s(:,end+1) = state;
         data.nexts(:,end+1) = nextstate;
-        data.endsim(:,end+1) = endsim;
+        data.terminal(:,end+1) = terminal;
         
         % Continue
         state = nextstate;
         
         if rand < 0.5 % Update Q1
-            E = reward(robj) + gamma * max(Q2(idx_sn(end),:),[],2)' .* ~endsim - Q1(idx_s(end),idx_a(end));
+            E = reward(robj) + gamma * max(Q2(idx_sn(end),:),[],2)' .* ~terminal - Q1(idx_s(end),idx_a(end));
             Q1(idx_s(end),idx_a(end)) = Q1(idx_s(end),idx_a(end)) + lrate * E;
         else % Update Q2
-            E = reward(robj) + gamma * max(Q1(idx_sn(end),:),[],2)' .* ~endsim - Q2(idx_s(end),idx_a(end));
+            E = reward(robj) + gamma * max(Q1(idx_sn(end),:),[],2)' .* ~terminal - Q2(idx_s(end),idx_a(end));
             Q2(idx_s(end),idx_a(end)) = Q2(idx_s(end),idx_a(end)) + lrate * E;
         end
         
 %         % Evaluation and plotting over the avg of the two Q
         Qavg = (Q1 + Q2) / 2;
-        E = data.r(robj,:) + gamma * max(Qavg(idx_sn,:),[],2)' .* ~data.endsim - Qavg(linidx);
+        E = data.r(robj,:) + gamma * max(Qavg(idx_sn,:),[],2)' .* ~data.terminal - Qavg(linidx);
         E_history(iter) = mean(E.^2);
 %         updateplot('MS TD Error',iter,mean(E.^2),1)
 %         [V, opt] = max(Qavg,[],2);
@@ -97,9 +101,9 @@ for episode = 1 : maxepisodes
         
         % Next action will be chosen using either Q1 or Q2
         if rand < 0.5
-            policy.drawAction = @(s)egreedy( Q1(ismember(allstates,s','rows'),:)', 0.1 );
+            policy.drawAction = @(s)egreedy( Q1(ismember(allstates,s','rows'),:)', epsilon );
         else
-            policy.drawAction = @(s)egreedy( Q2(ismember(allstates,s','rows'),:)', 0.1 );
+            policy.drawAction = @(s)egreedy( Q2(ismember(allstates,s','rows'),:)', epsilon );
         end
         
     end

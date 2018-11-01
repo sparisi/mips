@@ -1,9 +1,9 @@
 % Trust Region Policy Optimization https://arxiv.org/pdf/1502.05477.pdf
 % Like ACPG, but 
 %   1) Instead of GRAD_NAT = F \ GRAD, the natural gradient is computed by 
-%      conjugate gradient, knowing that F * GRAD_NAT = GRAD; and
+%      the conjugate gradient method, knowing that F * GRAD_NAT = GRAD; and
 %   2) The actual stepsize is computed by line seach, to check that the KL
-%      bound is satisfied.
+%      bound is really satisfied.
 
 % To learn V
 options = optimoptions(@fminunc, 'Algorithm', 'trust-region', ...
@@ -24,7 +24,7 @@ bfsV = bfs;
 omega = (rand(bfsV(),1)-0.5)*2;
 
 data = [];
-varnames = {'r','s','nexts','a','endsim','terminal'};
+varnames = {'r','s','nexts','a','t','terminal'};
 bfsnames = { {'phiP', @(s)policy.get_basis(s)}, {'phiV', bfsV} };
 iter = 1;
 
@@ -36,10 +36,6 @@ while iter < 200
     
     % Collect data
     [ds, J] = collect_samples(mdp, episodes_learn, steps_learn, policy);
-    for i = 1 : numel(ds)
-        ds(i).terminal = ds(i).endsim;
-        ds(i).endsim(end) = 1; % To separate episodes for GAE
-    end
     entropy = policy.entropy([ds.s]);
     max_samples(mod(iter-1,max_reuse)+1) = size([ds.s],2);
     data = getdata(data,ds,sum(max_samples),varnames,bfsnames);
