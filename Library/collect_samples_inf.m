@@ -58,6 +58,9 @@ while true
     
     if terminal
         data.length(:,end+1) = step;
+        if mdp.isAveraged && mdp.gamma == 1
+            J(episode) = J(episode) / step;
+        end
         if totsamples >= minsamples
             break
         else

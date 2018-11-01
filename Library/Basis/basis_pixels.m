@@ -1,5 +1,6 @@
 function phi = basis_pixels(mdp, varargin)
-% The MDP requires a function 'render' that returns the pixels.
+% The MDP requires a function 'render' which returns the pixels of the 
+% rendering animation.
 
 if nargin < 2
     phi = mdp.render();

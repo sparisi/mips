@@ -1,5 +1,8 @@
 function A = gae(data, V, gamma, lambda)
 % Computes generalized advantage estimates from potentially off-policy data.
+% Data have to be ordered by episode: data.r must have first all samples 
+% from the first episode, then all samples from the second, and so on.
+% So you cannot use samples collected with COLLECT_SAMPLES2.
 %
 % =========================================================================
 % REFERENCE
