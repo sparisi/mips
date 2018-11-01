@@ -1,6 +1,6 @@
 **Mi**nimal **P**olicy **S**earch is a toolbox for Matlab providing the implementation of RL algorithms.  
 The repository originally focused on policy search (hence the name), especially REPS and policy gradient, but it now contains a wide variety of algrorithms (PPO, TRPO, DQN, DPG, FQI, ...).
-It also has multi-objective RL algorithms, benchmark MDPs and optimization problems, and common policies classes.
+It also has multi-objective RL algorithms, benchmark MDPs and optimization problems, and common policies classes. 
 
 Some algorithms require the [Optimization Toolbox](https://www.mathworks.com/products/optimization.html).  
 Some utility functions are imported from [File Exchange](https://www.mathworks.com/matlabcentral/fileexchange/) (original authors are always acknowledged).
@@ -69,17 +69,17 @@ Policies are modeled as objects. Their most important method is `drawAction`, bu
 <summary><b>MDPs</b></summary>
   <p>
 Each MDP is modeled as an object (<code>MDP.m</code>) and requires some properties (dimension of state and action spaces, bounds, etc...) and methods (for state transitions and plots). 
-Each MDP also has a default discount factor <code>gamma</code>, which usually works on the majority of the algorithms, but feel free to change it if necessary.  
+Each MDP also has a default discount factor <code>gamma</code>, which usually works well with the majority of the algorithms, but feel free to change it if necessary.  
 The most important function is <code>[s',r,d] = simulator(s,a)</code>, which defines the transition function. 
 The function returns <code>d = True</code> if the next state <code>s'</code> is terminal (episode ended). 
 Usually, the reward <code>r(s,a,s')</code> depends on <code>s,a</code>, and on <code>s'</code> if the next state is terminal. 
 For example, the cart-pole swing-up returns a reward depending on the current position of the pole + a penalty if the cart hits the walls (terminal next state).  
 
-There are also some extensions, i.e., <i>Contextual MDPs</i> (<code>CMDP.m</code>), <i>Multi-objective MDPs</i> (<code>MOMDP.m</code>), and <i>Average-reward MDPs</i> (<code>MDP_avg.m</code>).  
-For MDPs sharing the same environment (e.g., Mountain Car with continuous or discrete actions, Cart-pole with or without swing-up, ...), there are common <i>Environment</i> (<code>Env</code>) classes.
-This classes define common variables and the transition function, while the subclasses define other functions (reward, action parsing, terminal conditions, ...).
+There are also some subclasses of MDPs, i.e., <i>Contextual MDPs</i> (<code>CMDP.m</code>), <i>Multi-objective MDPs</i> (<code>MOMDP.m</code>), and <i>Average-reward MDPs</i> (<code>MDP_avg.m</code>).  
+For MDPs sharing the same environment (e.g., mountain car with continuous or discrete actions, cart-pole with or without swing-up, ...), there are common <i>Environment</i> (<code>Env</code>) classes.
+These classes define common variables and functions (transition, plotting, ...), while each subclass defines task-specific functions (reward, action parsing, terminal conditions, ...).
 
-> **IMPORTANT!** To allow parallel execution of multiple episodes, `simulator` functions need to support vectorized operations, i.e., they need to deal with states and actions represented as `S x N` and `A x N` matrices, respectively.
+> **IMPORTANT!** To allow parallel execution of multiple episodes, all MDPs functions (except the ones for plotting) need to support vectorized operations, i.e., they need to deal with states and actions represented as `S x N` and `A x N` matrices, respectively.
   </p>
 </details>
 
@@ -108,9 +108,9 @@ Utility functions used for matrix operations, plotting and sampling are stored i
 Here is a list with examples of all ways for visualizing your data or rendering an environment. Please note that not all MDPs support rendering.
 
 <details>
-<summary><b>Real time data plotting</b></summary>
+<summary><b>Real-time data plotting</b></summary>
   <p>
-During the learning, it is possible to plot in real time a desired variable (e.g., the expected return <code>J</code>) by using <code>updateplot</code>. 
+During the learning, it is possible to plot in real-time a desired variable (e.g., the expected return <code>J</code>) by using <code>updateplot</code>. 
 
 ```
 updateplot('Return',iter,J,1)
@@ -120,7 +120,7 @@ updateplot('Return',iter,J,1)
 
 
 <details>
-<summary><b>Mean and std of data from multiple trials</b></summary>
+<summary><b>Confidene interval plots from multiple trials</b></summary>
   <p>
 If you are interested on evaluating an algorithm on several trials you can use the function <code>shadedErrorBar</code>. For a complete example, please refer to <code>make_stdplot.m</code>.
   </p>
@@ -128,7 +128,7 @@ If you are interested on evaluating an algorithm on several trials you can use t
 
 
 <details>
-<summary><b>Real time rendering</b></summary>
+<summary><b>Real-time rendering</b></summary>
   <p>
 Launch <code>mdp.showplot</code> to initialize the rendering of the agent-environment interaction will be shown during the learning. To stop plotting use <code>mdp.closeplot</code>.
 
@@ -166,9 +166,9 @@ show_simulation(mdp,policy,100,0.001,1)
 
 
 <details>
-<summary><b>Plot discrete policies</b></summary>
+<summary><b>Plot policies</b></summary>
   <p>
-If the state space is 2-dimensional, you can plot the value functions learned by discrete policies and the action distribution over the states.
+If the state space is 2-dimensional, you can plot the value functions learned by policies and the action distribution over the states.
 
 ```
 SettingDeep % deep sea treasure setup
