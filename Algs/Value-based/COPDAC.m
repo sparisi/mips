@@ -19,6 +19,7 @@ J_history = [];
 mdp = MCarContinuous; sigma = 4*2; maxsteps = 100;
 % mdp = CartPoleContinuous; sigma = 10*2; maxsteps = 1000;
 % mdp = PuddleworldContinuous; sigma = 1*2; maxsteps = 100;
+mdp = Pendulum; sigma = 2*2; maxsteps = 50;
 
 robj = 1;
 gamma = mdp.gamma;
@@ -27,25 +28,25 @@ lrate_theta = 0.001;
 lrate_v = 0.0001;
 lrate_w = 0.0001;
 iter = 1;
+eval_every = 1000;
 
 
 %% Setup actor and critic
 % Policy
-bfs_mu = @(varargin)basis_krbf(7, [mdp.stateLB, mdp.stateUB], 1, varargin{:});
-% bfs_mu = @(varargin)basis_poly(2, mdp.dstate, 1, varargin{:});
+bfs = @(varargin)basis_krbf(7, [mdp.stateLB, mdp.stateUB], 1, varargin{:});
+% bfs = @(varargin)basis_poly(2, mdp.dstate, 1, varargin{:});
 tmp_policy.drawAction = @(x)mymvnrnd(zeros(mdp.daction,1), sigma*eye(mdp.daction), size(x,2));
 ds = collect_samples(mdp, 100, 100, tmp_policy);
 B = avg_pairwise_dist([ds.s]);
-bfs_mu = @(varargin) basis_fourier(75, mdp.dstate, B, 0, varargin{:});
+bfs = @(varargin) basis_fourier(75, mdp.dstate, B, 0, varargin{:});
 
-theta = zeros(bfs_mu()*mdp.daction,1);
-mu = @(s,theta) reshape(theta,bfs_mu(),mdp.daction)' * bfs_mu(s);
-d_policy = @(s) kron(eye(mdp.daction),bfs_mu(s));
+theta = zeros(bfs()*mdp.daction,1);
+mu = @(s,theta) reshape(theta,bfs(),mdp.daction)' * bfs(s);
+d_policy = @(s) kron(eye(mdp.daction),bfs(s));
 
 % V-function
-bfs_v = bfs_mu;
-v = zeros(bfs_v(),1);
-Vfun = @(s,v) v'*bfs_v(s);
+v = zeros(bfs(),1);
+Vfun = @(s,v) v'*bfs(s);
 
 % Q-function (with compatible function approximation)
 w = zeros(size(theta));
@@ -104,13 +105,13 @@ while iter < 3000000
         % Gradient Q-learning critic
         w = w + lrate_w * delta * bfs_q(state,action,theta) - ...
             lrate_w * gamma * bfs_q(nextstate,mu(nextstate,theta),theta) * (bfs_q(state,action,theta)' * u);
-        v = v + lrate_v * delta * bfs_v(state) - ...
-            lrate_v * gamma * bfs_v(nextstate) * (bfs_q(state,action,theta)' * u);
+        v = v + lrate_v * delta * bfs(state) - ...
+            lrate_v * gamma * bfs(nextstate) * (bfs_q(state,action,theta)' * u);
         u = u + lrate_u * (delta - (bfs_q(state,action,theta)' * u)) * bfs_q(state,action,theta);
         else
         % Q-learning critic
         w = w + lrate_w * delta * bfs_q(state,action,theta);
-        v = v + lrate_v * delta * bfs_v(state);
+        v = v + lrate_v * delta * bfs(state);
         end
         
         if any(isnan(theta)) || any(isnan(w)) || any(isnan(v)) || ...
@@ -120,6 +121,12 @@ while iter < 3000000
         
         state = nextstate;
         iter = iter + 1;
+        
+        if mod(iter, eval_every) == 0
+            policy_eval.drawAction = @(s) mu(s,theta);
+            J_history(end+1) = evaluate_policies(mdp, 100, maxsteps, policy_eval);
+            if showplots, updateplot('Return',iter,J_history(end)); end
+        end
 
         % Plot
         if showplots
@@ -146,10 +153,6 @@ while iter < 3000000
         
     end
     
-    policy_eval.drawAction = @(s) mu(s,theta);
-    J_history(end+1) = evaluate_policies(mdp, 100, maxsteps, policy_eval);
-    if showplots, updateplot('Return',iter,J_history(end)); end
-
 end
 
 
