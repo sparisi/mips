@@ -75,9 +75,10 @@ The function returns <code>d = True</code> if the next state <code>s'</code> is 
 Usually, the reward <code>r(s,a,s')</code> depends on <code>s,a</code>, and on <code>s'</code> if the next state is terminal. 
 For example, the cart-pole swing-up returns a reward depending on the current position of the pole + a penalty if the cart hits the walls (terminal next state).  
 
-There are also some subclasses of MDPs, i.e., <i>Contextual MDPs</i> (<code>CMDP.m</code>), <i>Multi-objective MDPs</i> (<code>MOMDP.m</code>), and <i>Average-reward MDPs</i> (<code>MDP_avg.m</code>).  
 For MDPs sharing the same environment (e.g., mountain car with continuous or discrete actions, cart-pole with or without swing-up, ...), there are common <i>Environment</i> (<code>Env</code>) classes.
 These classes define common variables and functions (transition, plotting, ...), while each subclass defines task-specific functions (reward, action parsing, terminal conditions, ...).
+
+Finally, there are also subclasses for some special extension to MDPs, i.e., <i>Contextual MDPs</i> (<code>CMDP.m</code>), <i>Multi-objective MDPs</i> (<code>MOMDP.m</code>), and <i>Average-reward MDPs</i> (<code>MDP_avg.m</code>).  
 
 > **IMPORTANT!** To allow parallel execution of multiple episodes, all MDPs functions (except the ones for plotting) need to support vectorized operations, i.e., they need to deal with states and actions represented as `S x N` and `A x N` matrices, respectively.
   </p>
@@ -120,7 +121,7 @@ updateplot('Return',iter,J,1)
 
 
 <details>
-<summary><b>Confidene interval plots from multiple trials</b></summary>
+<summary><b>Confidence interval plots from multiple trials</b></summary>
   <p>
 If you are interested on evaluating an algorithm on several trials you can use the function <code>shadedErrorBar</code>. For a complete example, please refer to <code>make_stdplot.m</code>.
   </p>
