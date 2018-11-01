@@ -16,7 +16,7 @@ Launch `INSTALL` to add the path of all folders.
   <p>
 All the algorithms and solvers are located in this folder, as well as some script to run them. By using scripts, it is possible to interrupt and resume the learning process without losing any data.
 The only parameters that you might want to change are the learning rates and the number of rollouts per iteration.
-Also, a history of the results is usually kept. For example, <code>J_history</code> stores the average return at each iteration.
+Also, a history of the results is usually kept. For example, <code>J_history</code> stores the expected return at each iteration.
   </p>
 </details>
 
@@ -38,7 +38,7 @@ After running a setup script, just run an algorithm script to start the learning
 ```
 SettingMC % mountain car setup
 RUN_PG % run policy gradient (terminate by CTRL+C)
-plot(J_history) % plot average return
+plot(J_history) % plot expected return
 show_simulation(mdp,policy.makeDeterministic,1000,0.1) % visualize learned policy (see below)
 ```
 
@@ -71,7 +71,7 @@ Policies are modeled as objects. Their most important method is `drawAction`, bu
 Each MDP is modeled as an object (<code>MDP.m</code>) and requires some properties (dimension of state and action spaces, bounds, etc...) and methods (for state transitions and plots). 
 Each MDP also has a default discount factor <code>gamma</code>, which usually works on the majority of the algorithms, but feel free to change it if necessary.  
 The most important function is <code>[s',r,d] = simulator(s,a)</code>, which defines the transition function. 
-The function returns <code>d = True<\code> if the next state <code>s'</code> is terminal (episode ended). 
+The function returns <code>d = True</code> if the next state <code>s'</code> is terminal (episode ended). 
 Usually, the reward <code>r(s,a,s')</code> depends on <code>s,a</code>, and on <code>s'</code> if the next state is terminal. 
 For example, the cart-pole swing-up returns a reward depending on the current position of the pole + a penalty if the cart hits the walls (terminal next state).  
 
