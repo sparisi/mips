@@ -23,8 +23,8 @@ classdef NLinkEnv < MDP
             nextstate(1:2:end,:) = wrapinpi(nextstate(1:2:end,:)); % Wrap angles
             nextstate(2:2:end,:) = bsxfun(@max, ... % Bound velocities
                 bsxfun(@min,nextstate(2:2:end,:),obj.stateUB(2:2:end)), obj.stateLB(2:2:end));
-%             reward = obj.reward_joint(state, action);
-            reward = obj.reward_task(state, action);
+            reward = obj.reward_joint(state, action);
+%             reward = obj.reward_task(state, action);
             absorb = false(1,size(state,2));
             if obj.realtimeplot, obj.updateplot(nextstate); end
         end
@@ -33,9 +33,9 @@ classdef NLinkEnv < MDP
         function reward = reward_task(obj, state, action)
             X = obj.getJointsInTaskSpace(state);
             endEffector = X(end-3:end-2,:);
-            distance2 = sum(bsxfun(@minus,endEffector,obj.x_des).^2,1);
-            reward = - distance2 ...
-                - 0.001 * sum(action.^2,1);
+            penalty_dist = -sum(bsxfun(@minus,endEffector,obj.x_des).^2,1);
+            penalty_action = -sum(action.^2,1);
+            reward = penalty_dist + 0.001*penalty_action;
 %             reward = exp(reward) - 1; % Alternative reward
         end
         
