@@ -1,9 +1,9 @@
-function [g, gd, h] = mse_linear(w, X, T)
-% Mean squared error for linear functions.
+function [f, df, ddf] = mse_linear(w, X, T)
+% Mean squared error for linear functions
+% min_w ||Y-T||^2,   Y = w'X
 
 Y = w'*X;
-TD = Y - T; % T are the targets (constant)
-g = 0.5*mean(TD.^2);
-gd = X*TD'/size(T,2);
-h = X*X'/size(T,2);
-end
+E = Y - T; % T are the targets
+f = 0.5*mean(E.^2); % Function, MSE
+df = X*E'/size(T,2); % Gradient
+ddf = X*X'/size(T,2); % Hessian
