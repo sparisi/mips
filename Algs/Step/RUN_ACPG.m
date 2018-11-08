@@ -1,6 +1,6 @@
 % Actor-critic policy gradient, as described by https://arxiv.org/pdf/1703.02660.pdf
 % First, the generalized advantage A is estimated using V.
-% Then, V is updated by minimizing the generalized TD error.
+% Then, V is updated by minimizing the TD lambda error.
 % Finally, the policy is updated by natural gradient on A.
 
 % To learn V
@@ -22,7 +22,7 @@ bfsV = bfs;
 omega = (rand(bfsV(),1)-0.5)*2;
 
 data = [];
-varnames = {'r','s','nexts','a','t','terminal'};
+varnames = {'r','s','nexts','a','t'};
 bfsnames = { {'phiP', @(s)policy.get_basis(s)}, {'phiV', bfsV} };
 iter = 1;
 
@@ -41,11 +41,14 @@ while iter < 200
     % Estimate A
     V = omega'*data.phiV;
     A = gae(data,V,mdp.gamma,lambda_trace);
-    TD = [data.r] + mdp.gamma*omega'*data.phiV_nexts.*~data.terminal - V;
 
     % Update V
     omega = fminunc(@(omega)mse_linear(omega,data.phiV,V+A), omega, options);
-    
+
+    % Re-estimate A with the updated critic
+    V = omega'*data.phiV;
+    A = gae(data,V,mdp.gamma,lambda_trace);
+
     % Estimate natural gradient
     dlogpi = policy.dlogPidtheta(data.s,data.a);
     grad = mean(bsxfun(@times,dlogpi,A),2);
@@ -61,7 +64,7 @@ while iter < 200
     % Print info
     norm_g = norm(grad);
     norm_ng = norm(grad_nat);
-%     J = evaluate_policies(mdp, episodes_eval, steps_eval, policy.makeDeterministic);
+    J = evaluate_policies(mdp, episodes_eval, steps_eval, policy.makeDeterministic);
     fprintf('%d) Entropy: %.2f,   Norm (G): %e,   Norm (NG): %e,   J: %e \n', ...
         iter, entropy, norm_g, norm_ng, J);
     J_history(iter) = J;

@@ -44,6 +44,10 @@ while iter < 1000
     % Update V
     omega = fminunc(@(omega)mse_linear(omega,data.phiV,V+A), omega, options);
     
+    % Re-estimate A with the updated critic
+    V = omega'*data.phiV;
+    A = gae(data,V,mdp.gamma,lambda_trace);
+
     % Get REPS weights
     [d, divKL] = solver.optimize(A);
     

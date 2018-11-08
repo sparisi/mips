@@ -24,7 +24,7 @@ bfsV = bfs;
 omega = (rand(bfsV(),1)-0.5)*2;
 
 data = [];
-varnames = {'r','s','nexts','a','t','terminal'};
+varnames = {'r','s','nexts','a','t'};
 bfsnames = { {'phiP', @(s)policy.get_basis(s)}, {'phiV', bfsV} };
 iter = 1;
 
@@ -32,7 +32,7 @@ max_reuse = 1; % Reuse all samples from the past X iterations
 max_samples = zeros(1,max_reuse);
 
 %% Learning
-while iter < 200
+while iter < 2000
     
     % Collect data
     [ds, J] = collect_samples(mdp, episodes_learn, steps_learn, policy);
@@ -47,6 +47,10 @@ while iter < 200
     % Update V
     omega = fminunc(@(omega)mse_linear(omega,data.phiV,V+A), omega, options);
     
+    % Re-estimate A with the updated critic
+    V = omega'*data.phiV;
+    A = gae(data,V,mdp.gamma,lambda_trace);
+
     % Estimate natural gradient
     dlogpi = policy.dlogPidtheta(data.s,data.a);
     grad = mean(bsxfun(@times,dlogpi,A),2);
@@ -57,9 +61,9 @@ while iter < 200
 
     % Line search
     stepsize = sqrt(kl_bound / (0.5*grad'*grad_nat));
-    max_adv = @(theta) mean(policy.update(theta).logpdf([data.a],[data.s]).*A);
-    kl = @(theta) kl_mvn2(policy.update(theta), policy, policy.basis(data.s));
-    [success, theta, n_back] = linesearch(max_adv, policy.theta, stepsize*grad_nat, grad'*grad_nat*stepsize, kl, kl_bound);
+    obj_fun = @(x) mean(policy.update(x).logpdf([data.a],[data.s]).*A);
+    kl = @(x) kl_mvn2(policy.update(x), policy, policy.basis(data.s));
+    [success, theta, n_back] = linesearch(obj_fun, policy.theta, stepsize*grad_nat, grad'*grad_nat*stepsize, kl, kl_bound);
     if ~success, warning('Could not satisfy the KL constraint.'), end % in this case, theta = policy.theta
     
     % Print info
