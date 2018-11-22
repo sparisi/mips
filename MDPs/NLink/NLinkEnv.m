@@ -81,7 +81,7 @@ classdef NLinkEnv < MDP
         
         function [pixels, clims, cmap] = render(obj, state)
             n_links = length(obj.lengths);
-            meters_to_pixels = 5;
+            meters_to_pixels = 5; % Increase for higher resolution
             tot_size = meters_to_pixels*n_links*2+2;
             
             if nargin == 1, pixels = tot_size^2; return, end

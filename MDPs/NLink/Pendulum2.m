@@ -68,13 +68,27 @@ classdef Pendulum2 < NLinkEnv
         %% Plotting
         function initplot(obj)
             initplot@NLinkEnv(obj)
-            text(1,0.15,'0 (2\pi)','HorizontalAlignment','center')
-            text(-1,0.15,'\pi (-\pi)','HorizontalAlignment','center')
-            text(0,1,'\pi/2','HorizontalAlignment','center')
-            text(0,-1,'-\pi/2','HorizontalAlignment','center')
+%             text(1,0.15,'0 (2\pi)','HorizontalAlignment','center')
+%             text(-1,0.15,'\pi (-\pi)','HorizontalAlignment','center')
+%             text(0,1,'\pi/2','HorizontalAlignment','center')
+%             text(0,-1,'-\pi/2','HorizontalAlignment','center')
             pbaspect([1 1 1])
 %             rectangle('Position',[-1,-1,2,2],'Curvature',[1,1]);
         end
+        
+        function updateplot(obj, state)
+            % Upright position is at pi/2. In OpenAI gym, it is at 0.
+            % Since this code follows gym equations, for plotting we need 
+            % to shift everything by pi/2.
+            state(1,:) = state(1,:) + pi/2;
+            updateplot@NLinkEnv(obj,state);
+        end
+        
+        function [pixels, clims, cmap] = render(obj, state)
+            % See above.
+            state(1,:) = state(1,:) + pi/2;
+            [pixels, clims, cmap] = render@NLinkEnv(obj,state);
+        end        
     end
      
 end
