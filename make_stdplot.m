@@ -24,7 +24,8 @@ if isempty(filenames) % automatically identify algorithms name
     end
 end
 
-legendnames = {}; % if empty, filenames will be used
+legendnames = {};
+if isempty(legendnames), legendnames = filenames; end
 colors = {};
 markers = {};
 
@@ -34,6 +35,8 @@ variable = 'J_history';
 title(variable, 'Interpreter', 'none')
 
 %% Plot
+name_idx = 1;
+name_valid = [];
 for name = filenames
     counter = 1;
     dataMatrix = [];
@@ -51,10 +54,10 @@ for name = filenames
         hold all
         lineprops = { 'LineWidth', 3, 'DisplayName', name{:} };
         if ~isempty(colors)
-            lineprops = {lineprops{:}, 'Color', colors{numel(h)+1} };
+            lineprops = {lineprops{:}, 'Color', colors{name_idx} };
         end
         if ~isempty(markers)
-            lineprops = {lineprops{:}, 'Marker', markers{numel(h)+1} };
+            lineprops = {lineprops{:}, 'Marker', markers{name_idx} };
         end
         tmp = shadedErrorBar( ...
             1:size(dataMatrix,2), ...
@@ -63,10 +66,12 @@ for name = filenames
             lineprops, ...
             0.1, 0 );
         h{end+1} = tmp.mainLine;
+        name_valid(end+1) = name_idx;
     end
+    name_idx = name_idx + 1;
     
 end
 
-legend([h{:}], legendnames, 'Interpreter', 'none')
+legend([h{:}], legendnames{name_valid}, 'Interpreter', 'none')
 
 leg.Position = [0.2 0.7 0 0];
