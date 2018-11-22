@@ -15,8 +15,8 @@ mdp_avg = MDP_avg(mdp,reset_prob);
 % bfsV = @(varargin)basis_krbf(6, [mdp.stateLB, mdp.stateUB], 0, varargin{:});
 bfsV = bfs;
 
-solver = REPS_Solver(0.1,bfsV);
-solver.verbose = 1;
+solver = REPS_Solver(0.3,bfsV);
+solver.verbose = 0;
 
 data = [];
 varnames = {'r','s','nexts','a','t'};
@@ -29,9 +29,12 @@ max_samples = zeros(1,max_reuse);
 %% Learning
 while iter < 1000
     
-%     [ds, J] = collect_samples3(mdp_avg, 15000, 500, policy);
-    % [ds, J] = collect_samples(mdp_avg, episodes_learn, steps_learn, policy);
-    [ds, J] = collect_samples_inf(mdp, 10000, reset_prob, policy);
+    % If you use mdp_avg an episode ends after steps_learn of for a random reset
+    % If you use collect_samples_inf there is no time limit (an episode ends only because of a random reset)
+
+%     [ds, J] = collect_samples3(mdp_avg, 5000, steps_learn, policy);
+%     [ds, J] = collect_samples(mdp_avg, episodes_learn, steps_learn, policy);
+    [ds, J] = collect_samples_inf(mdp, 5000, reset_prob, policy);
     entropy = policy.entropy([ds.s]);
 
     avg_reset = length([ds.length]) / sum([ds.length]);
@@ -70,3 +73,4 @@ end
 
 %%
 show_simulation(mdp, policy.makeDeterministic, 200, 0.01)
+
