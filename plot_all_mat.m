@@ -1,16 +1,17 @@
-% Simple script to plot the trend of a specific variable saved in ALL .mat
-% files located in the root folder.
+% Simple script to plot the trend of a specific variable VARNAME saved in 
+% all .mat files located in a specific FOLDER.
 
 close all
 
-Files = dir(fullfile('.','*.mat'));
+folder = 'data/';
+Files = dir(fullfile(folder,'*.mat'));
 
-varname = 'mean(h.J_history,1)';
+varname = 'J_history';
 varbound = -inf;
 
-figure, hold all, title('Average Return')
+figure, hold all, title(varname, 'interpreter', 'none')
 for current_file = {Files.name}
-    h = load(current_file{:});
+    load([folder current_file{:}], varname);
     try
         plot(max(eval(varname), varbound))
     catch
