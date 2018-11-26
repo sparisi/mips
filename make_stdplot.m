@@ -1,6 +1,8 @@
 % Compares results of different methods averaged over many trials. 
 % You need to set the folder where the data is stored and the filename
 % format (eg, alg1_1.mat, alg1_2.mat, ..., alg2_1.mat, ...)
+%
+% Plot mean with 95% confidence interval.
 
 close all
 clear all
@@ -42,7 +44,7 @@ for name = filenames
     dataMatrix = [];
     for trial = 0 : 999
         try
-            load([folder name{:} separator num2str(trial) '.mat'])
+            load([folder name{:} separator num2str(trial) '.mat'], variable)
             dataMatrix(counter,:) = eval(variable);
             counter = counter + 1;
         catch
