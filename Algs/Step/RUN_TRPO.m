@@ -69,7 +69,7 @@ while iter < 2000
     norm_g = norm(grad);
     norm_ng = norm(grad_nat);
     J = evaluate_policies(mdp, episodes_eval, steps_eval, policy.makeDeterministic);
-    fprintf('%d) Entropy: %.2f,   Norm (G): %e,   Norm (NG): %e,   J: %e ', ...
+    fprintf('%d) Entropy: %.2f,   Norm (G): %e,   Norm (NG): %e,   J: %e', ...
         iter, entropy, norm_g, norm_ng, J);
     J_history(iter) = J;
     
@@ -77,7 +77,7 @@ while iter < 2000
     policy_old = policy;
     policy = policy.update(theta);
     if isa(policy,'Gaussian')
-        fprintf(',  KL (Pi): %.4f', kl_mvn2(policy, policy_old, policy.basis(data.s)));
+        fprintf(',   KL (Pi): %.4f', kl_mvn2(policy, policy_old, policy.basis(data.s)));
     end
     fprintf('\n');
     

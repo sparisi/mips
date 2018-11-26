@@ -72,7 +72,7 @@ while iter < 200
     policy_old = policy;
     policy = policy.update(policy.theta + grad_nat * stepsize);
     if isa(policy,'Gaussian')
-        fprintf(',  KL (Pi): %.4f', kl_mvn2(policy, policy_old, policy.basis(data.s)));
+        fprintf(',   KL (Pi): %.4f', kl_mvn2(policy, policy_old, policy.basis(data.s)));
     end
     fprintf('\n');
     
