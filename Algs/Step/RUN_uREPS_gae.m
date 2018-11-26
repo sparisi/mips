@@ -16,7 +16,6 @@ lambda_trace = 0.95;
 % bfsV = @(varargin)basis_poly(2,mdp.dstate,0,varargin{:});
 % bfsV = @(varargin)basis_krbf(4, [mdp.stateLB, mdp.stateUB], 0, varargin{:});
 bfsV = bfs;
-
 omega = (rand(bfsV(),1)-0.5)*2;
 solver = REPSep_Solver(0.3);
 

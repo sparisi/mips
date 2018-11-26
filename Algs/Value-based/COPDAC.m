@@ -16,29 +16,29 @@ rng(1)
 showplots = 1;
 J_history = [];
 
-mdp = MCarContinuous; sigma = 4*2; maxsteps = 100;
-% mdp = CartPoleContinuous; sigma = 10*2; maxsteps = 1000;
-% mdp = PuddleworldContinuous; sigma = 1*2; maxsteps = 100;
-mdp = Pendulum; sigma = 2*2; maxsteps = 50;
+mdp = MCarContinuous; sigma = 4; maxsteps = 100;
+% mdp = CartPoleContinuous; sigma = 10; maxsteps = 1000;
+% mdp = PuddleworldContinuous; sigma = 1; maxsteps = 100;
+mdp = Pendulum; sigma = 2; maxsteps = 5000;
+steps_eval = 150;
 
 robj = 1;
-gamma = mdp.gamma;
+gamma = 0.99;
+mdp.gamma = gamma;
 noise = @() (rand(mdp.daction,1) - 0.5) * 2 * sigma;
-lrate_theta = 0.001;
+lrate_theta = 0.0001;
 lrate_v = 0.0001;
 lrate_w = 0.0001;
-iter = 1;
+totsteps = 1;
 eval_every = 1000;
 
 
 %% Setup actor and critic
 % Policy
-bfs = @(varargin)basis_krbf(7, [mdp.stateLB, mdp.stateUB], 1, varargin{:});
-% bfs = @(varargin)basis_poly(2, mdp.dstate, 1, varargin{:});
-tmp_policy.drawAction = @(x)mymvnrnd(zeros(mdp.daction,1), sigma*eye(mdp.daction), size(x,2));
+tmp_policy.drawAction = @(x)mymvnrnd(zeros(mdp.daction,1), sigma^2*eye(mdp.daction), size(x,2));
 ds = collect_samples(mdp, 100, 100, tmp_policy);
 B = avg_pairwise_dist([ds.s]);
-bfs = @(varargin) basis_fourier(75, mdp.dstate, B, 0, varargin{:});
+bfs = @(varargin) basis_fourier(100, mdp.dstate, B, 0, varargin{:});
 
 theta = zeros(bfs()*mdp.daction,1);
 mu = @(s,theta) reshape(theta,bfs(),mdp.daction)' * bfs(s);
@@ -78,8 +78,9 @@ if showplots
     mdp.showplot
 end
 
+
 %% Learn
-while iter < 3000000
+while totsteps < 3000000
     
     state = mdp.initstate(1);
     terminal = 0;
@@ -90,12 +91,13 @@ while iter < 3000000
     
         action = mu(state,theta) + noise();
         [nextstate, reward, terminal] = mdp.simulator(state, action);
-        Qn = Qfun(nextstate, mu(nextstate,theta), w, v, theta); % Off-policy
+        Qn = Qfun(nextstate, mu(nextstate,theta), w, v, theta);
         Q = Qfun(state, action, w, v, theta);
 
         % Actor and critic update
         delta = reward(robj) + gamma * Qn * ~terminal - Q;
-        if natural
+        
+        if 0
         theta = theta + lrate_theta * w; % Natural
         else
         theta = theta + lrate_theta * d_policy(state) * (d_policy(state)' * w); % Vanilla
@@ -120,12 +122,12 @@ while iter < 3000000
         end
         
         state = nextstate;
-        iter = iter + 1;
+        totsteps = totsteps + 1;
         
-        if mod(iter, eval_every) == 0
+        if mod(totsteps, eval_every) == 0
             policy_eval.drawAction = @(s) mu(s,theta);
-            J_history(end+1) = evaluate_policies(mdp, 100, maxsteps, policy_eval);
-            if showplots, updateplot('Return',iter,J_history(end)); end
+            J_history(end+1) = evaluate_policies(mdp, 100, steps_eval, policy_eval);
+            if showplots, updateplot('Return',totsteps,J_history(end)); end
         end
 
         % Plot
@@ -144,11 +146,11 @@ while iter < 3000000
                     Q(:,i) = Qfun(S(:,i),P(:,i),w,v,theta);
                 end
                 subimagesc('Policy',Xnodes,Ynodes,P,1)
-                subimagesc('V-function - Q(s,pi(s))',Xnodes,Ynodes,Q)
+                subimagesc('V-function - Q(s,pi(s))',Xnodes,Ynodes,Vfun(S,v))
             end
-            updateplot('Delta',iter,delta^2)
-            updateplot('Action',iter,action)
-            if iter == 2, autolayout, end
+            updateplot('Delta',totsteps,delta^2)
+            updateplot('Action',totsteps,action)
+            if totsteps == 2, autolayout, end
         end
         
     end

@@ -31,7 +31,7 @@ maxsteps = 100;
 epsilon = .1;
 policy_type = 'egreedy';
 lrate = 0.01;
-iter = 1;
+totsteps = 1;
 data = [];
 
 
@@ -44,7 +44,7 @@ XY = [X(:)';Y(:)'];
 
 
 %% Learn
-while iter < 10000000
+while totsteps < 10000000
     
     state = mdp.initstate(1);
     terminal = 0;
@@ -74,10 +74,10 @@ while iter < 10000000
         theta = theta + lrate * E * phi;
 
         state = nextstate;
-        iter = iter + 1;
+        totsteps = totsteps + 1;
     end
     
-    updateplot('MS TD Error',iter,mean(E.^2),1)
+    updateplot('MS TD Error',totsteps,mean(E.^2),1)
 %     Q = Qfun(XY,theta);
 %     V = max(Q,[],1);
 %     subimagesc('Q-function',Xnodes,Ynodes,Q)

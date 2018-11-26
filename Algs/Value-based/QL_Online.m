@@ -37,7 +37,7 @@ policy.drawAction = @(s)myunidrnd(mdp.actionLB,mdp.actionUB,size(s,2));
 %% Collect data and learn
 maxepisodes = 10000;
 maxsteps = 100;
-iter = 1;
+totsteps = 1;
 epsilon = 0.2;
 
 for episode = 1 : maxepisodes
@@ -79,16 +79,16 @@ for episode = 1 : maxepisodes
         
         % Evaluation and plotting
         E = data.r(robj,:) + gamma * max(Q(idx_sn,:),[],2)' .* ~data.terminal - Q(linidx);
-        E_history(iter) = mean(E.^2);
+        E_history(totsteps) = mean(E.^2);
         
-        iter = iter + 1;
+        totsteps = totsteps + 1;
 
         % Update policy as well
         policy.drawAction = @(s)egreedy( Q(ismember(allstates,s','rows'),:)', epsilon );
         
     end
 
-    updateplot('MS TD Error',iter,mean(E.^2),1)
+    updateplot('MS TD Error',totsteps,mean(E.^2),1)
     [V, opt] = max(Q,[],2);
     subimagesc('Q-function',X,Y,Q')
     subimagesc('V-function',X,Y,V')

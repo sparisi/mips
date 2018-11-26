@@ -73,4 +73,3 @@ end
 
 %%
 show_simulation(mdp, policy.makeDeterministic, 200, 0.01)
-

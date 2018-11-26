@@ -43,7 +43,7 @@ policy.drawAction = @(s)myunidrnd(mdp.actionLB,mdp.actionUB,size(s,2));
 %% Collect data and learn
 maxepisodes = 10000;
 maxsteps = 100;
-iter = 1;
+totsteps = 1;
 epsilon = 0.2;
 
 for episode = 1 : maxepisodes
@@ -89,7 +89,7 @@ for episode = 1 : maxepisodes
 %         % Evaluation and plotting over the avg of the two Q
         Qavg = (Q1 + Q2) / 2;
         E = data.r(robj,:) + gamma * max(Qavg(idx_sn,:),[],2)' .* ~data.terminal - Qavg(linidx);
-        E_history(iter) = mean(E.^2);
+        E_history(totsteps) = mean(E.^2);
 %         updateplot('MS TD Error',iter,mean(E.^2),1)
 %         [V, opt] = max(Qavg,[],2);
 %         subimagesc('Q-function',X,Y,Qavg')
@@ -97,7 +97,7 @@ for episode = 1 : maxepisodes
 %         subimagesc('Action',X,Y,opt')
 %         if iter == 1, autolayout, end
         
-        iter = iter + 1;
+        totsteps = totsteps + 1;
         
         % Next action will be chosen using either Q1 or Q2
         if rand < 0.5
