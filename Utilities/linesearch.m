@@ -15,9 +15,12 @@ fval = f(x);
 n_back = 0;
 for stepfrac = 0.5.^(0:max_backtracks-1)
     x_new = x + stepfrac * fullstep;
-    fval_new = f(x_new);
-    gval = g(x_new);
-    if gval > eps
+    try
+        fval_new = f(x_new);
+        if g(x_new) > eps
+            fval_new = -inf;
+        end
+    catch
         fval_new = -inf;
     end
     actual_improve = fval_new - fval;
