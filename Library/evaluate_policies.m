@@ -22,7 +22,6 @@ J = zeros(mdp.dreward,totepisodes);
 step = 0;
 
 % Initialize simulation
-simulator = @mdp.simulator;
 state = mdp.initstate(totepisodes);
 action = zeros(mdp.daction,totepisodes);
 
@@ -39,7 +38,7 @@ endingstep = maxsteps*ones(1,totepisodes);
 while ( (step < maxsteps) && sum(ongoing) > 0 )
 
     step = step + 1;
-    
+
     % Select action
     for i = 1 : npolicy
         idx = (i-1)*episodes+1 : (i-1)*episodes+episodes;
@@ -51,22 +50,22 @@ while ( (step < maxsteps) && sum(ongoing) > 0 )
 
     % Simulate one step of all running episodes at the same time
     if nargin < 5
-        [nextstate, reward, terminal] = feval(simulator, state(:,ongoing), action(:,ongoing));
+        [nextstate, reward, terminal] = mdp.simulator(state(:,ongoing), action(:,ongoing));
     else
-        [nextstate, reward, terminal] = feval(simulator, state(:,ongoing), action(:,ongoing), contexts(:,ongoing));
+        [nextstate, reward, terminal] = mdp.simulator(state(:,ongoing), action(:,ongoing), contexts(:,ongoing));
     end
     state(:,ongoing) = nextstate;
-    
+
     % Update the total reward
-    J(:,ongoing) = J(:,ongoing) + (mpd.gamma)^(step-1) .* reward;
-    
+    J(:,ongoing) = J(:,ongoing) + (mdp.gamma)^(step-1) .* reward;
+
     % Continue
     idx = 1:totepisodes;
     idx = idx(ongoing);
     idx = idx(terminal);
     endingstep(idx) = step;
     ongoing(ongoing) = ~terminal;
-    
+
 end
 
 % If we are in the average reward setting, then normalize the return
