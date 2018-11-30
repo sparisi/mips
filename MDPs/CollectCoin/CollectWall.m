@@ -1,4 +1,10 @@
 classdef CollectWall < MDP
+% The agent has to collect a coin and bring it to a goal position.
+% Half of the environment is divided by a wall which moves at constant speed.
+% Reward is: distance from coin if the coin is not collected, distance from
+% goal otherwise. A penalty is given for hitting the wall or the environment 
+% boundaries. A bonus is given for picking up the coin and for delivering 
+% it to the goal.
     
     %% Properties
     properties
@@ -135,7 +141,7 @@ classdef CollectWall < MDP
             
             % Coin
             if has_coin, set(obj.handleAgent{2},'Visible','off'); 
-            else set(obj.handleAgent{2},'Visible','on'); end
+            else, set(obj.handleAgent{2},'Visible','on'); end
             
             % Hole
             obj.handleAgent{3}.XData = [hole(1)-obj.hole_width/2, hole(1)+obj.hole_width/2];
