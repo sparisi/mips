@@ -1,5 +1,5 @@
-% Compares results of different hyperparameters (of the same method) 
-% averaged over many trials. 
+% Compares results of different hyperparameters (of the same method)
+% averaged over many trials.
 % You need to set the folder (where data is stored) and the filename
 % format (eg, alg_param1_param2_1.mat)
 
@@ -27,7 +27,7 @@ for hp1 = hp1_list
     for hp2 = hp2_list
         for hp3 = hp3_list
 
-            
+
 name = [num2str(hp1{:}), separator, num2str(hp2{:}), separator, num2str(hp3{:})];
 counter = 1;
 dataMatrix = [];
@@ -46,7 +46,7 @@ if ~isempty(dataMatrix)
     tmp = shadedErrorBar( ...
         1:size(dataMatrix,2), ...
         mean(dataMatrix,1), ...
-        1.96*std(dataMatrix)/sqrt(size(dataMatrix,1)), ...
+        1.96*std(dataMatrix,[],1)/sqrt(size(dataMatrix,1)), ...
         { 'LineWidth', 3, 'DisplayName', name }, ...
         0.1, 0 );
         h{end+1} = tmp.mainLine;

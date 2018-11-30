@@ -1,4 +1,4 @@
-% Compares results of different methods averaged over many trials. 
+% Compares results of different methods averaged over many trials.
 % You need to set the folder where the data is stored and the filename
 % format (eg, alg1_1.mat, alg1_2.mat, ..., alg2_1.mat, ...)
 %
@@ -50,7 +50,7 @@ for name = filenames
         catch
         end
     end
-    
+
     if ~isempty(dataMatrix)
 %         dataMatrix = moving(dataMatrix',10)';
         hold all
@@ -64,14 +64,14 @@ for name = filenames
         tmp = shadedErrorBar( ...
             1:size(dataMatrix,2), ...
             mean(dataMatrix,1), ...
-            1.96*std(dataMatrix)/sqrt(size(dataMatrix,1)), ...
+            1.96*std(dataMatrix,[],1)/sqrt(size(dataMatrix,1)), ...
             lineprops, ...
             0.1, 0 );
         h{end+1} = tmp.mainLine;
         name_valid(end+1) = name_idx;
     end
     name_idx = name_idx + 1;
-    
+
 end
 
 legend([h{:}], legendnames{name_valid}, 'Interpreter', 'none')
