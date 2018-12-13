@@ -32,8 +32,11 @@ classdef (Abstract) GaussianConstant < Gaussian
         end
         
         %% PLOT PDF
-        function fig = plot(obj)
+        function fig = plot(obj, actionLB, actionUB)
         % Plot N(mu(i),Sigma(i,i)) for each dimension i (NORMPDF)
+            if nargin < 3, actionUB = inf; end
+            if nargin < 2, actionLB = -inf; end
+
             fig = figure(); hold all
             xlabel 'x'
             ylabel 'pdf(x)'
@@ -42,6 +45,9 @@ classdef (Abstract) GaussianConstant < Gaussian
             norm = bsxfun(@times, exp(-0.5 * bsxfun(@times, ...
                 bsxfun(@minus,range,obj.mu), 1./diag(obj.Sigma)).^2), ... 
                 1./(sqrt(2*pi) .* diag(obj.Sigma)));
+
+            norm = bsxfun(@max, bsxfun(@min, norm, actionUB), actionLB);
+
             plot(range', norm')
             legend show
         end

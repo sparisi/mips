@@ -38,8 +38,10 @@ while iter < 1000
     entropy = policy.entropy([ds.s]);
 
     avg_reset = length([ds.length]) / sum([ds.length]);
-    if avg_reset < reset_prob*0.9 || avg_reset > 1.1
-        warning('Reset probability not as expected.')
+    if avg_reset < reset_prob*0.9
+        warning(['Reset probability too low (' num2str(avg_reset) ').'])
+    elseif avg_reset > 1.1*reset_prob
+        warning(['Reset probability too high (' num2str(avg_reset) ').'])
     end
 
     max_samples(mod(iter-1,max_reuse)+1) = size([ds.s],2);
@@ -65,7 +67,7 @@ while iter < 1000
     %%
     if solver.verbose && mdp.dstate == 2
         solver.plotV(mdp.stateLB, mdp.stateUB)
-        policy.plotmean(mdp.stateLB, mdp.stateUB)
+        policy.plotmean(mdp.stateLB, mdp.stateUB, mdp.actionLB, mdp.actionUB)
         autolayout
     end
     

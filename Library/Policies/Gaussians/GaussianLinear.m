@@ -61,9 +61,12 @@ classdef (Abstract) GaussianLinear < Gaussian
             legend show
         end
         
-        function plotmean(obj, stateLB, stateUB)
+        function plotmean(obj, stateLB, stateUB, actionLB, actionUB)
         % Plot the mean action over the state space.
             if length(stateLB) > 2, return, end
+            
+            if nargin < 5, actionUB = inf; end
+            if nargin < 4, actionLB = -inf; end
 
             if length(stateLB) == 1
                 n = 100;
@@ -76,6 +79,7 @@ classdef (Abstract) GaussianLinear < Gaussian
                     figure('Name','Mean action')
                     for i = 1 : size(mu,1)
                         subplot(nrows,ncols,i,'align')
+                        mu = bsxfun(@max, bsxfun(@min, mu, actionUB), actionLB);
                         plot(s,mu(i,:))
                     end
                 else
@@ -92,6 +96,7 @@ classdef (Abstract) GaussianLinear < Gaussian
                 [X, Y] = meshgrid(x,y);
                 s = [X(:), Y(:)]';
                 mu = obj.A*obj.get_basis(s);
+                mu = bsxfun(@max, bsxfun(@min, mu, actionUB), actionLB);
                 subcontourf('Mean action', X, Y, mu, 1)
             end
         end

@@ -54,7 +54,6 @@ while iter < 2000
     dlogpi = policy.dlogPidtheta(data.s,data.a);
     grad = mean(bsxfun(@times,dlogpi,A),2);
     F = dlogpi * dlogpi' / length(A);
-    rankF = rank(F);
     [grad_nat,~,~,~,~] = pcg(F,grad,1e-10,50); % Use conjugate gradient (~ are to avoid messages)
 %     [grad_nat,~,~,~,~] = cgs(F,grad,1e-10,50);
 
