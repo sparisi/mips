@@ -90,8 +90,8 @@ classdef REPS_Solver < handle
                     validSF = errorSF < obj.tolSF;
                     numStepsNoKL = 0;
                     if obj.verbose
-                        fprintf('KL: %.4f / %.4f,  FE: %e / %e,  ETA: %e\n', ...
-                            divKL, (1+obj.tolKL)*obj.epsilon, errorSF, obj.tolSF, obj.eta)
+                        fprintf('KL: %.4f / %.4f,  FE: %e / %e,  ETA: %e,  MSA: %e\n', ...
+                            divKL, (1+obj.tolKL)*obj.epsilon, errorSF, obj.tolSF, obj.eta, mean(A.^2))
                     end
                 else
                     % KL is still valid, skip KL optimization
@@ -122,8 +122,8 @@ classdef REPS_Solver < handle
                     validSF = errorSF < obj.tolSF;
                     numStepsNoKL = 0;
                     if obj.verbose
-                        fprintf('KL: %.4f / %.4f,  FE: %e / %e,  ETA: %e\n', ...
-                            divKL, (1+obj.tolKL)*obj.epsilon, errorSF, obj.tolSF, obj.eta)
+                        fprintf('KL: %.4f / %.4f,  FE: %e / %e,  ETA: %e,  MSA: %e\n', ...
+                            divKL, (1+obj.tolKL)*obj.epsilon, errorSF, obj.tolSF, obj.eta, mean(A.^2))
                     end
                 end
                 

@@ -8,14 +8,14 @@
 % H van Hoof, G Neumann, J Peters
 % Non-parametric Policy Search with Limited Information Loss (2017)
 
-reset_prob = 0.1;
+reset_prob = 0.05;
 mdp_avg = MDP_avg(mdp,reset_prob);
 
 % bfsV = @(varargin)basis_poly(2,mdp.dstate,0,varargin{:});
 % bfsV = @(varargin)basis_krbf(6, [mdp.stateLB, mdp.stateUB], 0, varargin{:});
 bfsV = bfs;
 
-solver = REPS_Solver(0.3,bfsV);
+solver = REPS_Solver(0.1,bfsV);
 solver.verbose = 0;
 
 data = [];
@@ -33,7 +33,6 @@ while iter < 1000
     % If you use collect_samples_inf there is no time limit (an episode ends only because of a random reset)
 
 %     [ds, J] = collect_samples3(mdp_avg, 5000, steps_learn, policy);
-%     [ds, J] = collect_samples(mdp_avg, episodes_learn, steps_learn, policy);
     [ds, J] = collect_samples_inf(mdp, 5000, reset_prob, policy);
     entropy = policy.entropy([ds.s]);
 
@@ -68,7 +67,7 @@ while iter < 1000
     if solver.verbose && mdp.dstate == 2
         solver.plotV(mdp.stateLB, mdp.stateUB)
         policy.plotmean(mdp.stateLB, mdp.stateUB, mdp.actionLB, mdp.actionUB)
-        autolayout
+        if iter == 2, autolayout, end
     end
     
 end
