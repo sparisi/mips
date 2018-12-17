@@ -1,4 +1,4 @@
-classdef ADAM < handle
+classdef ADAM < handle & matlab.mixin.Copyable
     
     properties
         alpha = 1e-3;

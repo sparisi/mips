@@ -1,4 +1,4 @@
-classdef RMSprop < handle
+classdef RMSprop < handle & matlab.mixin.Copyable
     
     properties
         alpha = 1e-3;

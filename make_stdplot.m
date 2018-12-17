@@ -8,9 +8,11 @@ close all
 clear all
 figure()
 h = {};
+plot_every = 5; % plots data with the following indices [1, 5, 10, ..., end]
+mov_avg = 1; % computes moving avg to smooth the plot
 
 %% Change entries according to your needs
-folder = './data/';
+folder = 'data';
 separator = '_';
 filenames = {'alg1', 'alg2'};
 
@@ -44,15 +46,22 @@ for name = filenames
     dataMatrix = [];
     for trial = 0 : 999
         try
-            load([folder name{:} separator num2str(trial) '.mat'], variable)
-            dataMatrix(counter,:) = eval(variable);
+            load([folder '/' name{:} separator num2str(trial) '.mat'], variable)
+            tmp = eval(variable);
+            if counter == 1
+                dataMatrix(counter,:) = tmp;
+            else
+                len = min(size(dataMatrix,2), length(tmp));
+                dataMatrix = dataMatrix(:,1:len);
+                dataMatrix(counter,:) = tmp(1:len);
+            end
             counter = counter + 1;
         catch
         end
     end
 
     if ~isempty(dataMatrix)
-%         dataMatrix = moving(dataMatrix',10)';
+        dataMatrix = moving(dataMatrix',mov_avg)';
         hold all
         lineprops = { 'LineWidth', 3, 'DisplayName', name{:} };
         if ~isempty(colors)
@@ -61,19 +70,24 @@ for name = filenames
         if ~isempty(markers)
             lineprops = {lineprops{:}, 'Marker', markers{name_idx} };
         end
+        
+        x = [1, plot_every : plot_every : size(dataMatrix,2)];
+        dataMatrix = dataMatrix(:,x);
         tmp = shadedErrorBar( ...
-            1:size(dataMatrix,2), ...
+            x, ...
             mean(dataMatrix,1), ...
             1.96*std(dataMatrix,[],1)/sqrt(size(dataMatrix,1)), ...
             lineprops, ...
             0.1, 0 );
         h{end+1} = tmp.mainLine;
         name_valid(end+1) = name_idx;
+    else
+        disp([name{:} ' is empty!'])
     end
     name_idx = name_idx + 1;
 
 end
 
-legend([h{:}], legendnames{name_valid}, 'Interpreter', 'none')
+legend([h{:}], {legendnames{name_valid}}, 'Interpreter', 'none')
 
 leg.Position = [0.2 0.7 0 0];
