@@ -16,6 +16,7 @@ mdp_avg = MDP_avg(mdp,reset_prob);
 bfsV = bfs;
 
 solver = REPS_Solver(0.1,bfsV);
+solver = REPS_Solver2(0.1,bfsV);
 solver.verbose = 0;
 
 data = [];
@@ -57,7 +58,7 @@ while iter < 1000
     fprintf('%d ) Entropy: %.3f,  Eta: %e,  KL (Weights): %.4f,  J: %e', ...
         iter, entropy, solver.eta, divKL, J)
     if isa(policy,'Gaussian')
-        fprintf(',  KL (Policy): %.4f', kl_mvn2(policy, policy_old, policy.basis(data.s)));
+        fprintf(',  KL (Policy): %.4f', kl_mvn2(policy_old, policy, policy.basis(data.s)));
     end
     fprintf('\n');
     

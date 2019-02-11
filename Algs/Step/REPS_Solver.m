@@ -21,7 +21,7 @@ classdef REPS_Solver < handle
         theta         % Lagrangian (features)
         l2_reg        % Regularizer for theta
         tolKL = 0.1;  % Tolerance of the KL error
-        tolSF = 1e-5; % Tolerance of feature matching error
+        tolSF = 1e-6; % Tolerance of feature matching error
         verbose = 1;  % 1 to display inner loop statistics
     end
 
@@ -54,8 +54,10 @@ classdef REPS_Solver < handle
                 'GradObj', 'on', ...
                 'Display', 'off', ...
                 'Hessian', 'on', ...
+                'StepTolerance', 0, ...
+                'FunctionTolerance', 0, ...
                 'MaxFunEvals', 100, ...
-                'TolX', 10^-8, 'TolFun', 10^-12, 'MaxIter', 100);
+                'TolX', 0, 'TolFun', 0, 'MaxIter', 100);
 
             % Hyperparams
             maxIter = 10;
@@ -171,9 +173,9 @@ classdef REPS_Solver < handle
             % Dual function
             g = eta * obj.epsilon + eta * log(sumWeights/n) + maxA + obj.l2_reg*sum(theta.^2);
             % Gradient wrt theta
-            gd = sumPhiWeights / sumWeights + obj.l2_reg*2*theta;
+            gd = sumPhiWeights / sumWeights + 2*obj.l2_reg*theta;
             % Hessian
-            h = ( sumPhiWeightsPhi * sumWeights - sumPhiWeights * sumPhiWeights') / sumWeights^2 / eta + obj.l2_reg/2;
+            h = ( sumPhiWeightsPhi * sumWeights - sumPhiWeights * sumPhiWeights') / sumWeights^2 / eta + 2*obj.l2_reg;
         end
         
         %% GET V-FUNCTION
