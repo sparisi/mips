@@ -64,6 +64,7 @@ classdef (Abstract) GaussianLinear < Gaussian
         function plotmean(obj, stateLB, stateUB, actionLB, actionUB)
         % Plot the mean action over the state space.
             if length(stateLB) > 2, return, end
+            if sum(isinf(stateLB) | isinf(stateUB)) > 0, return, end
             
             if nargin < 5, actionUB = inf; end
             if nargin < 4, actionLB = -inf; end
