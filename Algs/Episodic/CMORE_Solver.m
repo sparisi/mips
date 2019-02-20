@@ -110,6 +110,8 @@ classdef CMORE_Solver < handle
                 obj.K = F_new * L_new;
                 p.A = [obj.b, obj.K];
                 p.Sigma = obj.Q;
+                p.no_bias = false;
+                q.no_bias = false;
                 divKL = kl_mvn2(p,q,Phi);
             end
         end
