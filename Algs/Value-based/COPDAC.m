@@ -19,7 +19,8 @@ J_history = [];
 mdp = MCarContinuous; sigma = 4; maxsteps = 100;
 % mdp = CartPoleContinuous; sigma = 10; maxsteps = 1000;
 % mdp = PuddleworldContinuous; sigma = 1; maxsteps = 100;
-mdp = Pendulum; sigma = 2; maxsteps = 5000;
+% mdp = Pendulum; sigma = 2; maxsteps = 50;
+% mdp = LQR(dim); sigma = 5; maxsteps = 150;
 steps_eval = 150;
 
 robj = 1;
@@ -38,15 +39,21 @@ eval_every = 1000;
 tmp_policy.drawAction = @(x)mymvnrnd(zeros(mdp.daction,1), sigma^2*eye(mdp.daction), size(x,2));
 ds = collect_samples(mdp, 100, 100, tmp_policy);
 B = avg_pairwise_dist([ds.s]);
-bfs = @(varargin) basis_fourier(100, mdp.dstate, B, 0, varargin{:});
+bfs = @(varargin) basis_fourier(50, mdp.dstate, B, 0, varargin{:});
 
-theta = zeros(bfs()*mdp.daction,1);
-mu = @(s,theta) reshape(theta,bfs(),mdp.daction)' * bfs(s);
-d_policy = @(s) kron(eye(mdp.daction),bfs(s));
+bfsPi = bfs;
+bfsV = bfs;
+
+% bfsPi = @(varargin)basis_poly(1,dim,0,varargin{:});
+% bfsV = @(varargin)basis_poly(2,dim,0,varargin{:});
+
+theta = zeros(bfsPi()*mdp.daction,1);
+mu = @(s,theta) reshape(theta,bfsPi(),mdp.daction)' * bfsPi(s);
+d_policy = @(s) kron(eye(mdp.daction),bfsPi(s));
 
 % V-function
-v = zeros(bfs(),1);
-Vfun = @(s,v) v'*bfs(s);
+v = zeros(bfsV(),1);
+Vfun = @(s,v) v'*bfsV(s);
 
 % Q-function (with compatible function approximation)
 w = zeros(size(theta));
@@ -58,7 +65,7 @@ lrate_u = lrate_v;
 
 % Update rules
 natural = true;
-gradient = false;
+gradient = true;
 
 %% Prepare plots
 if showplots
@@ -75,7 +82,7 @@ if showplots
         figure; hP = plot(S,zeros(1,npoints_plot)); title 'Policy';
         figure; hQ = plot(S,zeros(1,npoints_plot)); title 'V-function - Q(s,pi(s))';
     end
-    mdp.showplot
+%     mdp.showplot
 end
 
 
@@ -97,7 +104,9 @@ while totsteps < 3000000
         % Actor and critic update
         delta = reward(robj) + gamma * Qn * ~terminal - Q;
         
-        if 0
+        theta_old = theta;
+        
+        if natural
         theta = theta + lrate_theta * w; % Natural
         else
         theta = theta + lrate_theta * d_policy(state) * (d_policy(state)' * w); % Vanilla
@@ -105,15 +114,18 @@ while totsteps < 3000000
 
         if gradient
         % Gradient Q-learning critic
-        w = w + lrate_w * delta * bfs_q(state,action,theta) - ...
-            lrate_w * gamma * bfs_q(nextstate,mu(nextstate,theta),theta) * (bfs_q(state,action,theta)' * u);
-        v = v + lrate_v * delta * bfs(state) - ...
-            lrate_v * gamma * bfs(nextstate) * (bfs_q(state,action,theta)' * u);
-        u = u + lrate_u * (delta - (bfs_q(state,action,theta)' * u)) * bfs_q(state,action,theta);
+        w = w ...
+            + lrate_w * delta * bfs_q(state,action,theta_old) ...
+            - lrate_w * gamma * bfs_q(nextstate,mu(nextstate,theta_old),theta_old) * (bfs_q(state,action,theta_old)' * u);
+        v = v ...
+            + lrate_v * delta * bfsV(state) ...
+            - lrate_v * gamma * bfsV(nextstate) * (bfs_q(state,action,theta_old)' * u);
+        u = u ...
+            + lrate_u * (delta - (bfs_q(state,action,theta_old)' * u)) * bfs_q(state,action,theta_old);
         else
         % Q-learning critic
-        w = w + lrate_w * delta * bfs_q(state,action,theta);
-        v = v + lrate_v * delta * bfs(state);
+        w = w + lrate_w * delta * bfs_q(state,action,theta_old);
+        v = v + lrate_v * delta * bfsV(state);
         end
         
         if any(isnan(theta)) || any(isnan(w)) || any(isnan(v)) || ...
@@ -130,8 +142,8 @@ while totsteps < 3000000
             if showplots, updateplot('Return',totsteps,J_history(end)); end
         end
 
-        % Plot
-        if showplots
+        %% Plot
+        if showplots && mod(totsteps,50) == 0
             if mdp.dstate == 1
                 P = mu(S,theta);
                 for i = 1 : size(S,2)
