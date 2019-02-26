@@ -15,8 +15,8 @@ mdp_avg = MDP_avg(mdp,reset_prob);
 % bfsV = @(varargin)basis_krbf(6, [mdp.stateLB, mdp.stateUB], 0, varargin{:});
 bfsV = bfs;
 
-solver = REPS_Solver(0.1,bfsV);
-solver = REPS_Solver2(0.1,bfsV);
+solver = REPS_Solver(0.01,bfsV);
+solver = REPS_Solver2(0.001,bfsV);
 solver.verbose = 0;
 
 data = [];
@@ -66,7 +66,7 @@ while iter < 1000
     
     %%
     if solver.verbose && mdp.dstate == 2
-        solver.plotV(mdp.stateLB, mdp.stateUB)
+        solver.plotV(mdp.stateLB, mdp.stateUB, 'surf')
         policy.plotmean(mdp.stateLB, mdp.stateUB, mdp.actionLB, mdp.actionUB)
         if iter == 2, autolayout, end
     end

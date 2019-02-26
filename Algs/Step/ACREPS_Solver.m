@@ -87,9 +87,10 @@ classdef ACREPS_Solver < handle
         end
 
         %% PLOTTING
-        function plotV(obj, stateLB, stateUB)
+        function plotV(obj, stateLB, stateUB, type)
             if length(stateLB) > 2, return, end
             if sum(isinf(stateLB) | isinf(stateUB)) > 0, return, end
+            if nargin < 4, type = 'contourf'; end
 
             if length(stateLB) == 1
                 n = 100;
@@ -113,7 +114,13 @@ classdef ACREPS_Solver < handle
                 [X, Y] = meshgrid(x,y);
                 s = [X(:), Y(:)]';
                 V = obj.getV(s);
-                updatesurf('V-function', X, Y, reshape(V,n,n))
+                if strcmp(type, 'contourf')
+                    updatecontourf('V-function', X, Y, reshape(V,n,n))
+                elseif strcmp(type, 'surf')
+                    updatesurf('V-function', X, Y, reshape(V,n,n))
+                else
+                    error('Unknown plot type.')
+                end
             end
         end
 

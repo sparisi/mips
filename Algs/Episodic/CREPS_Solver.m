@@ -194,9 +194,10 @@ classdef CREPS_Solver < handle
         end
 
         %% PLOTTING
-        function plotV(obj, ctxLB, ctxUB)
+        function plotV(obj, ctxLB, ctxUB, type)
             if length(ctxLB) > 2, return, end
             if sum(isinf(ctxLB) | isinf(ctxUB)) > 0, return, end
+            if nargin < 4, type = 'contourf'; end
 
             if length(ctxLB) == 1
                 n = 100;
@@ -220,10 +221,13 @@ classdef CREPS_Solver < handle
                 [X, Y] = meshgrid(x,y);
                 s = [X(:), Y(:)]';
                 V = obj.getV(s);
-                updatesurf('V-function', X, Y, reshape(V,n,n))
-                colorbar
-                xlabel x
-                ylabel y
+                if strcmp(type, 'contourf')
+                    updatecontourf('V-function', X, Y, reshape(V,n,n))
+                elseif strcmp(type, 'surf')
+                    updatesurf('V-function', X, Y, reshape(V,n,n))
+                else
+                    error('Unknown plot type.')
+                end
             end
         end
 

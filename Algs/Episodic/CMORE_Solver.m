@@ -194,15 +194,22 @@ classdef CMORE_Solver < handle
         end
 
         %% PLOTTING
-        function plotR(obj, actionLB, actionUB, contextLB, contextUB)
+        function plotR(obj, actionLB, actionUB, contextLB, contextUB, type)
             if length(contextLB) > 1 || length(actionLB) > 1, return, end
+            if nargin < 6, type = 'contourf'; end
 
             n = 30;
             x = linspace(actionLB,actionUB,n);
             y = linspace(contextLB,contextUB,n);
             [X, Y] = meshgrid(x,y);
             R = obj.getR(X(:)',Y(:)');
-            updatesurf('Return Model', X, Y, reshape(R,n,n))
+            if strcmp(type, 'contourf')
+                updatecontourf('Return Model', X, Y, reshape(R,n,n))
+            elseif strcmp(type, 'surf')
+                updatesurf('Return Model', X, Y, reshape(R,n,n))
+            else
+                error('Unknown plot type.')
+            end
         end        
         
     end

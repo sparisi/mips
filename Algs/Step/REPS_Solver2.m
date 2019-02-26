@@ -7,8 +7,6 @@ classdef REPS_Solver2 < handle
         eta           % Lagrangian (KL)
         theta         % Lagrangian (features)
         l2_reg        % Regularizer for theta
-        tolKL = 0.1;  % Tolerance of the KL error
-        tolSF = 1e-5; % Tolerance of feature matching error
         verbose = 1;  % 1 to display inner loop statistics
     end
 
@@ -36,7 +34,7 @@ classdef REPS_Solver2 < handle
                 'MaxFunEvals', 100, ...
                 'TolX', 10^-8, 'TolFun', 10^-12, 'MaxIter', 100);
 
-            % Iteratively solve fmincon for eta and theta separately
+            % Solve fmincon for eta and theta together
             params = fmincon(@(params)obj.dual(params,R,Phi,PhiN,W), [obj.eta; obj.theta], ...
                 [], [], [], [], [1e-8, -inf(1,length(obj.theta))], [1e8, inf(1,length(obj.theta))], [], options);
             obj.eta = params(1);
@@ -54,8 +52,8 @@ classdef REPS_Solver2 < handle
             featureDiff = bsxfun(@rdivide,(Phi - PhiN)*pWeighting',std(Phi,0,2)); % Standardize
             errorSF = max(abs(featureDiff));
             if obj.verbose
-                fprintf('KL: %.4f / %.4f,  FE: %e / %e,  ETA: %e,  MSA: %e\n', ...
-                    divKL, (1+obj.tolKL)*obj.epsilon, errorSF, obj.tolSF, obj.eta, mean(A.^2))
+                fprintf('KL: %.4f,  FE: %e,  ETA: %e,  MSA: %e\n', ...
+                    divKL, errorSF, obj.eta, mean(A.^2))
                 fprintf('\n')
             end
         end
@@ -82,7 +80,6 @@ classdef REPS_Solver2 < handle
             h_e = (sumWeightsAA * sumWeights - sumWeightsA^2) / (eta^3 * sumWeights^2);
             h_t = ( sumPhiWeightsPhi * sumWeights - sumPhiWeights * sumPhiWeights') / sumWeights^2 / eta + 2*obj.l2_reg;
             h_et = (-sumPhiWeightsA * sumWeights + sumPhiWeights * sumWeightsA) / (eta^2 * sumWeights^2);
-
             
             % Dual function
             g = eta * obj.epsilon + eta * log(sumWeights/n) + maxA + obj.l2_reg*sum(obj.theta.^2);
@@ -97,11 +94,12 @@ classdef REPS_Solver2 < handle
         function V = getV(obj, state)
             V = obj.theta'*obj.basis(state);
         end
-
+        
         %% PLOTTING
-        function plotV(obj, stateLB, stateUB)
+        function plotV(obj, stateLB, stateUB, type)
             if length(stateLB) > 2, return, end
             if sum(isinf(stateLB) | isinf(stateUB)) > 0, return, end
+            if nargin < 4, type = 'contourf'; end
 
             if length(stateLB) == 1
                 n = 100;
@@ -125,7 +123,13 @@ classdef REPS_Solver2 < handle
                 [X, Y] = meshgrid(x,y);
                 s = [X(:), Y(:)]';
                 V = obj.getV(s);
-                updatecontourf('V-function', X, Y, reshape(V,n,n))
+                if strcmp(type, 'contourf')
+                    updatecontourf('V-function', X, Y, reshape(V,n,n))
+                elseif strcmp(type, 'surf')
+                    updatesurf('V-function', X, Y, reshape(V,n,n))
+                else
+                    error('Unknown plot type.')
+                end
             end
         end
 

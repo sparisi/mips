@@ -2,10 +2,11 @@ function subsurf(name, X, Y, Z, addcolorbar)
 % SUBSURF Plots multiple surf on the same figure using subplot.
 %
 %    INPUT
-%     - name : figure name
-%     - X    : [1 x M] vector
-%     - Y    : [1 x N] vector
-%     - Z    : [D x MN] matrix
+%     - name        : figure name
+%     - X           : [1 x M] vector
+%     - Y           : [1 x N] vector
+%     - Z           : [D x MN] matrix
+%     - addcolorbar : (optional) 1 to display colorbar
 
 [nplots, ~] = size(Z);
 m = length(X);
