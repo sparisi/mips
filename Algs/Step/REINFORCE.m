@@ -10,7 +10,7 @@ function [grad, stepsize] = REINFORCE(policy, data, gamma, lrate)
 R = mc_ret(data,gamma);
 R = R - mean(R,2);
 dlogpi = policy.dlogPidtheta([data.s],[data.a]);
-grad = dlogpi * R' /size(R,2);
+grad = dlogpi * R' / size(R,2);
 grad = mean(grad,2);
 
 if nargin == 4

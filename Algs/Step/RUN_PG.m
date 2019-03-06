@@ -1,5 +1,5 @@
 iter = 1;
-lrate = 0.1;
+lrate = 0.01;
 
 %%
 while true
@@ -9,9 +9,9 @@ while true
 
 %     [grad, stepsize] = GPOMDPbase(policy,ds,mdp.gamma,lrate);
 %     [grad, stepsize] = eREINFORCEbase(policy,ds,mdp.gamma,lrate);
-    [grad, stepsize] = eNACbase(policy,ds,mdp.gamma,lrate);
-%     [grad, stepsize] = REINFORCE(policy,ds,mdp.gamma,lrate);
-%     [grad, stepsize] = NPG(policy,ds,mdp.gamma,lrate);
+%     [grad, stepsize] = eNACbase(policy,ds,mdp.gamma,lrate);
+%     [grad, stepsize] = REINFORCE_C(policy,ds,mdp.gamma,lrate);
+    [grad, stepsize] = NPG_C(policy,ds,mdp.gamma,lrate);
     
     J = evaluate_policies(mdp, episodes_eval, steps_eval, policy.makeDeterministic);
 %     J = evaluate_policies(mdp, episodes_eval, steps_eval, policy);
