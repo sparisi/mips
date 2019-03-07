@@ -18,7 +18,6 @@ mdp = Gridworld;
 
 robj = 1;
 gamma = mdp.gamma;
-simulator = @mdp.simulator;
 allstates = mdp.allstates;
 X = unique(allstates(:,1));
 Y = unique(allstates(:,2));
@@ -62,7 +61,7 @@ for episode = 1 : maxepisodes
         action = policy.drawAction(state);
         
         % Simulate one step
-        [nextstate, reward, terminal] = feval(simulator, state, action);
+        [nextstate, reward, terminal] = mdp.simulator(state, action);
         [~, idx_s(end+1)] = ismember(state',allstates,'rows');
         [~, idx_sn(end+1)] = ismember(nextstate',allstates,'rows');
         [~, idx_a(end+1)] = ismember(action',allactions);

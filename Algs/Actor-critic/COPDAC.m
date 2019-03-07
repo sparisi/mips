@@ -2,7 +2,9 @@
 % You can use a Q-learning critic or a Gradient Q-learning critic.
 % Both the policy and the Q-function approximation are linear in the
 % parameters.
-% 
+%
+% This version is modified such that all gradients normalized.
+%
 % =========================================================================
 % REFERENCE
 % D Silver, G Lever, N Heess, T Degris, D Wierstra, M Riedmiller
@@ -17,19 +19,19 @@ showplots = 1;
 J_history = [];
 
 mdp = MCarContinuous; sigma = 4; maxsteps = 100;
-% mdp = CartPoleContinuous; sigma = 10; maxsteps = 1000;
+mdp = CartPoleContinuous; sigma = 10; maxsteps = 1000;
 % mdp = PuddleworldContinuous; sigma = 1; maxsteps = 100;
 % mdp = Pendulum; sigma = 2; maxsteps = 50;
-% mdp = LQR(dim); sigma = 5; maxsteps = 150;
+% mdp = LQR(2); sigma = 5; maxsteps = 150;
 steps_eval = 150;
 
 robj = 1;
 gamma = 0.99;
 mdp.gamma = gamma;
 noise = @() (rand(mdp.daction,1) - 0.5) * 2 * sigma;
-lrate_theta = 0.0001;
-lrate_v = 0.0001;
-lrate_w = 0.0001;
+lrate_theta = 0.001;
+lrate_v = 0.001;
+lrate_w = 0.001;
 totsteps = 1;
 eval_every = 1000;
 
@@ -39,13 +41,13 @@ eval_every = 1000;
 tmp_policy.drawAction = @(x)mymvnrnd(zeros(mdp.daction,1), sigma^2*eye(mdp.daction), size(x,2));
 ds = collect_samples(mdp, 100, 100, tmp_policy);
 B = avg_pairwise_dist([ds.s]);
-bfs = @(varargin) basis_fourier(50, mdp.dstate, B, 0, varargin{:});
+bfs = @(varargin) basis_fourier(100, mdp.dstate, B, 0, varargin{:});
 
 bfsPi = bfs;
 bfsV = bfs;
 
-% bfsPi = @(varargin)basis_poly(1,dim,0,varargin{:});
-% bfsV = @(varargin)basis_poly(2,dim,0,varargin{:});
+% bfsPi = @(varargin)basis_poly(1,mdp.dstate,0,varargin{:});
+% bfsV = @(varargin)basis_poly(2,mdp.dstate,0,varargin{:});
 
 theta = zeros(bfsPi()*mdp.daction,1);
 mu = @(s,theta) reshape(theta,bfsPi(),mdp.daction)' * bfsPi(s);
@@ -105,27 +107,30 @@ while totsteps < 3000000
         delta = reward(robj) + gamma * Qn * ~terminal - Q;
         
         theta_old = theta;
-        
-        if natural
-        theta = theta + lrate_theta * w; % Natural
-        else
-        theta = theta + lrate_theta * d_policy(state) * (d_policy(state)' * w); % Vanilla
-        end
 
+        if natural % Natural
+            g_theta = w;
+        else % Vanilla
+            g_theta = d_policy(state) * (d_policy(state)' * w);
+        end
+        theta = theta + lrate_theta * g_theta / max(norm(g_theta),1); % Normalize gradient
+
+        if gradient % Gradient Q-learning critic
+            g_w = max(norm(delta),1) * delta * bfs_q(state,action,theta_old) ...
+                - gamma * bfs_q(nextstate,mu(nextstate,theta_old),theta_old) * (bfs_q(state,action,theta_old)' * u);
+            g_v = delta * bfsV(state) ...
+                - gamma * bfsV(nextstate) * (bfs_q(state,action,theta_old)' * u);
+            g_u = (delta - (bfs_q(state,action,theta_old)' * u)) * bfs_q(state,action,theta_old);
+        else % Q-learning critic
+            g_w = delta * bfs_q(state,action,theta_old);
+            g_v = delta * bfsV(state);
+        end
+        
+        % Normalize gradients
+        w = w + lrate_w / max(1,norm(g_w)) * g_w;
+        v = v + lrate_v / max(1,norm(g_v)) * g_v;
         if gradient
-        % Gradient Q-learning critic
-        w = w ...
-            + lrate_w * delta * bfs_q(state,action,theta_old) ...
-            - lrate_w * gamma * bfs_q(nextstate,mu(nextstate,theta_old),theta_old) * (bfs_q(state,action,theta_old)' * u);
-        v = v ...
-            + lrate_v * delta * bfsV(state) ...
-            - lrate_v * gamma * bfsV(nextstate) * (bfs_q(state,action,theta_old)' * u);
-        u = u ...
-            + lrate_u * (delta - (bfs_q(state,action,theta_old)' * u)) * bfs_q(state,action,theta_old);
-        else
-        % Q-learning critic
-        w = w + lrate_w * delta * bfs_q(state,action,theta_old);
-        v = v + lrate_v * delta * bfsV(state);
+            u = u + lrate_u / max(1,norm(g_u)) * g_u;
         end
         
         if any(isnan(theta)) || any(isnan(w)) || any(isnan(v)) || ...
@@ -158,11 +163,11 @@ while totsteps < 3000000
                     Q(:,i) = Qfun(S(:,i),P(:,i),w,v,theta);
                 end
                 subimagesc('Policy',Xnodes,Ynodes,P,1)
-                subimagesc('V-function - Q(s,pi(s))',Xnodes,Ynodes,Vfun(S,v))
+                subimagesc('V-function',Xnodes,Ynodes,Vfun(S,v))
             end
-            updateplot('Delta',totsteps,delta^2)
+            updateplot('MSTDE',totsteps,delta^2)
             updateplot('Action',totsteps,action)
-            if totsteps == 2, autolayout, end
+            if totsteps < 3, autolayout, end
         end
         
     end
