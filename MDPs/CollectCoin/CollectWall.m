@@ -27,8 +27,8 @@ classdef CollectWall < MDP
         % Bounds
         stateLB = zeros(4,1); % (x,y) of the agent + (x) of the center of the hole + boolean hasCoin
         stateUB = ones(4,1);
-        actionLB = -ones(2,1);
-        actionUB = ones(2,1)
+        actionLB = -ones(2,1)/2;
+        actionUB = ones(2,1)/2;
         rewardLB = -2;
         rewardUB = 1;
     end

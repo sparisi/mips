@@ -1,38 +1,46 @@
 classdef CollectRewards < MDP
 % An agent moves in a 2D environment with multiple reward states.
-% If the agent walk close to a reward, it collects the reward and the 
+% If the agent walks close to a reward, it collects the reward and the 
 % reward disappears. Each reward has a different magnitude and the episode 
 % ends only when the largest one is collected.
+% The largest one has to be the last one in the property REWARD_MAGNITUDE.
     
     %% Properties
     properties
         reward_radius = 1;
-        reward_states = [0 0; 1 1; -2 3; 10 -2]';
-        reward_magnitude = [1, 2, 4, 10];
+        reward_states = [0 0; 1 1; -2 3; 10 -2; 20 20]';
+        reward_magnitude = [1, 2, 4, 10, 50];
 
         % MDP variables
-        dstate = 6;
+        dstate = 2;
         daction = 2;
         dreward = 1;
         isAveraged = 0;
         gamma = 0.99;
         
         % Upper/Lower Bounds (state = position and flags for collected rewards)
-        stateLB = -[20, 20, 0, 0, 0, 0]';
-        stateUB = [20, 20, 1, 1, 1, 1]';
+        stateLB = -[20, 20]';
+        stateUB = [20, 20]';
         actionLB = -[1, 1]';
         actionUB = [1, 1]';
         rewardLB = 0;
-        rewardUB = 10;
+        rewardUB = 100;
     end
     
     methods
 
+        %% Constructor
+        function obj = CollectRewards()
+            obj.dstate = obj.dstate + length(obj.reward_magnitude);
+            obj.stateLB = [obj.stateLB; zeros(length(obj.reward_magnitude), 1)];
+            obj.stateUB = [obj.stateUB; ones(length(obj.reward_magnitude), 1)];
+            obj.rewardUB = max(obj.reward_magnitude);
+        end
+        
         %% Simulator
         function state = init(obj, n)
-%             state = repmat(obj.x0,1,n); % Fixed
-            state = myunifrnd(-[10;10],[10;10],n); % Random
-            state(3:6,:) = 0; % No reward collected yet
+            state = myunifrnd(-[10;10],[10;10],n);
+            state(3:obj.dstate,:) = 0; % No reward collected yet
         end
         
         function [nextstate, reward, absorb] = simulator(obj, state, action)
@@ -53,6 +61,8 @@ classdef CollectRewards < MDP
                 nextstate(i+2,idx_close & idx_notcollected) = 1;
                 reward(idx_close & idx_notcollected) = obj.reward_magnitude(i);
             end
+            
+            reward = reward - 0.01*sum(action.^2,1);
             absorb(idx_close & idx_notcollected) = true; % Last (biggest) reward is terminal state
         end
         
