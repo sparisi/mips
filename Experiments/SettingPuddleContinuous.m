@@ -12,7 +12,7 @@ bfs = @(varargin)basis_krbf(7,[mdp.stateLB mdp.stateUB],0,varargin{:});
 tmp_policy.drawAction = @(x)mymvnrnd(zeros(mdp.daction,1), 4*eye(mdp.daction), size(x,2));
 ds = collect_samples(mdp, 100, 100, tmp_policy);
 B = avg_pairwise_dist([ds.s]);
-bfs = @(varargin) basis_fourier(50, mdp.dstate, B, 0, varargin{:});
+bfs = @(varargin) basis_fourier(100, mdp.dstate, B, 0, varargin{:});
 
 A0 = zeros(mdp.daction,bfs()+1);
 Sigma0 = 4*eye(mdp.daction);
