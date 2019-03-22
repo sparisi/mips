@@ -75,6 +75,26 @@ classdef Gibbs < PolicyDiscrete
             end
         end
         
+        
+        %% Phi(s,a) activates state-dependent features for a specific action
+        function phi_action = get_basis_action(obj, States, Actions)
+            assert(size(States,2) == size(Actions,2), ...
+                'The number of states and actions must be the same.');
+            found = (ismember(Actions,obj.action_list));
+            assert(min(found) == 1, 'Unknown action.');
+
+            phi = obj.get_basis(States);
+            [dphi,n] = size(phi);
+
+            phi_action = zeros(obj.dparams,n);
+            for i = 1 : obj.dparams / dphi
+                idx1 = (i-1)*dphi + 1 : (i-1)*dphi + dphi;
+                idx2 = Actions == i;
+                phi_action(idx1,idx2) = phi_action(idx1,idx2) + phi(:,idx2) / obj.epsilon;
+            end
+            phi_action = phi_action / obj.epsilon;
+        end
+        
         %% Update
         function obj = update(obj, theta)
             obj.theta(1:length(theta)) = theta;
