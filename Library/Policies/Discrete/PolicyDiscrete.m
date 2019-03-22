@@ -44,8 +44,9 @@ classdef (Abstract) PolicyDiscrete < Policy
             prob_list = obj.distribution(States);
             idx = isinf(prob_list) | isnan(prob_list) | prob_list == 0;
             prob_list(idx) = 1; % ignore them -> log(1)*1 = 0
-            S = -sum(prob_list.*log2(prob_list),1) / log2(length(obj.action_list));
+            S = -sum(prob_list.*log2(prob_list),1);
             S = mean(S);
+%             S = S / log2(length(obj.action_list)); % Normalize in [0, 1]
         end
         
         %% Plotting
