@@ -4,7 +4,7 @@ function C = mtimescolumn(A, B)
 % matrix (one vectorization per column).
 % It is equivalent to the following loop:
 % >> for i = 1 : D
-% >>     tmp = A(:,i) * B(:,i);
+% >>     tmp = A(:,i) * B(:,i)';
 % >>     C(:,i) = tmp(:);
 % >> end
 %
