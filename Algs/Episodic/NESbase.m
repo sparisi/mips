@@ -1,4 +1,4 @@
-function [nat_grad, stepsize] = NESbase(policy_high, data, lrate, W)
+function [nat_grad, stepsize] = NESbase(policy_high, data, epsilon, W)
 % Natural Evolution Strategy with optimal baseline.
 % It supports Importance Sampling (IS).
 % NAT_GRAD is a [D x R] matrix, where D is the length of the gradient and R
@@ -46,7 +46,7 @@ else
 end
 
 if nargin > 2
-    lambda = sqrt(diag(grad' * nat_grad) / (4 * lrate))';
+    lambda = sqrt(diag(grad' * nat_grad) / (8 * epsilon))';
     lambda = max(lambda,1e-8); % to avoid numerical problems
     stepsize = 1 ./ (2 * lambda);
 end

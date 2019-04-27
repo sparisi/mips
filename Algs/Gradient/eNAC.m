@@ -1,4 +1,4 @@
-function [grad_nat, stepsize] = eNAC(policy, data, gamma, lrate)
+function [grad_nat, stepsize] = eNAC(policy, data, gamma, epsilon)
 % Episodic Natural Actor Critic.
 % GRAD_NAT is a [D x R] matrix, where D is the length of the gradient and R
 % is the number of immediate rewards received at each time step.
@@ -34,7 +34,7 @@ else
 end
 
 if nargin == 4
-    lambda = sqrt(diag(g' * grad_nat) / (4 * lrate));
+    lambda = sqrt(diag(g' * grad_nat) / (8 * epsilon));
     lambda = max(lambda,1e-8);
     stepsize = 1 ./ (2 * lambda)';
 end

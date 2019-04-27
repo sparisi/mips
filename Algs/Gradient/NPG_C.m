@@ -1,4 +1,4 @@
-function [nat_grad, stepsize] = NPG_C(policy, data, gamma, lrate)
+function [nat_grad, stepsize] = NPG_C(policy, data, gamma, epsilon)
 % As NPG, but with compatible function approximation. 
 % See REINFORCE_C.
 
@@ -26,7 +26,7 @@ if nargin == 4
         nat_grad = pinv(F) * grad;
     end
     
-    lambda = sqrt(diag(grad' * nat_grad) / (4 * lrate))';
+    lambda = sqrt(diag(grad' * nat_grad) / (8 * epsilon))';
     lambda = max(lambda,1e-8); % to avoid numerical problems
     stepsize = 1 ./ (2 * lambda);
 end

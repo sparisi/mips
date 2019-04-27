@@ -66,7 +66,7 @@ classdef NES_Solver < handle
                 nat_grad = pinv(F) * grad;
             end
             
-            lambda = sqrt(diag(grad' * nat_grad) / (4 * obj.epsilon))';
+            lambda = sqrt(diag(grad' * nat_grad) / (8 * obj.epsilon))';
             lambda = max(lambda,1e-8); % to avoid numerical problems
             stepsize = 1 ./ (2 * lambda);
         end

@@ -1,4 +1,4 @@
-function [nat_grad, stepsize] = NPG(policy, data, gamma, lrate)
+function [nat_grad, stepsize] = NPG(policy, data, gamma, epsilon)
 % Basic version of natural policy gradient. REINFORCE gradient with baseline
 % mean(R) is multiplied by the inverse of the Fisher information matrix.
 
@@ -17,7 +17,7 @@ else
 end
 
 if nargin == 4
-    lambda = sqrt(diag(grad' * nat_grad) / (4 * lrate))';
+    lambda = sqrt(diag(grad' * nat_grad) / (8 * epsilon))';
     lambda = max(lambda,1e-8); % to avoid numerical problems
     stepsize = 1 ./ (2 * lambda);
 end
