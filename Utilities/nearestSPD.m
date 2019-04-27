@@ -46,7 +46,7 @@ Ahat = (Ahat + Ahat')/2;
 % test that Ahat is in fact PD. if it is not so, then tweak it just a bit.
 p = 1;
 k = 0;
-while p ~= 0
+while p ~= 0 && k < 1e3
   [R,p] = chol(Ahat);
   k = k + 1;
   if p ~= 0
