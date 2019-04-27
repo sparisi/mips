@@ -23,7 +23,7 @@ classdef CollectRewards2 < MDP
         actionLB = -[1, 1]';
         actionUB = [1, 1]';
         rewardLB = 0;
-        rewardUB = 100;
+        rewardUB = 50;
     end
     
     methods
