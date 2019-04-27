@@ -92,6 +92,34 @@ classdef GmmConstant < Policy
             obj.Sigma = obj.Sigma .* factor;
         end
        
+        %% PLOT PDF
+        function fig = plot(obj, actionLB, actionUB)
+        % Plot N(mu(i),Sigma(i,i)) for each dimension i (NORMPDF)
+            if nargin < 3, actionUB = inf; end
+            if nargin < 2, actionLB = -inf; end
+
+            fig = figure(); hold all
+            xlabel 'x'
+            ylabel 'pdf(x)'
+            norm = 0;
+            min_range = inf;
+            max_range = -inf;
+            for i = 1 : length(obj.p)
+                range = ndlinspace(obj.mu(i,:)' - 3*diag(obj.Sigma(:,:,i)), obj.mu(i,:)' + 3*diag(obj.Sigma(:,:,i)), 100);
+                min_range = min(min_range,range);
+                max_range = max(max_range,range);
+
+                norm = bsxfun(@times, exp(-0.5 * bsxfun(@times, ...
+                    bsxfun(@minus,range,obj.mu(i,:)'), 1./diag(obj.Sigma(:,:,i))).^2), ... 
+                    1./(sqrt(2*pi) .* diag(obj.Sigma(:,:,i))));
+
+                norm = norm + bsxfun(@max, bsxfun(@min, norm, actionUB), actionLB);
+            end
+
+            plot(ndlinspace(min_range(:,1),max_range(:,end),100)', norm')
+            legend show
+        end
+        
     end
     
 end
