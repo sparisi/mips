@@ -7,7 +7,7 @@ classdef REPS_Solver2 < handle
         eta           % Lagrangian (KL)
         theta         % Lagrangian (features)
         l2_reg        % Regularizer for theta
-        verbose = 1;  % 1 to display inner loop statistics
+        verbose = 0;  % 1 to display inner loop statistics
     end
 
     methods
@@ -32,7 +32,7 @@ classdef REPS_Solver2 < handle
                 'Display', 'off', ...
                 'Hessian', 'on', ...
                 'MaxFunEvals', 100, ...
-                'TolX', 10^-8, 'TolFun', 10^-12, 'MaxIter', 100);
+                'TolX', 0, 'TolFun', 0, 'MaxIter', 100);
 
             % Solve fmincon for eta and theta together
             params = fmincon(@(params)obj.dual(params,R,Phi,PhiN,W), [obj.eta; obj.theta], ...

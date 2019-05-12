@@ -56,7 +56,7 @@ for episode = 1 : maxepisodes
         action = policy.drawAction(state);
         
         % Simulate one step
-        [nextstate, reward, terminal] = mpd.simulator(state, action);
+        [nextstate, reward, terminal] = mdp.simulator(state, action);
         [~, idx_s(end+1)] = ismember(state',allstates,'rows');
         [~, idx_sn(end+1)] = ismember(nextstate',allstates,'rows');
         [~, idx_a(end+1)] = ismember(action',allactions);

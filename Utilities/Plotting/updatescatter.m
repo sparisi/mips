@@ -14,7 +14,7 @@ if isempty(fig)
     fig = figure();
     fig.Name = name;
     if isempty(Z), scatter(X,Y,size,value),
-    else, scatter3(X,Y,Z,1,value), end
+    else, scatter3(X,Y,Z,size,value), end
     title(name)
     xlabel x
     ylabel y
