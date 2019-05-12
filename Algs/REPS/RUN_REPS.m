@@ -8,16 +8,17 @@
 % H van Hoof, G Neumann, J Peters
 % Non-parametric Policy Search with Limited Information Loss (2017)
 
-reset_prob = 0.05;
+reset_prob = 0.01;
 mdp_avg = MDP_avg(mdp,reset_prob);
 
 % bfsV = @(varargin)basis_poly(2,mdp.dstate,0,varargin{:});
-% bfsV = @(varargin)basis_krbf(6, [mdp.stateLB, mdp.stateUB], 0, varargin{:});
+% bfsV = @(varargin)basis_krbf(10, [mdp.stateLB, mdp.stateUB], 0, varargin{:});
 bfsV = bfs;
 
-solver = REPS_Solver(0.01,bfsV);
-solver = REPS_Solver2(0.001,bfsV);
-solver.verbose = 0;
+epsilon = 0.01;
+solver = REPS_Solver(epsilon,bfsV);
+solver = REPS_Solver2(epsilon,bfsV);
+solver.verbose = 1;
 
 data = [];
 varnames = {'r','s','nexts','a','t'};
@@ -66,11 +67,17 @@ while iter < 1000
     
     %%
     if solver.verbose && mdp.dstate == 2
+        updatescatter('Weights (s)', data.s(1,:), data.s(2,:), [], d, 50)
+        if mdp.daction == 1
+            updatescatter('Weights (s,a)', data.s(1,:), data.s(2,:), data.a, d, 50)
+            A = data.r + solver.theta' * (phiVN - data.phiV);
+            updatescatter('Advantage', data.s(1,:), data.s(2,:), data.a, A, 50)
+        end
         solver.plotV(mdp.stateLB, mdp.stateUB, 'surf')
         policy.plotmean(mdp.stateLB, mdp.stateUB, mdp.actionLB, mdp.actionUB)
         if iter == 2, autolayout, end
     end
-    
+        
 end
 
 %%
