@@ -1,6 +1,7 @@
 function r = unifrnds(a, b, n)
 % UNIFRNDS Draws N random values from an uniform distribution in the 
-% simplex of [A,B].
+% simplex of [A,B], i.e., R ~ U(A, B) such that sum(R_i) = 1 
+% with i = 1 ... D, where D is the dimensionality of x.
 %
 %    INPUT
 %     - a : lower bound, vector of length D
@@ -19,6 +20,11 @@ if ~iscolumn(b), b = b'; end
 assert(min(a <= b) == 1, 'Bounds are not consistent.')
 
 dim = length(a);
+
+if dim == 1
+    r = bsxfun(@plus, a, bsxfun(@times, (b - a), rand(dim, n)));
+    return
+end    
 
 real_lo = a; % shift if lower bound is not 0
 b = b - a;
