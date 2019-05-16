@@ -3,15 +3,16 @@ clc
 clear all
 close all
 reset(symengine)
+rng(1)
 
-dim = 2;
+dim = 3;
 
 % mdp = Dam(dim); bfs = @dam_basis_rbf; mu0 = [50, -50, 0, 0, 50]; sigma0 = 150^2;
 % [theta, rho, t, D_t_theta, D_rho_theta] = feval(['params_' lower(class(mdp))], [], mdp.dreward);
 % policy = GaussianLinearDiag(bfs, mdp.daction, mu0, sigma0);
 
 mdp = LQR_MO(dim); bfs = @(varargin)basis_poly(1,dim,0,varargin{:}); mu0 = -0.5*eye(dim); sigma0 = eye(dim);
-[theta, rho, t, D_t_theta, D_rho_theta] = feval(['params_' lower(class(mdp))], 'NN', mdp.dreward);
+[theta, rho, t, D_t_theta, D_rho_theta] = feval(['params_' lower(class(mdp))], 'P1', mdp.dreward);
 policy = GaussianLinearFixedvarDiagmean(bfs, mdp.daction, mu0, sigma0);
 
 utopia = mdp.utopia;
@@ -35,7 +36,7 @@ D_r_Dtheta = reshape(D_r_Dtheta,dim_theta*dim_t,dim_rho);
 
 %% Learning settings
 tolerance = 0.00001;
-lrate = 2;
+lrate = 0.5;
 
 episodes = 50;
 steps = 50;
@@ -46,8 +47,10 @@ hi = ones(dim_t,1);
 
 MAX_ITER = 1000;
 
+
+%% Init learning
 % rho_learned = -20*ones(1,dim_rho);
-rho_learned = rand(1, dim_rho);
+rho_learned = rand(1, dim_rho)-0.5;
 % rho_learned(end) = 50;
 
 rho_history = [];
@@ -95,9 +98,10 @@ end
 
 %% Evaluation
 if dim_J == 2
-    hv_fun = @(varargin)hypervolume2d(varargin{:},antiutopia,utopia);
+    hypervfun = @(varargin)hypervolume2d(varargin{:},antiutopia,utopia);
 else
-    hv_fun = @(varargin)mexHypervolume(varargin{:},antiutopia,utopia,1e6);
+%     hypervfun = @(varargin)mexHypervolume(varargin{:},antiutopia,utopia,1e6);
+    hypervfun = @(varargin)hypervolume(varargin{:},antiutopia,utopia,1e6);
 end
 
 n_points_eval = 100;
@@ -134,7 +138,7 @@ for j = 1 : 1 : size(rho_history,1)
     end
     
     front_learned = pareto(front_learned);
-    hv(j) = hv_fun(front_learned);
+    hv(j) = hypervfun(front_learned);
     l(j) = eval_loss(front_learned,mdp);
     fprintf('%d ) Hyperv: %.4f, Loss: %.4f\n',j,hv(j),l(j));
 

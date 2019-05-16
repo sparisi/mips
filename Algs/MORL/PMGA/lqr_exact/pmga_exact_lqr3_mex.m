@@ -1,7 +1,6 @@
 %% Init
 clear all
 close all
-clc
 reset(symengine)
 
 load('front_lqr3.mat');

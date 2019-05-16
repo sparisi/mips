@@ -2,9 +2,10 @@
 % Evaluation: exact
 
 %% Init
-clc
 clear all
 reset(symengine)
+
+rng(1)
 
 dim = 2;
 mdp = LQR_MO(dim);
@@ -16,12 +17,12 @@ antiutopia = mdp.antiutopia;
 true_front = mdp.truefront;
 dim_J = mdp.dreward;
 
-param_type = 'NN'; % P1 unconstrained, P2 constrained
+param_type = 'NN'; % P1 unconstrained, P2 constrained, NN neural network
 ind_type = {'mix2', [1,1]}; % MIX2: beta1 * I_AU / I_U - beta2
 ind_type = {'mix3', 1}; % MIX3: I_AU * (1 - lambda * I_U)
 [ind_handle, ind_d_handle] = parse_indicator_handle(ind_type{1},ind_type{2},utopia,antiutopia);
 
-[theta, rho, t, D_t_theta, D_rho_theta, J_sym] = params_lqr( param_type, mdp.dreward );
+[theta, rho, t, D_t_theta, D_rho_theta, J_sym] = params_lqr_mo( param_type, mdp.dreward );
 dim_rho = length(rho);
 dim_t = length(t);
 dim_theta = length(theta);
@@ -35,27 +36,30 @@ D_r_Dtheta = reshape(D_r_Dtheta,dim_theta*dim_t,dim_rho);
 if dim_J == 2
     hypervfun = @(varargin)hypervolume2d(varargin{:},antiutopia,utopia);
 else
-    hypervfun = @(varargin)mexHypervolume(varargin{:},antiutopia,utopia,1e6);
+%     hypervfun = @(varargin)mexHypervolume(varargin{:},antiutopia,utopia,1e5);
+    hypervfun = @(varargin)hypervolume(varargin{:},antiutopia,utopia,1e5);
 end
 
 
 %% Learning settings
 tolerance = 0.00001;
-lrate = 0.1;
+lrate = 0.01;
 
 episodes = 50;
 steps = 50;
-n_points = 5; % #points t used to estimate the integral
-n_points_eval = 10000;
+n_points = 10; % #points t used to estimate the integral
+n_points_eval = 5000;
 lo = zeros(dim_t,1);
 hi = ones(dim_t,1);
 [~, volume] = simplex(lo,hi);
 
 MAX_ITER = 1000;
 
+
+%% Init learning
 rho_learned = [1 1 0 0];
 % rho_learned = [3 7];
-rho_learned = rand(1,dim_rho);
+rho_learned = rand(1,dim_rho)-0.5;
 
 rho_history = [];
 L_history = [];
@@ -119,11 +123,17 @@ points_eval = linspacesim(lo, hi, n_points_eval);
 figure
 for j = 1 : size(rho_history,1)
     clf, hold on
-    plot(true_front(:,1),true_front(:,2))
     rho_arg = num2cell(rho_history(j,:));
     t_arg = mat2cell(points_eval', size(points_eval,2), ones(1,dim_t));
     front_learned = -J_fun(rho_arg{:},t_arg{:});
-    plot(front_learned(:,1),front_learned(:,2),'r')
+    if dim == 2
+        plot(true_front(:,1),true_front(:,2))
+        plot(front_learned(:,1),front_learned(:,2),'r')
+    elseif dim == 3
+        grid on, view(70,24)
+        scatter3(true_front(:,1),true_front(:,2),true_front(:,3))
+        scatter3(front_learned(:,1),front_learned(:,2),front_learned(:,3),'r')
+    end
     drawnow
 end
 

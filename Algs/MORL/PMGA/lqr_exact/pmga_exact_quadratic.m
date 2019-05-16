@@ -1,7 +1,6 @@
 %% Init
 clear all
 close all
-clc
 reset(symengine)
 
 utopia = 1e-8*[1,1]; % 0 would cause numerical problems

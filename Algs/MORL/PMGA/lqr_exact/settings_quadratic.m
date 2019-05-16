@@ -15,15 +15,17 @@ function [J, ...         % objective functions
 % Quadratic reward (theta - goal).^2
 % We use different goals for each objective (e.g., 1 and -1).
 
-dim_theta = 30; % Change the dimensionality of the problem
+dim_theta = 2; % Change the dimensionality of the problem
+goal_1 = 1;
+goal_2 = -1;
 
-Up = sym('Up',[1,dim_theta]);
-AUp = sym('AUp',[1,dim_theta]);
+Up = sym('Up',[1,2]);
+AUp = sym('AUp',[1,2]);
 
 % t = sym('t',[1,3]);
 t = sym('t');
 theta = sym('theta',[dim_theta,1]);
-J = [sum((theta-1).^2), sum((theta+1).^2)];
+J = [sum((theta-goal_1).^2), sum((theta-goal_2).^2)];
 
 D_theta_J = jacobian(J,theta);
 D2_theta_J = jacobian(D_theta_J(:),theta);

@@ -50,7 +50,7 @@ elseif strcmp(param_type, 'P2') % Constrained
 elseif strcmp(param_type, 'NN') % Neural network (unconstrained)
     dim_theta = length(theta);
     dim_t = length(t);
-    d1 = 3; % Hidden layer size
+    d1 = 16; % Hidden layer size
     dim_r = dim_t*d1+d1+d1*dim_theta+dim_theta;
     r = sym('r',[1,dim_r]);
 
