@@ -10,12 +10,12 @@ function [J, ...         % objective functions
     I_params, ...        % loss function parameters
     AUp, ...             % antiutopia point
     Up] = ...            % utopia point
-    settings_quadratic( indicator_type )
+    settings_quadratic( indicator_type, param_type )
 
 % Quadratic reward (theta - goal).^2
 % We use different goals for each objective (e.g., 1 and -1).
 
-dim_theta = 2; % Change the dimensionality of the problem
+dim_theta = 1; % Change the dimensionality of the problem
 goal_1 = 1;
 goal_2 = -1;
 
@@ -30,20 +30,38 @@ J = [sum((theta-goal_1).^2), sum((theta-goal_2).^2)];
 D_theta_J = jacobian(J,theta);
 D2_theta_J = jacobian(D_theta_J(:),theta);
 
-% Neural network manifold
 dim_theta = length(theta);
 dim_t = length(t);
-d1 = 3; % Hidden layer size
-dim_r = dim_t*d1+d1+d1*dim_theta+dim_theta;
-r = sym('r',[1,dim_r]);
 
-% One hidden layer with tanh to bound theta in [-1,1]
-net = transpose( tanh( ...
-    t*reshape(r(1:dim_t*d1),[dim_t,d1])+r(dim_t*d1+1:dim_t*d1+d1))*reshape(r(dim_t*d1+d1+1:dim_t*d1+d1+dim_theta*d1),d1,dim_theta)+r(end-dim_theta+1:end));
+if strcmp(param_type, 'NN') % Neural network manifold
+    d1 = 3; % Hidden layer size
+    dim_r = dim_t*d1+d1+d1*dim_theta+dim_theta;
+    r = sym('r',[1,dim_r]);
 
-% Do not do theta(1) = net(1) or the subs(theta) below won't work
-for i = 1 : dim_theta
-    eval(['theta' num2str(i) ' =  ' 'net(' num2str(i) +');']);
+    % One hidden layer with tanh to bound theta in [-1,1]
+    net = transpose( tanh( ...
+        t*reshape(r(1:dim_t*d1),[dim_t,d1])+r(dim_t*d1+1:dim_t*d1+d1))*reshape(r(dim_t*d1+d1+1:dim_t*d1+d1+dim_theta*d1),d1,dim_theta)+r(end-dim_theta+1:end));
+
+    % Do not do theta(1) = net(1) or the subs(theta) below won't work
+    for i = 1 : dim_theta
+        eval(['theta' num2str(i) ' =  net(' num2str(i) ');']);
+    end
+elseif strcmp(param_type, 'QUAD') % Quadratic manifold
+    dim_r = 3*dim_theta;
+    r = sym('r',[1,dim_r]);
+    i_r = 1;
+    for i = 1 : dim_theta
+        eval(['theta' num2str(i) ' = r(' num2str(i_r)  ')+ r(' num2str(i_r+1) ')*t + r(' num2str(i_r+2) ')*t^2;'])
+        i_r = i_r+3;
+    end
+elseif strcmp(param_type, 'LIN') % Linear manifold
+    dim_r = 2*dim_theta;
+    r = sym('r',[1,dim_r]);
+    i_r = 1;
+    for i = 1 : dim_theta
+        eval(['theta' num2str(i) ' = r(' num2str(i_r)  ')+ r(' num2str(i_r+1) ')*t;'])
+        i_r = i_r+2;
+    end
 end
 
 theta = subs(theta);

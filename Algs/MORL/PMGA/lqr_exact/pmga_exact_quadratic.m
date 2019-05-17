@@ -3,8 +3,7 @@ clear all
 close all
 reset(symengine)
 
-utopia = 1e-8*[1,1]; % 0 would cause numerical problems
-antiutopia = [350,350];
+rng(1)
 
 
 %% Parse settings 
@@ -13,11 +12,15 @@ indicator = {'antiutopia'};
 indicator = {'pareto'};
 indicator = {'mix1', 1.5}; % MIX1: I_AU * (1 - lambda * I_P)
 indicator = {'mix2', [3,1]}; % MIX2: beta1 * I_AU / I_U - beta2
-indicator = {'mix3', 1}; % MIX3: I_AU * (1 - lambda * I_U)
-param_type = 'NN';
+indicator = {'mix3', 0.5}; % MIX3: I_AU * (1 - lambda * I_U)
+param_type = 'QUAD';
 
 [J, theta, rho, t, D_theta_J, D2_theta_J, D_t_theta, D_rho_theta, I, I_params, AUp, Up] = ...
-    settings_quadratic( indicator{1} );
+    settings_quadratic( indicator{1}, param_type );
+
+dim_theta = size(theta,1);
+utopia = -1e-8*[1,1]; % 0 would cause numerical problems
+antiutopia = dim_theta*[4,4];
 
 switch indicator{1}
     case 'utopia' , params = num2cell(utopia,1);
@@ -89,7 +92,7 @@ while true
 
     fprintf('Iter: %d, L: %.4f, Norm: %.3f\n', iter, L_eval, norm(D_L_eval));
 
-    if norm(D_L_eval) < tolerance || lrate < 1e-8
+    if norm(D_L_eval) < 0 || lrate < 0
         rho_history = [rho_history; rho_learned];
         L_history = [L_history; L_eval];
         break
@@ -125,26 +128,27 @@ ylabel 'L(\rho)'
 
 
 %% Plot front in the parameters space over time
-theta_fun = matlabFunction(theta);
-points = linspace(0,1,n_points_plot);
-figure
-for j = 1 : size(rho_history,1)
-    clf, hold all
-    rho_arg = num2cell(rho_history(j,:));
-    theta_learned = theta_fun(rho_arg{:},points);
-    plot(theta_learned(1,:),theta_learned(2,:),'r')
-    xlabel '\theta_1'
-    ylabel '\theta_2'
-    title 'Frontier in the Policy Parameters Space'
-    drawnow
+if size(theta,1) == 2
+    theta_fun = matlabFunction(theta);
+    points = linspace(0,1,n_points_plot);
+    figure
+    for j = 1 : 10 : size(rho_history,1)
+        clf, hold all
+        rho_arg = num2cell(rho_history(j,:));
+        theta_learned = theta_fun(rho_arg{:},points);
+        plot(theta_learned(1,:),theta_learned(2,:),'r')
+        xlabel '\theta_1'
+        ylabel '\theta_2'
+        title 'Frontier in the Policy Parameters Space'
+        drawnow
+    end
 end
-
 
 %% Plot front in the objectives space over time
 J_fun = matlabFunction(J);
 points = linspace(0,1,n_points_plot);
 figure
-for j = 1 : size(rho_history,1)
+for j = 1 : 10 : size(rho_history,1)
     clf, hold all
     rho_arg = num2cell(rho_history(j,:));
     front_learned = J_fun(rho_arg{:},points');
