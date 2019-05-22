@@ -1,6 +1,6 @@
 function Phi = basis_krbf(n_centers, range, offset, state)
 % BASIS_KRBF Kernel Radial Basis Functions. 
-% Phi = exp( (state - centers)' * B * (state - centers) ), 
+% Phi = exp( -(state - centers)' * B * (state - centers) ), 
 % where B is a diagonal matrix denoting the bandwiths of the kernels.
 % Centers are uniformly placed in RANGE and bandwidths are automatically 
 % computed. See the code for more details.

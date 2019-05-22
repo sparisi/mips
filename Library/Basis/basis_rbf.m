@@ -1,6 +1,6 @@
 function Phi = basis_rbf(centers, widths, offset, state)
 % BASIS_RBF Radial Basis Functions. 
-% Phi = exp( (state - centers)' * B * (state - centers) ), 
+% Phi = exp( -(state - centers)' * B * (state - centers) ), 
 % where B is a diagonal matrix denoting the bandwiths of the kernels.
 %
 %    INPUT
