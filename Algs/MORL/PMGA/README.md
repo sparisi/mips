@@ -31,6 +31,6 @@ The implemented indicators are:
 - *utopia* (I<sub>U</sub>)     : distance from utopia
 - *antiutopia* (I<sub>A</sub>) : distance from antiutopia
 - *pareto* (I<sub>P</sub>)     : Pareto-ascent norm (not implemented for the sampled version)
-- *mix1* (I<sub>M1</sub>)      : I<sub>A</sub>(1 - I<sub>P</sub>) (not implemented for the sampled version)
-- *mix2* (I<sub>M2</sub>)      : I<sub>1</sub>I<sub>A</sub>/I<sub>U</sub> - I<sub>2</sub>
-- *mix3* (I<sub>M3</sub>)      : I<sub>A</sub>(1 - I<sub>U</sub>)
+- *mix1* (I<sub>M1</sub>)      : I<sub>A</sub>(1 - &beta;I<sub>P</sub>) (not implemented for the sampled version)
+- *mix2* (I<sub>M2</sub>)      : &beta;<sub>1</sub>I<sub>A</sub>/I<sub>U</sub> - &beta;<sub>2</sub>
+- *mix3* (I<sub>M3</sub>)      : I<sub>A</sub>(1 - &beta;I<sub>U</sub>)
