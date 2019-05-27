@@ -36,7 +36,9 @@ D_r_Dtheta = reshape(D_r_Dtheta,dim_theta*dim_t,dim_rho);
 
 %% Learning settings
 tolerance = 0.00001;
-lrate = 0.5;
+lrate = 0.01;
+optim = ADAM(dim_rho);
+optim.alpha = lrate;
 
 episodes = 50;
 steps = 50;
@@ -83,13 +85,10 @@ while iter < MAX_ITER
     D_L_eval = D_L_eval * volume;
     
     % Update
-    fprintf('Iter: %d, L: %.4f, Norm: %.3f\n', iter, L_eval, norm(D_L_eval));
+    fprintf('%d) Loss (learn): %.4f, Norm: %.3f\n', iter, L_eval, norm(D_L_eval));
     L_history = [L_history; L_eval];
-    
-    lambda = sqrt(D_L_eval * eye(dim_rho) * D_L_eval' / (4 * lrate));
-    lambda = max(lambda,1e-8); % to avoid numerical problems
-    stepsize = 1 / (2 * lambda);
-    rho_learned = rho_learned + D_L_eval * stepsize;
+%     rho_learned = rho_learned + D_L_eval / norm(D_L_eval) * lrate;
+    rho_learned = optim.step(rho_learned, -D_L_eval);
     
     iter = iter + 1;
 
@@ -103,6 +102,7 @@ else
 %     hypervfun = @(varargin)mexHypervolume(varargin{:},antiutopia,utopia,1e6);
     hypervfun = @(varargin)hypervolume(varargin{:},antiutopia,utopia,1e6);
 end
+hv_ref = hypervfun(true_front);
 
 n_points_eval = 100;
 t_points_eval = linspacesim(lo, hi, n_points_eval);
@@ -137,11 +137,12 @@ for j = 1 : 1 : size(rho_history,1)
         plot(front_learned(:,1),front_learned(:,2),'r')
     end
     
+    l(j) = sum(ind_handle(front_learned));
     front_learned = pareto(front_learned);
     hv(j) = hypervfun(front_learned);
-    l(j) = eval_loss(front_learned,mdp);
-    fprintf('%d ) Hyperv: %.4f, Loss: %.4f\n',j,hv(j),l(j));
+    fprintf('%d ) Hyperv: %.4f / %.4f, Loss: %.4f\n',j,hv(j),hv_ref,l(j));
 
+    title(num2str(j))
     drawnow limitrate
     
 end
