@@ -39,22 +39,21 @@ end
 D_theta_J = jacobian(J,theta);
 D2_theta_J = jacobian(D_theta_J(:),theta);
 
+dim_r = 9;
+r = sym('r',[1,dim_r]);
 if strcmp(param_type, 'P1') % Unconstrained
-    k1_1 = sym('-1/(1+exp(r1 + r2*t1 + r3*t2))');
-    k2_2 = sym('-1/(1+exp(r4 + r5*t1 + r6*t2))');
-    k3_3 = sym('-1/(1+exp(r7 + r8*t1 + r9*t2))');
-    dim_r = 9;
+    k1_1 = -1./(1+exp(r(1) + r(2)*t(1) + r(3)*t(2)));
+    k2_2 = -1./(1+exp(r(4) + r(5)*t(1) + r(6)*t(2)));
+    k3_3 = -1./(1+exp(r(7) + r(8)*t(1) + r(9)*t(2)));
 elseif strcmp(param_type, 'P2') % Constrained
-    k1_1 = sym('-1/(1+exp(1.151035476+r1*t1-(-r2+3.338299811)*t2-r1*t1^2-r2*t2^2-r3*t2*t1))');
-    k2_2 = sym('-1/(1+exp(1.151035476-(-r4+3.338299811)*t1+r5*t2-r4*t1^2-r5*t2^2-r6*t1*t2))');
-    k3_3 = sym('-1/(1+exp(-2.187264336-(-r7-3.338299811)*t1-(-r8-3.338299811)*t2-r7*t1^2-r8*t2^2-r9*t1*t2))');
-    dim_r = 9;
+    k1_1 = -1./(1+exp(1.151035476+r(1)*t(1)-(-r(2)+3.338299811)*t(2)-r(1)*t(1)^2-r(2)*t(2)^2-r(3)*t(2)*t(1)));
+    k2_2 = -1./(1+exp(1.151035476-(-r(4)+3.338299811)*t(1)+r(5)*t(2)-r(4)*t(1)^2-r(5)*t(2)^2-r(6)*t(1)*t(2)));
+    k3_3 = -1./(1+exp(-2.187264336-(-r(7)-3.338299811)*t(1)-(-r(8)-3.338299811)*t(2)-r(7)*t(1)^2-r(8)*t(2)^2-r(9)*t(1)*t(2)));
 else
     error('Unknown parameterization.');
 end
 
 K = subs(K);
-r = sym('r',[1,dim_r]);
 theta = subs(theta);
 D_t_theta = jacobian(theta,t);
 J = subs(J);

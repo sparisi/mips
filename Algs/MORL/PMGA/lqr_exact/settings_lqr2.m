@@ -40,13 +40,15 @@ D_theta_J = jacobian(J,theta);
 D2_theta_J = jacobian(D_theta_J(:),theta);
 
 if strcmp(param_type, 'P1') % Unconstrained
-    k1_1 = sym('-1/(1+exp(r1+r2*t))');
-    k2_2 = sym('-1/(1+exp(r3+r4*t))');
     dim_r = 4;
+    r = sym('r',[1,dim_r]);
+    k1_1 = -1./(1+exp(r(1)+r(2)*t));
+    k2_2 = -1./(1+exp(r(3)+r(4)*t));
 elseif strcmp(param_type, 'P2') % Constrained
-    k1_1 = sym('-1/(1+exp(-2.18708-r1*t^2+(3.33837+r1)*t))');
-    k2_2 = sym('-1/(1+exp(1.15129-r2*t^2+(-3.33837+r2)*t))');
     dim_r = 2;
+    r = sym('r',[1,dim_r]);
+    k1_1 = -1./(1+exp(-2.18708-r(1)*t^2+(3.33837+r(1))*t));
+    k2_2 = -1./(1+exp(1.15129-r(2)*t^2+(-3.33837+r(2))*t));
 elseif strcmp(param_type, 'NN') % Neural network (unconstrained)
     dim_theta = length(theta);
     dim_t = length(t);
