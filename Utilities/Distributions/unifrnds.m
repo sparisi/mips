@@ -1,7 +1,6 @@
 function r = unifrnds(a, b, n)
 % UNIFRNDS Draws N random values from an uniform distribution in the 
-% simplex of [A,B], i.e., R ~ U(A, B) such that sum(R_i) = 1 
-% with i = 1 ... D, where D is the dimensionality of x.
+% simplex of [A,B].
 %
 %    INPUT
 %     - a : lower bound, vector of length D

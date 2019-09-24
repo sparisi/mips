@@ -7,7 +7,7 @@ close all
 
 rng(2)
 
-mdp = Gridworld;
+mdp = GridworldSparse;
 % mdp = DeepSeaTreasure;
 % mdp = Resource;
 
@@ -37,9 +37,11 @@ policy.drawAction = @(s)myunidrnd(mdp.actionLB,mdp.actionUB,size(s,2));
 maxepisodes = 10000;
 maxsteps = 100;
 totsteps = 1;
-epsilon = 0.2;
+epsilon = 0.9;
 
 for episode = 1 : maxepisodes
+    
+    epsilon = epsilon * 0.9999;
     
     step = 0;
     state = mdp.initstate(1);

@@ -12,9 +12,9 @@ plot_every = 5; % plots data with the following indices [1, 5, 10, ..., end]
 mov_avg = 1; % computes moving avg to smooth the plot
 
 %% Change entries according to your needs
-folder = 'data';
+folder = '.';
 separator = '_';
-filenames = {'alg1', 'alg2'};
+filenames = {'true', 'false'};
 
 if isempty(filenames) % automatically identify algorithms name
     allfiles = dir(fullfile(folder,'*.mat'));
@@ -22,7 +22,7 @@ if isempty(filenames) % automatically identify algorithms name
         tmpname = allfiles(i).name(1:end-4); % remove .mat from string
         trial_idx = strfind(tmpname, separator); % find separator
         tmpname = tmpname(1:trial_idx(end)-1); % remove trial idx from string
-        if isempty(filenames) || ~strcmp(filenames{end}, tmpname) % if new name, add it
+        if (isempty(filenames) || ~strcmp(filenames{end}, tmpname) ) && ~any(strcmp(filenames, tmpname)) % if new name, add it
             filenames{end+1} = tmpname;
         end
     end

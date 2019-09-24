@@ -36,6 +36,7 @@ classdef CollectRewards2 < MDP
         %% Simulator
         function state = init(obj, n)
             state = repmat([0;0],1,n); % Fixed
+%             state = 40*(rand(2,n)-0.5);
         end
         
         function [nextstate, reward, absorb] = simulator(obj, state, action)
@@ -56,6 +57,8 @@ classdef CollectRewards2 < MDP
             end
             
             reward = reward - 0.01*sum(action.^2,1);
+
+            if obj.realtimeplot, obj.updateplot(nextstate), end
         end
         
     end

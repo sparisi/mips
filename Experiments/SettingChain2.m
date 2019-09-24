@@ -3,7 +3,7 @@ close all
 
 %% ===================================================================== %%
 %  ======================== LOW LEVEL SETTINGS =========================  %
-mdp = Chainwalk2;
+mdp = ChainwalkContBonus;
 robj = 1;
 
 % bfs = @(varargin) basis_poly(2, mdp.dstate, 0, varargin{:});

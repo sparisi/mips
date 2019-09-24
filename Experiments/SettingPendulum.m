@@ -1,6 +1,7 @@
 clear all
 close all
 
+rng(1)
 
 %% ===================================================================== %%
 %  ======================== LOW LEVEL SETTINGS =========================  %
@@ -29,7 +30,7 @@ Sigma0high = 100 * eye(n_params);
 Sigma0high = Sigma0high + diag(abs(mu0)).^2;
 Sigma0high = nearestSPD(Sigma0high);
 policy_high = GaussianConstantChol(n_params, mu0, Sigma0high);
-% policy_high = GaussianConstantDiag(n_params, mu0, Sigma0high);
+policy_high = GaussianConstantDiag(n_params, mu0, Sigma0high);
 
 
 %% ===================================================================== %%

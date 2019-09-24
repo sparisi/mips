@@ -17,10 +17,10 @@ bfs = @(varargin)basis_poly(1,dim,0,varargin{:});
 A0 = zeros(dim,bfs()+1);
 Sigma0 = 5*eye(dim);
 % policy = GaussianLinearChol(bfs, dim, A0, Sigma0);
-% policy = GaussianLinearDiag(bfs, dim, A0, Sigma0);
+policy = GaussianLinearDiag(bfs, dim, A0, Sigma0);
 % policy = GaussianLinearFixedvar(bfs, dim, A0, Sigma0);
 % policy = GaussianLinearFixedvarDiagmean(bfs, dim, A0(:,2:end), Sigma0);
-policy = GaussianLinearFixedvarDiagmean(bfs, dim, -diag(rand(dim,1))*0.1, Sigma0);
+% policy = GaussianLinearFixedvarDiagmean(bfs, dim, -diag(rand(dim,1))*0.1, Sigma0);
 
 
 %% ===================================================================== %%

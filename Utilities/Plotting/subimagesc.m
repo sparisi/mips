@@ -14,9 +14,9 @@ nrows = floor(sqrt(nplots));
 ncols = ceil(nplots/nrows);
 
 fig = findobj('type','figure','name',name);
+if nargin == 4, addcolorbar = 0; end
 
 if isempty(fig)
-    if nargin == 4, addcolorbar = 0; end
     figure('Name',name);
     for i = nplots : -1 : 1
         subplot(nrows,ncols,i,'align')

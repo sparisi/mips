@@ -22,7 +22,7 @@ if isempty(filenames) % automatically identify algorithms name
         tmpname = allfiles(i).name(1:end-4); % remove .mat from string
         trial_idx = strfind(tmpname, separator); % find separator
         tmpname = tmpname(1:trial_idx(end)-1); % remove trial idx from string
-        if isempty(filenames) || ~strcmp(filenames{end}, tmpname) % if new name, add it
+        if (isempty(filenames) || ~strcmp(filenames{end}, tmpname) ) && ~any(strcmp(filenames, tmpname)) % if new name, add it
             filenames{end+1} = tmpname;
         end
     end

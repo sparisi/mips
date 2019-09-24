@@ -6,6 +6,7 @@ clear all
 close all
 
 mdp = Gridworld;
+mdp = GridworldSparse;
 % mdp = DeepSeaTreasure;
 % mdp = Resource;
 

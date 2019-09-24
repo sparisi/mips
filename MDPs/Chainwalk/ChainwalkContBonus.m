@@ -1,5 +1,5 @@
-classdef Chainwalk2 < MDP
-% Continuous chainwalk with linear dynamics.
+classdef ChainwalkContBonus < MDP
+% Continuous chainwalk with simple dynamics.
 % Starting state is always in 0.
 % Goal state is also fixed.
 % A random bonus state is places either behind the start or the goal.
@@ -14,13 +14,14 @@ classdef Chainwalk2 < MDP
         dreward = 1;
         isAveraged = 0;
         gamma = 0.99;
-        dt = 0.1;
+        dt = 0.05;
+        tol = 0.05;
         
         % Bounds
         stateLB = [-1, -1, -1]'; % [x, x_dot, bonus_pos]
         stateUB = [1, 1, 1]';
-        actionLB = -0.1; % acc
-        actionUB = 0.1;
+        actionLB = -1; % acc
+        actionUB = 1;
         rewardLB = 0;
         rewardUB = 1;
 
@@ -33,7 +34,8 @@ classdef Chainwalk2 < MDP
         
         %% Simulator
         function state = init(obj, n)
-            state = zeros(1,n);
+            if nargin == 1, n = 1; end
+            state = zeros(2,n);
             r = randi(2,1,n);
             state(3,:) = obj.bonus_states(r);
         end
@@ -47,22 +49,23 @@ classdef Chainwalk2 < MDP
             xd = state(2,:);
             xd_next = xd + obj.dt * action;
             x_next = x + obj.dt * xd;
-            close_bonus = abs(state(1,:) - state(3,:)) < 0.01 & abs(state(2,:)) < 0.01;
+            close_bonus = abs(state(1,:) - state(3,:)) < obj.tol & abs(state(2,:)) < obj.tol;
             bonus_next = state(3,:).*~close_bonus + obj.goal_state.*close_bonus; % if the bonus is picked, overlap it with the goal
             nextstate = [x_next; xd_next; bonus_next];
             nextstate = bsxfun(@max, bsxfun(@min,nextstate,obj.stateUB), obj.stateLB);
         end
         
         function reward = reward(obj, state, action, nextstate)
-            reward = zeros(1,size(state,2));
-            close_bonus = abs(state(1,:) - state(3,:)) < 0.01 & abs(state(2,:)) < 0.01;
-            close_goal = abs(state(1,:) - obj.goal_state) < 0.01 & abs(state(2,:)) < 0.01;
+            reward = zeros(1,size(nextstate,2));
+            close_bonus = abs(nextstate(1,:) - nextstate(3,:)) < obj.tol & abs(nextstate(2,:)) < obj.tol;
+            close_goal = abs(nextstate(1,:) - obj.goal_state) < obj.tol & abs(nextstate(2,:)) < obj.tol;
             reward(close_bonus) = 1;
             reward(close_goal) = 0.5; % this will overwrite the bonus if the bonus has been picked and placed to the goal
+%             reward = reward - 0.001 * action.^2;
         end
         
         function absorb = isterminal(obj, state)
-            absorb = abs(state(1,:) - obj.goal_state) < 0.01 & abs(state(2,:)) < 0.01;
+            absorb = abs(state(1,:) - obj.goal_state) < obj.tol & abs(state(2,:)) < obj.tol;
         end
         
     end

@@ -53,6 +53,16 @@ classdef (Abstract) MDP < handle
             if ~isvalid(obj.handleEnv), obj.initplot(); end
         end
         
+        function pauseplot(obj)
+        % Pauses the plotting procedure.
+            obj.realtimeplot = 0;
+        end
+        
+        function resumeplot(obj)
+        % Resumes the plotting procedure.
+            obj.realtimeplot = 1;
+        end
+        
         function closeplot(obj)
         % Closes the plots and stops the plotting procedure.
             obj.realtimeplot = 0;

@@ -64,6 +64,8 @@ classdef CollectRewards < MDP
             
             reward = reward - 0.01*sum(action.^2,1);
             absorb(idx_close & idx_notcollected) = true; % Last (biggest) reward is terminal state
+
+            if obj.realtimeplot, obj.updateplot(nextstate), end
         end
         
     end
