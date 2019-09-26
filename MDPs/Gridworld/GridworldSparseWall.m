@@ -1,11 +1,12 @@
-classdef GridworldSparseBig < MDP
-% Bigger grid and more sparse rewards.
+classdef GridworldSparseWall < MDP
+% Like GridworldSparse, but with a wall which makes it harder to reach the
+% highest reward.
     
     %% Properties
     properties
         % Environment variables
-        reward = zeros(100,100);
-        isopen = ones(100,100);
+        reward = zeros(50,50);
+        isopen = ones(50,50);
         
         probT = [1, 0, 0];
 %         probT = [0.8, 0.15, 0.05];
@@ -17,7 +18,7 @@ classdef GridworldSparseBig < MDP
         % a+b+c = 1
         
         % Finite states and actions
-        allstates = allcomb(1:100, 1:100);
+        allstates = allcomb(1:50, 1:50);
         allactions = [0  0  -1  1
                      -1 1   0  0]; % Left right up down
 
@@ -30,7 +31,7 @@ classdef GridworldSparseBig < MDP
         
         % Bounds
         stateLB = [1 1]';
-        stateUB = [100 100]';
+        stateUB = [50 50]';
         actionLB = 1;
         actionUB = 4;
         rewardLB
@@ -40,18 +41,19 @@ classdef GridworldSparseBig < MDP
     methods
         
         %% Constructor
-        function obj = GridworldSparseBig()
-            obj.reward(100,100) = 1000;
+        function obj = GridworldSparseWall()
+            obj.reward(50,50) = 500;
             obj.reward(10,22) = 15;
             obj.reward(22,24) = 3;
             obj.reward(31,8) = 22;
             obj.reward(30,30) = -20;
-            obj.reward(40,20) = -15;
-            obj.reward(20,40) = -15;
-            obj.reward(30,60) = 45;
-            obj.reward(35,63) = -45;
+            obj.reward(38,20) = -15;
+            obj.reward(20,38) = -15;
             obj.rewardLB = min(obj.reward(:));
             obj.rewardUB = max(obj.reward(:));
+            
+            obj.isopen(40,1:40) = 0;
+            obj.isopen(5:40,40) = 0;
         end
         
         %% Simulator
@@ -86,7 +88,7 @@ classdef GridworldSparseBig < MDP
         end
         
     end
-        
+
     %% Plotting
     methods(Hidden = true)
 
@@ -94,6 +96,7 @@ classdef GridworldSparseBig < MDP
             obj.handleEnv = figure(); hold all
             
             cells = obj.reward;
+            cells(~obj.isopen) = -100;
             h = image(flipud(cells)); % Plot environment
 
             imggrid(h,'k',0.5); % Add grid
@@ -101,11 +104,13 @@ classdef GridworldSparseBig < MDP
             cells = flipud(cells)';
             [rows,cols] = find(cells);
             for i = 1 : length(rows) % Add value
-                text('position', [rows(i) cols(i)], ...
-                    'fontsize', 10, ...
-                    'string', num2str(cells(rows(i),cols(i))), ...
-                    'color', 'red', ...
-                    'horizontalalignment', 'center')
+                if ~ (cells(rows(i),cols(i)) == -100)
+                    text('position', [rows(i) cols(i)], ...
+                        'fontsize', 10, ...
+                        'string', num2str(cells(rows(i),cols(i))), ...
+                        'color', 'red', ...
+                        'horizontalalignment', 'center')
+                end
             end
             
             axis off

@@ -1,4 +1,5 @@
 classdef GridworldSparse < MDP
+% Gridworld with sparse reward (0 everywhere, except for few cells).
     
     %% Properties
     properties
