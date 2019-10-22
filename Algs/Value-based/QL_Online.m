@@ -100,5 +100,5 @@ end
 
 
 %% Show
-policy_eval.drawAction = @(s)egreedy( Q(ismember(allstates,s','rows'),:)', 0 );
+policy_eval.drawAction = @(s)egreedy( Q(mdp.get_state_idx(s),:)', 0 ); 
 show_simulation(mdp, policy_eval, 1000, 0.05)

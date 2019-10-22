@@ -30,6 +30,14 @@ classdef (Abstract) MDP < handle
     end
         
     methods
+        function idx = get_state_idx(obj, s)
+        % Return a vector with the indices of the the states s wrt their 
+        % tabular representation, i.e., obj.allstates(idx,:) = s
+        % ONLY FOR MDP WITH DISCRETE STATES
+        % S must be [dS x N].
+            [~, idx] = ismember(s', obj.allstates, 'rows');
+        end
+        
         function state = initstate(obj,n)
         % Return N initial states.
             if nargin == 1, n = 1; end

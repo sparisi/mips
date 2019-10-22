@@ -112,5 +112,5 @@ end
 
 %% Show
 Qavg = (Q1 + Q2) / 2;
-policy_eval.drawAction = @(s)egreedy( Qavg(ismember(allstates,s','rows'),:)', 0 );
+policy_eval.drawAction = @(s)egreedy( Qavg(mdp.get_state_idx(s),:)', 0 ); 
 show_simulation(mdp, policy_eval, 1000, 0.1)
