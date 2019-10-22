@@ -10,7 +10,7 @@ t = [data.t];
 t(end+1) = 1;
 R = zeros(size(r));
 
-for k = size(R,2) : -1 : 1
+for k = length(t)-1 : -1 : 1
     if t(k+1) == 1 % Next state is a new episode init state
         R(k) = r(k);
     else

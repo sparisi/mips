@@ -24,7 +24,7 @@ A = zeros(size(V));
 
 if nargin == 4 || isempty(prob_ratio), prob_ratio = ones(size(V)); end
 
-for k = size(V,2) : -1 : 1
+for k = length(t)-1 : -1 : 1
     if t(k+1) == 1 % Next state is a new episode init state
         A(k) = prob_ratio(k) * (r(k) - V(k));
     else

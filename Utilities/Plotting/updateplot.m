@@ -1,4 +1,4 @@
-function updateplot(name, newX, newY, cursorOn)
+function updateplot(name, newX, newY, cursorOn, legendOn)
 % UPDATEPLOT Updates 2d plots with new points.
 %
 %    INPUT
@@ -6,6 +6,7 @@ function updateplot(name, newX, newY, cursorOn)
 %     - newX     : cell array of new single X-coord (one element per plot)
 %     - newY     : cell array of new single Y-coord (one element per plot)
 %     - cursorOn : (optional) any to show the coordinates of the new points
+%     - legendOn : (optional) any to show legend
 %
 % =========================================================================
 % EXAMPLE
@@ -32,14 +33,20 @@ if isempty(fig)
     hold all
     for i = 1 : numel(newX)
         dataObjs = plot(newX{i}, newY{i});
-        if nargin == 4
-            set(dataObjs, 'UserData', cursorMode.createDatatip(dataObjs));
+        if nargin > 3
+            if ~isempty(cursorOn)
+                set(dataObjs, 'UserData', cursorMode.createDatatip(dataObjs));
+            end
         end
     end
     
     hold off
     title(name)
-    legend show
+    if nargin > 4
+        if ~isempty(legendOn)
+            legend show
+        end
+    end
     return
 end
 
