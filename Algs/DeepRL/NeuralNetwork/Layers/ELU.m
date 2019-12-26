@@ -8,6 +8,7 @@ classdef ELU < Layer
         
         function obj = ELU(alpha)
             obj.W = [];
+            if nargin == 0, alpha = 1; end
             obj.alpha = alpha;
         end
         

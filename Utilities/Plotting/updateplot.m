@@ -31,7 +31,7 @@ if isempty(fig)
     set(cursorMode, 'enable', 'on');
     
     hold all
-    for i = 1 : numel(newX)
+    for i = numel(newX) : -1 : 1
         dataObjs = plot(newX{i}, newY{i});
         if nargin > 3
             if ~isempty(cursorOn)

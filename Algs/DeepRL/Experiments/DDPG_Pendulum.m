@@ -1,6 +1,8 @@
 clear
 close all
 
+rng(1)
+
 %% Get problem specification
 mdp = Pendulum;
 episodes_eval = 500;

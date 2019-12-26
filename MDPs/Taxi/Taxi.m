@@ -49,6 +49,7 @@ classdef Taxi < MDP
         
         %% Simulator
         function state = init(obj, n)
+            if nargin == 1, n = 1; end
             state = ones(2,n);
             state = [state; zeros(3,n)];
         end
@@ -84,7 +85,7 @@ classdef Taxi < MDP
             nextstate(5,:) = has_p3;
             
             % Check if absorb
-            absorb = (nextstate(1,:) == obj.dest(1)) & (nextstate(2,:) == obj.dest(2));
+            absorb = (state(1,:) == obj.dest(1)) & (state(2,:) == obj.dest(2));
 
             % Reward function
             n_p = has_p1 + has_p2 + has_p3;

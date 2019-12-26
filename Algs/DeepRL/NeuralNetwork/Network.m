@@ -20,10 +20,14 @@ classdef Network < handle
                    obj.L = [obj.L ...
                        feval(activs{i-1}), Lin(dims(i),dims(i+1)), Bias(dims(i+1))];
                end
-               obj.L(end).W = (rand(size(obj.L(end).W))-0.5)/1000;
-               obj.L(end-1).W(:) = (rand(size(obj.L(end-1).W))-0.5)/1000;
                obj.W = cat(2,obj.L.W);
            end
+       end
+
+       function init_output_to(obj, value)
+           obj.L(end).W = (rand(size(obj.L(end).W))-0.5)*1e-12 + value;
+           obj.L(end-1).W(:) = (rand(size(obj.L(end-1).W))-0.5)*1e-12;
+           obj.W = cat(2,obj.L.W);
        end
        
        function set_output(obj, activation)

@@ -7,7 +7,7 @@ classdef CollectRewards2 < MDP
     %% Properties
     properties
         reward_radius = 1;
-        reward_states = [1 1; -2 3; 10 -2; 20 20]';
+        reward_states = [2 2; -2 3; 10 -2; 20 20]';
         reward_magnitude = [2, 4, 10, 50];
 
         % MDP variables
@@ -35,7 +35,9 @@ classdef CollectRewards2 < MDP
         
         %% Simulator
         function state = init(obj, n)
+            if nargin == 1, n = 1; end
             state = repmat([0;0],1,n); % Fixed
+            state = randn(2,n);
 %             state = 40*(rand(2,n)-0.5);
         end
         
@@ -56,7 +58,7 @@ classdef CollectRewards2 < MDP
                 absorb(idx_close) = true; % Any reward is terminal
             end
             
-            reward = reward - 0.01*sum(action.^2,1);
+%             reward = reward - 0.01*sum(action.^2,1);
 
             if obj.realtimeplot, obj.updateplot(nextstate), end
         end
