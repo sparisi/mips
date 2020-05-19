@@ -1,4 +1,4 @@
-% This script iterative loads data from .dat files located in FOLDER into 
+% This script iteratively loads data from .dat files located in FOLDER into 
 % a matrix, and plots the column VAR_IDX. 
 
 close all

@@ -2,18 +2,19 @@
 % all .mat files located in a specific FOLDER.
 
 close all
+clear all
 
 folder = 'data/';
 Files = dir(fullfile(folder,'*.mat'));
-
 varname = 'J_history';
 varbound = -inf;
 
 figure, hold all, title(varname, 'interpreter', 'none')
+
 for current_file = {Files.name}
     load([folder current_file{:}], varname);
     try
-        plot(max(eval(varname), varbound))
+        plot(max(eval(varname), varbound), 'linewidth',2)
     catch
         warning(['Variable "' varname '" does not exist in file "' current_file{:} '".'])
     end

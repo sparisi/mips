@@ -38,7 +38,7 @@ for i = 1 : n
 end
 
 % Write video
-v = VideoWriter(filename);
+v = VideoWriter(filename, 'MPEG-4');
 v.FrameRate = 1/dt;
 open(v)
 writeVideo(v,F)
