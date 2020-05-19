@@ -1,7 +1,7 @@
 % Learning: sampled
 % Evaluation: exact
 
-%% Init
+%% Init vars
 clear all
 reset(symengine)
 
@@ -17,11 +17,16 @@ antiutopia = mdp.antiutopia;
 true_front = mdp.truefront;
 dim_J = mdp.dreward;
 
-param_type = 'P1'; % P1 unconstrained, P2 constrained, NN neural network
-ind_type = {'mix2', [1,1]}; % MIX2: beta1 * I_AU / I_U - beta2
-ind_type = {'mix3', 1}; % MIX3: I_AU * (1 - lambda * I_U)
-[ind_handle, ind_d_handle] = parse_indicator_handle(ind_type{1},ind_type{2},utopia,antiutopia);
+if dim_J == 2
+    hypervfun = @(varargin)hypervolume2d(varargin{:},antiutopia,utopia);
+else
+%     hypervfun = @(varargin)mexHypervolume(varargin{:},antiutopia,utopia,1e5);
+    hypervfun = @(varargin)hypervolume(varargin{:},antiutopia,utopia,1e5);
+end
+hv_ref = hypervfun(true_front);
 
+%% Choose parameterization
+param_type = 'NN'; % P1 unconstrained, P2 constrained, NN neural network
 [theta, rho, t, D_t_theta, D_rho_theta, J_sym] = params_lqr_mo( param_type, mdp.dreward );
 dim_rho = length(rho);
 dim_t = length(t);
@@ -33,20 +38,8 @@ for j = 1 : dim_rho
 end
 D_r_Dtheta = reshape(D_r_Dtheta,dim_theta*dim_t,dim_rho);
 
-if dim_J == 2
-    hypervfun = @(varargin)hypervolume2d(varargin{:},antiutopia,utopia);
-else
-%     hypervfun = @(varargin)mexHypervolume(varargin{:},antiutopia,utopia,1e5);
-    hypervfun = @(varargin)hypervolume(varargin{:},antiutopia,utopia,1e5);
-end
-hv_ref = hypervfun(true_front);
 
 %% Learning settings
-tolerance = 0.00001;
-lrate = 0.01;
-optim = ADAM(dim_rho);
-optim.alpha = lrate;
-
 episodes = 50;
 steps = 50;
 n_points = 10; % #points t used to estimate the integral
@@ -54,14 +47,24 @@ n_points_eval = 500;
 lo = -ones(dim_t,1);
 hi = ones(dim_t,1);
 [~, volume] = simplex(lo,hi);
+t_points_tmp = unifrnds(lo, hi, 10)';
+rho_learned = [1 1 0 0]; % Bad init for P1
+rho_learned = [3 7]; % Bad init for P2
+rho_learned = (rand(1,dim_rho) - 0.5) * 2; % Bad init for everything
+
+tolerance = 0.00001;
+lrate = 0.1;
+optim = ADAM(dim_rho);
+optim.alpha = lrate;
 
 MAX_ITER = 10000;
 
 
 %% Init learning
-rho_learned = [1 1 0 0];
-% rho_learned = [3 7];
-rho_learned = (rand(1,dim_rho)-0.5)*1e-3;
+% ind_type = {'mix2', [1,1]}; % MIX2: beta1 * I_AU / I_U - beta2
+% ind_type = {'mix3', 1}; % MIX3: I_AU * (1 - lambda * I_U)
+ind_type = {'hv', [1,1]}; % Hypervolume contribution
+[ind_handle, ind_d_handle] = parse_indicator_handle(ind_type{1},ind_type{2},utopia,antiutopia);
 
 rho_history = [];
 L_history = [];

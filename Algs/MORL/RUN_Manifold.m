@@ -115,6 +115,7 @@ f_eval = evaluate_policies(mdp, episodes_eval, steps_eval, pol_eval)';
 [f, p] = pareto(f_eval, pol_eval);
 fprintf('Hypervolume: %.4f\n', hyperv(f,antiutopia));
 
+%%
 figure, hold all
 mdp.plotfront(mdp.truefront,'o','DisplayName','True frontier');
 mdp.plotfront(f,'+','DisplayName','Approximate frontier');

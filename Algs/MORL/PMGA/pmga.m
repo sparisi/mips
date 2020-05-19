@@ -1,5 +1,4 @@
 %% Init
-clc
 clear all
 close all
 reset(symengine)
@@ -7,13 +6,15 @@ rng(1)
 
 dim = 3;
 
-% mdp = Dam(dim); bfs = @dam_basis_rbf; mu0 = [50, -50, 0, 0, 50]; sigma0 = 150^2;
-% [theta, rho, t, D_t_theta, D_rho_theta] = feval(['params_' lower(class(mdp))], [], mdp.dreward);
-% policy = GaussianLinearDiag(bfs, mdp.daction, mu0, sigma0);
+% parameterization: P1 constrained, P2 unconstrained, NN neural net
 
-mdp = LQR_MO(dim); bfs = @(varargin)basis_poly(1,dim,0,varargin{:}); mu0 = -0.5*eye(dim); sigma0 = eye(dim);
-[theta, rho, t, D_t_theta, D_rho_theta] = feval(['params_' lower(class(mdp))], 'P1', mdp.dreward);
-policy = GaussianLinearFixedvarDiagmean(bfs, mdp.daction, mu0, sigma0);
+mdp = Dam(dim); bfs = @dam_basis_rbf; mu0 = [50, -50, 0, 0, 50]; sigma0 = 150^2;
+[theta, rho, t, D_t_theta, D_rho_theta] = feval(['params_' lower(class(mdp))], [], mdp.dreward);
+policy = GaussianLinearDiag(bfs, mdp.daction, mu0, sigma0);
+
+% mdp = LQR_MO(dim); bfs = @(varargin)basis_poly(1,dim,0,varargin{:}); mu0 = -0.5*eye(dim); sigma0 = eye(dim);
+% [theta, rho, t, D_t_theta, D_rho_theta] = feval(['params_' lower(class(mdp))], 'P1', mdp.dreward);
+% policy = GaussianLinearFixedvarDiagmean(bfs, mdp.daction, mu0, sigma0);
 
 utopia = mdp.utopia;
 antiutopia = mdp.antiutopia;
@@ -22,6 +23,7 @@ dim_J = mdp.dreward;
 
 ind_type = {'mix2', [1,1]}; % MIX2: beta1 * I_AU / I_U - beta2
 % ind_type = {'mix3', 1}; % MIX3: I_AU * (1 - lambda * I_U)
+ind_type = {'hv', [1,1]}; % Hypervolume contribution
 [ind_handle, ind_d_handle] = parse_indicator_handle(ind_type{1},ind_type{2},utopia,antiutopia);
 
 dim_rho = length(rho);
@@ -36,13 +38,13 @@ D_r_Dtheta = reshape(D_r_Dtheta,dim_theta*dim_t,dim_rho);
 
 %% Learning settings
 tolerance = 0.00001;
-lrate = 0.01;
+lrate = 0.1;
 optim = ADAM(dim_rho);
 optim.alpha = lrate;
 
 episodes = 50;
 steps = 50;
-n_points = 5; % #points t used to estimate the integral
+n_points = 15; % #points t used to estimate the integral
 lo = zeros(dim_t,1);
 hi = ones(dim_t,1);
 [~, volume] = simplex(lo,hi);
@@ -52,7 +54,8 @@ MAX_ITER = 1000;
 
 %% Init learning
 % rho_learned = -20*ones(1,dim_rho);
-rho_learned = rand(1, dim_rho)-0.5;
+% rho_learned = rand(1, dim_rho) - 0.5;
+rho_learned = (rand(1, dim_rho) - 0.5) * 5;
 % rho_learned(end) = 50;
 
 rho_history = [];
@@ -114,7 +117,10 @@ theta_f = matlabFunction(theta);
 
 close all
 figure
-for j = 1 : 1 : size(rho_history,1)
+
+
+%% Plotting
+for j = 1 : 50 : size(rho_history,1)
     
     clf, hold all
 
